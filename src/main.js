@@ -8,6 +8,8 @@ import store from './utils/store'
 import api from './utils/backend-api'
 import appUtil from './utils/app-util'
 
+import firebase from 'firebase'
+
 import VueProgressBar from 'vue-progressbar'
 
 const options = {
@@ -32,6 +34,17 @@ Vue.config.productionTip = false
 window.Store = store
 Vue.prototype.api = api
 Vue.prototype.appUtil = appUtil
+
+// Initialize Firebase
+let config = {
+  apiKey: 'AIzaSyBXnXeRynieZD55-zDCpXD0BlHuQQZHH7c',
+  authDomain: 'vue2crm.firebaseapp.com',
+  databaseURL: 'https://vue2crm.firebaseio.com',
+  projectId: 'vue2crm',
+  storageBucket: 'vue2crm.appspot.com',
+  messagingSenderId: '201150997664'
+}
+firebase.initializeApp(config)
 
 /* eslint-disable no-new */
 new Vue({
