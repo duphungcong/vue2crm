@@ -12,20 +12,18 @@ import Products from '@/components/Products'
 import Product from '@/components/Product'
 
 import Login from '@/components/Login'
+import SignUp from '@/components/SignUp'
 import ChangePassword from '@/components/ChangePassword'
+
+import store from '@/utils/store'
 
 Vue.use(Router)
 
-import auth from '@/utils/auth'
-
 function requireAuth (to, from, next) {
-  if (!auth.loggedIn()) {
-    next({
-      path: '/login',
-      query: { redirect: to.fullPath }
-    })
-  } else {
+  if (store.getters.user !== null && store.getters.user !== undefined) {
     next()
+  } else {
+    next('/login')
   }
 }
 
@@ -47,15 +45,10 @@ export default new Router({
     { path: '/products', component: Products, name: 'Products', beforeEnter: requireAuth },
     { path: '/newproduct', component: Product, name: 'NewProduct', beforeEnter: requireAuth },
     { path: '/login', component: Login, name: 'Login' },
+    { path: '/signup', component: SignUp, name: 'SignUp' },
     { path: '/changePassword', component: ChangePassword, name: 'ChangePassword' },
-    { path: '/logout',
-      beforeEnter (to, from, next) {
-        auth.logout()
-        next('/login')
-      }
-    },
     { path: '/', redirect: '/dashboard' },
-    { path: '*', redirect: '/404' }
+    { path: '*', redirect: '/login' }
   ],
   meta: {
     progress: {

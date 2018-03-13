@@ -44,13 +44,19 @@ let config = {
   storageBucket: 'vue2crm.appspot.com',
   messagingSenderId: '201150997664'
 }
-firebase.initializeApp(config)
 
 /* eslint-disable no-new */
 new Vue({
   el: '#app',
   router,
   store,
-  template: '<App/>',
-  components: { App }
+  render: h => h(App),
+  created () {
+    firebase.initializeApp(config)
+    firebase.auth().onAuthStateChanged((user) => {
+      if (user) {
+        this.$store.dispatch('autoSignIn', user)
+      }
+    })
+  }
 })

@@ -2,13 +2,13 @@
 <v-container fluid >
   <v-layout row wrap>
     <v-flex xs4 offset-xs4 justify-space-between>
-      <h1> &nbsp;</h1>  
+      <h1> &nbsp;</h1>
       <v-card>
           <v-card-title  class="blue darken-1">
-            <h4 style="color:white">Reetek Vue 2 CRM</h4>
+            <h4 style="color:white">Log In</h4>
           </v-card-title>
           <v-card-text>
-              <form @submit.prevent="login">
+              <form @submit.prevent="onLogin">
                 <v-layout row>
                   <v-flex xs4>
                     <v-subheader>User ID</v-subheader>
@@ -22,53 +22,61 @@
                     <v-subheader>Password</v-subheader>
                   </v-flex>
                   <v-flex xs8>
-                    <v-text-field name="password" v-model="pass" label="password" value="Input text" type="password" class="input-group--focused"></v-text-field>
+                    <v-text-field name="password" v-model="password" label="password" value="Input text" type="password" class="input-group--focused"></v-text-field>
                   </v-flex>
                 </v-layout>
-                <v-btn type="submit">login</v-btn>
-                <v-snackbar v-if="error" :timeout="timeout" :top="true" :multi-line="mode === 'multi-line'" :vertical="mode === 'vertical'" v-model="error">
-                  {{ text }}
-                  <v-btn flat class="pink--text" @click.native="error = false">Close</v-btn>
-                </v-snackbar>
+                <v-btn type="submit" :disabled="loading" :loading="loading">login</v-btn>
               </form>
+              <br>
+              <v-layout row>
+                <p>No account? <router-link to="/signup">Create one</router-link></p>
+              </v-layout>
         </v-card-text>
       </v-card>
     </v-flex>
   </v-layout>
   </v-container>
 </template>
-<script>
-import auth from '../utils/auth'
 
+<script>
 export default {
   data () {
     return {
-      email: 'hho@test.com',
-      pass: 'password',
-      error: false,
-      text: ''
+      email: '',
+      password: ''
+    }
+  },
+  computed: {
+    user () {
+      let user = this.$store.getters.user
+      if (user !== null && user !== undefined) {
+        this.$router.push(this.$route.query.redirect || '/')
+      }
+      return user
+    },
+    error () {
+      return this.$store.getters.error
+    },
+    loading () {
+      return this.$store.getters.loading
+    }
+  },
+  watch: {
+    // TODO: check watcher not working
+    user (value) {
+      // if (value !== null && value !== undefined) {
+      //   this.$router.push(this.$route.query.redirect || '/')
+      // }
     }
   },
   methods: {
-    login () {
-      auth.login(this.email, this.pass, (loggedIn, err) => {
-        if (err) {
-          console.log('login', err)
-          this.error = true
-          this.text = err
-        } else if (loggedIn === false) {
-          console.log('login', loggedIn)
-          this.error = true
-          this.text = 'Bad login information'
-        } else {
-          console.log(this.$route)
-          this.$router.push(this.$route.query.redirect || '/')
-        }
-      })
+    onLogin () {
+      this.$store.dispatch('login', {email: this.email, password: this.password})
     }
   }
 }
 </script>
+
 <style lang="stylus">
   @import '../stylus/main'
 </style>

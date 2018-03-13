@@ -1,5 +1,6 @@
 /* globals Store */
 import api from './backend-api'
+import firebase from 'firebase'
 
 export default {
   login (email, pass, cb) {
@@ -17,6 +18,20 @@ export default {
       if (cb) cb(false, err)
       this.onChange(false)
     })
+  },
+  signUpFireBase (email, password, cb) {
+    cb = arguments[arguments.length - 1]
+    firebase.auth().createUserWithEmailAndPassword(email, password).then(
+      (user) => {
+        Store.commit('setUser', user)
+        if (cb) cb(true, null)
+        this.onChange(true)
+      },
+      (err) => {
+        if (cb) cb(false, err)
+        this.onChange(false)
+      }
+    )
   },
   getToken () {
     return Store.state.token
