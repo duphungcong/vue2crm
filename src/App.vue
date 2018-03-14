@@ -39,9 +39,6 @@
               <v-icon>more_vert</v-icon>
             </v-btn>
             <v-list>
-              <!-- <v-list-tile v-for="item in userMenus" :key="item.title" value="true" :to="item.link" router>
-                <v-list-tile-title v-text="item.title"></v-list-tile-title>
-              </v-list-tile> -->
               <v-list-tile @click="onLogOut">Logout</v-list-tile>
             </v-list>
           </v-menu>
@@ -49,6 +46,7 @@
       </v-list>
     </v-navigation-drawer>
     <v-toolbar
+      dense
       color="blue darken-3"
       dark
       app
@@ -96,10 +94,10 @@
       color="pink"
       dark
       fixed
-      @click.stop="dialog = !dialog">
+      @click.stop="sheet = !sheet">
       <v-icon>add</v-icon>
     </v-btn>
-    <v-dialog v-model="dialog" width="800px">
+    <!-- <v-dialog v-model="dialog" width="800px">
       <v-card>
         <v-card-title
           class="grey lighten-4 py-4 title"
@@ -161,7 +159,23 @@
           <v-btn flat @click="dialog = false">Save</v-btn>
         </v-card-actions>
       </v-card>
-    </v-dialog>
+    </v-dialog> -->
+    <v-bottom-sheet v-model="sheet" inset="">
+      <!-- <v-btn slot="activator" color="purple" dark>Click me</v-btn> -->
+      <v-list>
+        <v-list-tile
+          v-for="tile in tiles"
+          :key="tile.title"
+          @click="sheet = false">
+          <v-list-tile-title class="text-xs-right pr-2">{{ tile.title }}</v-list-tile-title>
+          <v-list-tile-avatar>
+            <v-avatar size="32px" tile>
+              <img :src="`https://vuetifyjs.com/static/doc-images/bottom-sheets/${tile.img}`" :alt="tile.title">
+            </v-avatar>
+          </v-list-tile-avatar>
+        </v-list-tile>
+      </v-list>
+    </v-bottom-sheet>
     </template>
   </v-app>
 </template>
@@ -178,6 +192,12 @@
         { icon: 'content_copy', text: 'Customers', link: 'Customers', vertical: 'Customer' },
         { icon: 'settings', text: 'Products', link: 'Products', vertical: 'Product' },
         { icon: 'chat_bubble', text: 'About', link: 'About', vertical: 'About' }
+      ],
+      sheet: false,
+      tiles: [
+        { img: 'keep.png', title: 'NRC' },
+        { img: 'inbox.png', title: 'Spare order' },
+        { img: 'hangouts.png', title: 'Add task card into WP' }
       ]
     }),
     props: {
