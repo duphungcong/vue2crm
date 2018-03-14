@@ -6,215 +6,209 @@
       <router-view></router-view>
     </template>
     <template v-if="userIsAuthenticated">
-      <v-navigation-drawer dark fixed v-model="drawer" app>
-        <!-- mini-variant.sync="true" -->
-        <v-list class="pa-0">
-          <v-list-tile avatar tag="div">
-            <v-list-tile-avatar>
-              <img src="/assets/img/avatar0.png">
-            </v-list-tile-avatar>
-            <v-list-tile-content>
-              <v-list-tile-title>{{ user.id }}</v-list-tile-title>
-            </v-list-tile-content>
-            <v-menu bottom left offset-y origin="bottom right" transition="v-slide-y-transition">
-              <v-btn icon light slot="activator">
-                <v-icon>more_vert</v-icon>
-              </v-btn>
-              <v-list>
-                <v-list-tile v-for="item in userMenus" :key="item.title" value="true" :to="item.link" router>
-                  <v-list-tile-title v-text="item.title"></v-list-tile-title>
-                </v-list-tile>
-                <v-list-tile @click="onLogOut">Logout</v-list-tile>
-              </v-list>
-            </v-menu>
-          </v-list-tile>
-        </v-list>
-        <v-list>
-          <v-list-tile v-for="item in items" :key="item.title" @click.native="clickMenu(item)" router>
+      <v-navigation-drawer
+      fixed
+      :clipped="$vuetify.breakpoint.lgAndUp"
+      app
+      v-model="drawer">
+      <v-list dense>
+        <template v-for="item in items">
+          <v-list-tile :key="item.text" @click="clickMenu(item)" router>
             <v-list-tile-action>
-              <v-icon v-if="activeMenuItem.indexOf(item.vertical) > -1" light v-html="item.icon" class="blue--text"></v-icon>
-              <v-icon v-if="activeMenuItem.indexOf(item.vertical) < 0" dark v-html="item.icon"></v-icon>
+              <v-icon v-if="activeMenuItem.indexOf(item.vertical) > -1" class="blue--text">{{ item.icon }}</v-icon>
+              <v-icon v-else>{{ item.icon }}</v-icon>
             </v-list-tile-action>
             <v-list-tile-content>
-              <v-list-tile-title v-text="item.title"></v-list-tile-title>
+              <v-list-tile-title>
+                {{ item.text }}
+              </v-list-tile-title>
             </v-list-tile-content>
           </v-list-tile>
-        </v-list>
-      </v-navigation-drawer>
-      <v-toolbar app>
-        <v-toolbar-side-icon @click.native.stop="drawer = !drawer" light></v-toolbar-side-icon>
-        <v-spacer></v-spacer>
-      </v-toolbar>
-      <v-content>
-        <v-container fluid fill-height>
-          <v-layout>
-            <v-flex row>
-              <router-view></router-view>
+        </template>
+      </v-list>
+      <v-list>
+        <v-list-tile avatar tag="div">
+          <v-list-tile-avatar>
+            <img src="/assets/img/avatar0.png">
+          </v-list-tile-avatar>
+          <v-list-tile-content>
+            <v-list-tile-title>{{ user.email }}</v-list-tile-title>
+          </v-list-tile-content>
+          <v-menu bottom left offset-y origin="bottom right" transition="v-slide-y-transition">
+            <v-btn icon light slot="activator">
+              <v-icon>more_vert</v-icon>
+            </v-btn>
+            <v-list>
+              <!-- <v-list-tile v-for="item in userMenus" :key="item.title" value="true" :to="item.link" router>
+                <v-list-tile-title v-text="item.title"></v-list-tile-title>
+              </v-list-tile> -->
+              <v-list-tile @click="onLogOut">Logout</v-list-tile>
+            </v-list>
+          </v-menu>
+        </v-list-tile>
+      </v-list>
+    </v-navigation-drawer>
+    <v-toolbar
+      color="blue darken-3"
+      dark
+      app
+      :clipped-left="$vuetify.breakpoint.lgAndUp"
+      fixed>
+      <v-toolbar-title style="width: 300px" class="ml-0 pl-3">
+        <v-toolbar-side-icon @click.stop="drawer = !drawer"></v-toolbar-side-icon>
+        <span class="hidden-sm-and-down">PLN TEAM</span>
+      </v-toolbar-title>
+      <v-text-field
+        flat
+        solo-inverted
+        prepend-icon="search"
+        label="Search"
+        class="hidden-sm-and-down"></v-text-field>
+      <v-spacer></v-spacer>
+      <v-btn icon>
+        <v-icon>apps</v-icon>
+      </v-btn>
+      <v-btn icon>
+        <v-icon>notifications</v-icon>
+      </v-btn>
+      <v-btn icon large>
+        <v-avatar size="32px" tile>
+          <img
+            src="https://vuetifyjs.com/static/doc-images/logo.svg"
+            alt="Vuetify"
+          >
+        </v-avatar>
+      </v-btn>
+    </v-toolbar>
+    <v-content>
+      <v-container fluid fill-height>
+        <v-layout>
+          <v-flex row>
+            <router-view></router-view>
+          </v-flex>
+        </v-layout>
+      </v-container>
+    </v-content>
+    <v-btn
+      fab
+      bottom
+      right
+      color="pink"
+      dark
+      fixed
+      @click.stop="dialog = !dialog">
+      <v-icon>add</v-icon>
+    </v-btn>
+    <v-dialog v-model="dialog" width="800px">
+      <v-card>
+        <v-card-title
+          class="grey lighten-4 py-4 title"
+        >
+          Create contact
+        </v-card-title>
+        <v-container grid-list-sm class="pa-4">
+          <v-layout row wrap>
+            <v-flex xs12 align-center justify-space-between>
+              <v-layout align-center>
+                <v-avatar size="40px" class="mr-3">
+                  <img
+                    src="//ssl.gstatic.com/s2/oz/images/sge/grey_silhouette.png"
+                    alt=""
+                  >
+                </v-avatar>
+                <v-text-field
+                  placeholder="Name"
+                ></v-text-field>
+              </v-layout>
+            </v-flex>
+            <v-flex xs6>
+              <v-text-field
+                prepend-icon="business"
+                placeholder="Company"
+              ></v-text-field>
+            </v-flex>
+            <v-flex xs6>
+              <v-text-field
+                placeholder="Job title"
+              ></v-text-field>
+            </v-flex>
+            <v-flex xs12>
+              <v-text-field
+                prepend-icon="mail"
+                placeholder="Email"
+              ></v-text-field>
+            </v-flex>
+            <v-flex xs12>
+              <v-text-field
+                type="tel"
+                prepend-icon="phone"
+                placeholder="(000) 000 - 0000"
+                mask="phone"
+              ></v-text-field>
+            </v-flex>
+            <v-flex xs12>
+              <v-text-field
+                prepend-icon="notes"
+                placeholder="Notes"
+              ></v-text-field>
             </v-flex>
           </v-layout>
         </v-container>
-      </v-content>
-
-      <v-footer :fixed="fixed" app>
-        <span style="justify-content:center">&copy; Reetek 2018 Vue-Crm </span>
-      </v-footer>
-
-
-    </template>
-    <v-dialog v-model="dialog" persistent max-width="290">
-      <v-card>
-        <v-card-title>{{dialogTitle}}</v-card-title>
-        <v-card-text>{{dialogText}}</v-card-text>
         <v-card-actions>
-          <v-btn class="green--text darken-1" flat="flat" @click.native="onConfirm">Confirm</v-btn>
-          <v-btn class="green--text darken-1" flat="flat" @click.native="onCancel">Cancel</v-btn>
+          <v-btn flat color="primary">More</v-btn>
+          <v-spacer></v-spacer>
+          <v-btn flat color="primary" @click="dialog = false">Cancel</v-btn>
+          <v-btn flat @click="dialog = false">Save</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
+    </template>
   </v-app>
-
 </template>
+
 <script>
   export default {
-  data() {
-    return {
+    data: () => ({
       dialog: false,
-      dialogText: '',
-      dialogTitle: '',
-      isRootComponent: true,
-      // clipped: false,
-      drawer: true,
-      fixed: false,
-      items: [{
-        icon: 'bubble_chart',
-        title: 'Dashboard',
-        vertical: 'Dashboard',
-        link: 'dashboard'
+      drawer: null,
+      menuItem: '',
+      items: [
+        { icon: 'contacts', text: 'Dashboard', link: 'Dashboard', vertical: 'Dashboard' },
+        { icon: 'history', text: 'Orders', link: 'Orders', vertical: 'Order' },
+        { icon: 'content_copy', text: 'Customers', link: 'Customers', vertical: 'Customer' },
+        { icon: 'settings', text: 'Products', link: 'Products', vertical: 'Product' },
+        { icon: 'chat_bubble', text: 'About', link: 'About', vertical: 'About' }
+      ]
+    }),
+    props: {
+      source: String
+    },
+    computed: {
+      user () {
+        return this.$store.getters.user
       },
-      {
-        icon: 'bubble_chart',
-        title: 'Orders',
-        vertical: 'Order',
-        link: 'orders'
+      userIsAuthenticated () {
+        return this.$store.getters.user !== null && this.$store.getters.user !== undefined
       },
-      {
-        icon: 'bubble_chart',
-        title: 'Customers',
-        vertical: 'Customer',
-        link: 'customers'
-      },
-      {
-        icon: 'bubble_chart',
-        title: 'Products',
-        vertical: 'Product',
-        link: 'products'
-      },
-      {
-        icon: 'bubble_chart',
-        title: 'About',
-        vertical: 'About',
-        link: 'about'
-      }],
-      userMenus: [{
-        icon: 'bubble_chart',
-        title: 'Logout',
-        link: '/logout'
-      },
-      {
-        icon: 'bubble_chart',
-        title: 'Change Password',
-        link: '/changepassword'
-      }],
-      miniVariant: false,
-      right: true,
-      rightDrawer: false,
-      menuItem: 'Orders'
-    }
-  },
-  created() {
-    //  [App.vue specific] When App.vue is first loaded start the progress bar
-    this.$Progress.start()
-    //  hook the progress bar to start before we move router-view
-    this.$router.beforeEach((to, from, next) => {
-      //  does the page we want to go to have a meta.progress object
-      if (to.meta.progress !== undefined) {
-        let meta = to.meta.progress
-        // parse meta tags
-        this.$Progress.parseMeta(meta)
+      activeMenuItem () {
+        return this.menuItem
       }
-      //  start the progress bar
-      this.$Progress.start()
-      //  continue to next page
-      next()
-    })
-    //  hook the progress bar to finish after we've finished moving router-view
-    this.$router.afterEach((to, from) => {
-      if (to.name !== 'ErrorPage') {
-        this.menuItem = to.name
+    },
+    methods: {
+      clickMenu (item) {
+        this.menuItem = item.text
+        this.$router.push({
+          name: item.link
+        })
+      },
+      onLogOut () {
+        this.$store.dispatch('logOut')
+        this.$router.push('/login')
       }
-      //  finish the progress bar
-      this.$Progress.finish()
-    })
-  },
-  computed: {
-    // store: function () {
-    //   return this.$parent.$store
-    // },
-    // state: function () {
-    //   return this.store.state
-    // },
-    user: function () {
-      console.log('computed - app')
-      return this.$store.getters.user
-    },
-    activeMenuItem: function () {
-      return this.menuItem
-    },
-    userIsAuthenticated () {
-      return this.$store.getters.user !== null && this.$store.getters.user !== undefined
     }
-  },
-  methods: {
-    clickMenu: function (item) {
-      this.menuItem = item.title
-      this.$router.push({
-        name: item.title
-      })
-    },
-    openDialog: function (dialogText, dialogTitle, confirmCallback, canelCallbak) {
-      this.dialog = true
-      this.dialogText = dialogText
-      this.dialogTitle = dialogTitle
-      if (confirmCallback) this.confirmCallback = confirmCallback
-      if (canelCallbak) this.cancelCallback = canelCallbak
-    },
-    confirmCallback: function () { },
-    cancelCallback: function () { },
-    onConfirm: function () {
-      this.dialog = false
-      this.dialogText = ''
-      this.dialogTitle = ''
-      this.confirmCallback()
-      this.confirmCallback = () => { }
-    },
-    onCancel: function () {
-      this.dialog = false
-      this.dialogText = ''
-      this.dialogTitle = ''
-      this.cancelCallback()
-      this.cancelCallback = () => { }
-      console.log('Cancelled')
-    },
-    onLogOut () {
-      this.$store.dispatch('logOut')
-      this.$router.push('/login')
-    }
-  },
-  mounted() {
-    this.$Progress.finish()
   }
-}
 </script>
+
 <style lang="stylus">
   @import './stylus/main'
 </style>

@@ -37,7 +37,8 @@ const actions = {
       (user) => {
         commit('setLoading', false)
         const newUser = {
-          id: user.uid
+          id: user.uid,
+          email: user.email
         }
         commit('setUser', newUser)
       },
@@ -54,7 +55,8 @@ const actions = {
       (user) => {
         commit('setLoading', false)
         const newUser = {
-          id: user.uid
+          id: user.uid,
+          email: user.email
         }
         commit('setUser', newUser)
       },
@@ -66,7 +68,7 @@ const actions = {
   },
   autoSignIn ({commit}, payload) {
     console.log('auto signin')
-    commit('setUser', {id: payload.uid})
+    commit('setUser', {id: payload.uid, email: payload.email})
   },
   logOut ({commit}) {
     firebase.auth().signOut()
