@@ -248,7 +248,6 @@
       },
       onLogOut () {
         this.$store.dispatch('logOut')
-        this.$router.push('/login')
       }
     },
     mounted() {

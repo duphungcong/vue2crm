@@ -47,26 +47,11 @@ export default {
     }
   },
   computed: {
-    user () {
-      let user = this.$store.getters.user
-      if (user !== null && user !== undefined) {
-        this.$router.push(this.$route.query.redirect || '/')
-      }
-      return user
-    },
     error () {
       return this.$store.getters.error
     },
     loading () {
       return this.$store.getters.loading
-    }
-  },
-  watch: {
-    // TODO: check watcher not working
-    user (value) {
-      // if (value !== null && value !== undefined) {
-      //   this.$router.push(this.$route.query.redirect || '/')
-      // }
     }
   },
   methods: {

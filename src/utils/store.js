@@ -2,6 +2,7 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import createPersistedState from 'vuex-persistedstate'
 import firebase from 'firebase'
+import router from '@/router'
 
 Vue.use(Vuex)
 
@@ -15,8 +16,6 @@ const state = {
 const mutations = {
   setUser (state, payload) {
     state.user = payload
-    console.log('write user state')
-    console.log(payload)
   },
   setLoading (state, payload) {
     state.loading = payload
@@ -67,7 +66,6 @@ const actions = {
     )
   },
   autoSignIn ({commit}, payload) {
-    console.log('auto signin')
     commit('setUser', {id: payload.uid, email: payload.email})
   },
   logOut ({commit}) {
@@ -81,8 +79,6 @@ const actions = {
 
 const getters = {
   user (state) {
-    console.log('read user state')
-    console.log(state.user)
     return state.user
   },
   error (state) {
@@ -93,10 +89,24 @@ const getters = {
   }
 }
 
-export default new Vuex.Store({
+const store = new Vuex.Store({
   plugins: [createPersistedState({ storage: window.sessionStorage })],
   state,
   mutations,
   actions,
   getters
 })
+
+store.watch(
+  (state) => state.user, (newValue, oldValue) => {
+    console.log(oldValue)
+    console.log(newValue)
+    if (newValue !== null && newValue !== undefined) {
+      router.replace('/')
+    } else {
+      router.replace('login')
+    }
+  }
+)
+
+export default store
