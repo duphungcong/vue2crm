@@ -8,6 +8,9 @@ List of checks
 
 <script>
 export default {
-
+  name: 'Checks',
+  data () {
+    return {}
+  }
 }
 </script>

@@ -20,13 +20,13 @@ import store from '@/utils/store'
 
 Vue.use(Router)
 
-function requireAuth (to, from, next) {
-  if (store.getters.user !== null && store.getters.user !== undefined) {
-    next()
-  } else {
-    next('login')
-  }
-}
+// function requireAuth (to, from, next) {
+//   if (store.getters.user !== null && store.getters.user !== undefined) {
+//     next()
+//   } else {
+//     next('login')
+//   }
+// }
 
 // function requireFollowing (to, from, next) {
 //     if (store.getters.following !== null && store.getters.following !== undefined) {
@@ -36,29 +36,99 @@ function requireAuth (to, from, next) {
 //     }
 // }
 
-export default new Router({
+let router = new Router({
   base: __dirname,
   mode: 'history',
   scrollBehavior: () => ({ y: 0 }),
   routes: [
+    // { path: '/404', component: ErrorPage, name: 'ErrorPage' },
+    // { path: '/dashboard', component: Dashboard, name: 'Dashboard', meta: {
+    //     requireAuth: true,
+    //     requireFollowing: true
+    //   }
+    // },
+    // { path: '/about', component: About, name: 'About', beforeEnter: requireAuth },
+    // { path: '/orders', component: Orders, name: 'Orders', beforeEnter: requireAuth },
+    // { path: '/neworder', component: Order, name: 'NewOrder', beforeEnter: requireAuth },
+    // { path: '/order/:id', component: Order, name: 'Order', beforeEnter: requireAuth },
+    // { path: '/customers', component: Customers, name: 'Customers', beforeEnter: requireAuth },
+    // { path: '/newcustomer', component: Customer, name: 'NewCustomer', beforeEnter: requireAuth },
+    // { path: '/customer/:id', component: Customer, name: 'Customer', beforeEnter: requireAuth },
+    // { path: '/product/:id', component: Product, name: 'Product', beforeEnter: requireAuth },
+    // { path: '/products', component: Products, name: 'Products', beforeEnter: requireAuth },
+    // { path: '/newproduct', component: Product, name: 'NewProduct', beforeEnter: requireAuth },
+    // { path: '/checks', component: Checks, name: 'Checks', beforeEnter: requireAuth },
+    // { path: '/login', component: Login, name: 'Login' },
+    // { path: '/signup', component: SignUp, name: 'SignUp' },
+    // { path: '/changePassword', component: ChangePassword, name: 'ChangePassword' },
+    // { path: '/', redirect: '/dashboard' },
+    // { path: '*', redirect: '/login' }
     { path: '/404', component: ErrorPage, name: 'ErrorPage' },
-    { path: '/dashboard', component: Dashboard, name: 'Dashboard', beforeEnter: requireAuth },
-    { path: '/about', component: About, name: 'About', beforeEnter: requireAuth },
-    { path: '/orders', component: Orders, name: 'Orders', beforeEnter: requireAuth },
-    { path: '/neworder', component: Order, name: 'NewOrder', beforeEnter: requireAuth },
-    { path: '/order/:id', component: Order, name: 'Order', beforeEnter: requireAuth },
-    { path: '/customers', component: Customers, name: 'Customers', beforeEnter: requireAuth },
-    { path: '/newcustomer', component: Customer, name: 'NewCustomer', beforeEnter: requireAuth },
-    { path: '/customer/:id', component: Customer, name: 'Customer', beforeEnter: requireAuth },
-    { path: '/product/:id', component: Product, name: 'Product', beforeEnter: requireAuth },
-    { path: '/products', component: Products, name: 'Products', beforeEnter: requireAuth },
-    { path: '/newproduct', component: Product, name: 'NewProduct', beforeEnter: requireAuth },
-    { path: '/checks', component: Checks, name: 'Checks', beforeEnter: requireAuth },
+    { path: '/dashboard', component: Dashboard, name: 'Dashboard', meta: {
+        requireAuth: true,
+        requireFollowing: true
+      }
+    },
+    { path: '/about', component: About, name: 'About', meta: {
+        requireAuth: true,
+        requireFollowing: true
+      }
+    },
+    { path: '/orders', component: Orders, name: 'Orders', meta: {
+        requireAuth: true,
+        requireFollowing: true
+      }
+    },
+    { path: '/neworder', component: Order, name: 'NewOrder', meta: {
+        requireAuth: true,
+        requireFollowing: true
+      }
+    },
+    { path: '/order/:id', component: Order, name: 'Order', meta: {
+        requireAuth: true,
+        requireFollowing: true
+      }
+    },
+    { path: '/customers', component: Customers, name: 'Customers', meta: {
+        requireAuth: true,
+        requireFollowing: true
+      }
+    },
+    { path: '/newcustomer', component: Customer, name: 'NewCustomer', meta: {
+        requireAuth: true,
+        requireFollowing: true
+      }
+    },
+    { path: '/customer/:id', component: Customer, name: 'Customer', meta: {
+        requireAuth: true,
+        requireFollowing: true
+      }
+    },
+    { path: '/product/:id', component: Product, name: 'Product', meta: {
+        requireAuth: true,
+        requireFollowing: true
+      }
+    },
+    { path: '/products', component: Products, name: 'Products', meta: {
+        requireAuth: true,
+        requireFollowing: true
+      }
+    },
+    { path: '/newproduct', component: Product, name: 'NewProduct', meta: {
+        requireAuth: true,
+        requireFollowing: true
+      }
+    },
+    { path: '/checks', component: Checks, name: 'Checks', meta: {
+        requireAuth: true,
+        requireFollowing: false
+      }
+    },
     { path: '/login', component: Login, name: 'Login' },
     { path: '/signup', component: SignUp, name: 'SignUp' },
     { path: '/changePassword', component: ChangePassword, name: 'ChangePassword' },
-    { path: '/', redirect: '/dashboard' },
-    { path: '*', redirect: '/login' }
+    { path: '/', redirect: 'dashboard' },
+    { path: '*', redirect: 'login' }
   ],
   meta: {
     progress: {
@@ -71,3 +141,27 @@ export default new Router({
     }
   }
 })
+
+router.beforeEach((to, from, next) => {
+  let isAuth = false
+  let isFollowing = false
+  if (store.getters.user !== null && store.getters.user !== undefined) {
+    isAuth = true
+  }
+  if (store.getters.following !== null && store.getters.following !== undefined) {
+    isFollowing = true
+  }
+
+  let requireAuth = to.matched.some(record => record.meta.requireAuth)
+  let requireFollowing = to.matched.some(record => record.meta.requireFollowing)
+
+  if (requireAuth && !isAuth) {
+    next('login')
+  } else if (requireFollowing && !isFollowing) {
+    next('checks')
+  } else {
+    next()
+  }
+})
+
+export default router

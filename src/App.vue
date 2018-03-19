@@ -190,6 +190,25 @@
       },
       userIsFollowingCheck () {
         return this.$store.getters.following !== null
+      },
+      following () {
+        return this.$store.getters.following
+      }
+    },
+    watch: {
+      user (value) {
+        if (value !== null) {
+          this.$router.push('/')
+        } else {
+          this.$router.push('login')
+        }
+      },
+      following (value) {
+        if (value == null) {
+          this.$router.replace('checks')
+        } else {
+          this.$router.replace('/')
+        }
       }
     },
     methods: {

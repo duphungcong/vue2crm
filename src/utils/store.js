@@ -2,7 +2,7 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import createPersistedState from 'vuex-persistedstate'
 import firebase from 'firebase'
-import router from '@/router'
+// import router from '@/router'
 
 Vue.use(Vuex)
 
@@ -113,14 +113,14 @@ const store = new Vuex.Store({
   getters
 })
 
-store.watch(
-  (state) => state.user, (newValue, oldValue) => {
-    if (oldValue == null) {
-      router.push('/')
-    } else if (newValue == null) {
-      router.push('login')
-    }
-  }
-)
+// store.watch(
+//   (state) => state.user, (newValue, oldValue) => {
+//     if (oldValue == null) {
+//       router.push('/')
+//     } else if (newValue == null) {
+//       router.push('login')
+//     }
+//   }
+// )
 
 export default store
