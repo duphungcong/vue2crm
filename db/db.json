@@ -28,13 +28,39 @@
       "avatar": "/assets/img/avatar4.png"
     },
     {
-      "isActive": false,
+      "isActive": true,
       "age": 38,
       "id": 5,
       "firstName": "William",
       "lastName": "Carney",
       "email": "test@test.com",
-      "avatar": "/assets/img/avatar2.png"
+      "avatar": "/assets/img/avatar2.png",
+      "orders": [
+        {
+          "id": 5,
+          "reference": "order-5-5-1-2",
+          "customerId": 5,
+          "products": [
+            {
+              "id": 5,
+              "productName": "Product EPEIM",
+              "categoryId": 2,
+              "unitInStock": null,
+              "unitPrice": 21.5
+            }
+          ],
+          "amount": 399.99,
+          "orderDate": "2017-01-01",
+          "shippedDate": "2017-01-01",
+          "shipAddress": {
+            "address": "Gran Vía, 0123",
+            "city": "Madrid",
+            "zipcode": "10298",
+            "country": "Spain"
+          }
+        }
+      ],
+      "orderRecord": 1
     },
     {
       "isActive": false,
