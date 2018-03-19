@@ -10,6 +10,7 @@ import Customers from '@/components/Customers'
 import Customer from '@/components/Customer'
 import Products from '@/components/Products'
 import Product from '@/components/Product'
+import Checks from '@/components/Checks'
 
 import Login from '@/components/Login'
 import SignUp from '@/components/SignUp'
@@ -23,9 +24,17 @@ function requireAuth (to, from, next) {
   if (store.getters.user !== null && store.getters.user !== undefined) {
     next()
   } else {
-    next('/login')
+    next('login')
   }
 }
+
+// function requireFollowing (to, from, next) {
+//     if (store.getters.following !== null && store.getters.following !== undefined) {
+//       next()
+//     } else {
+//       next('checks')
+//     }
+// }
 
 export default new Router({
   base: __dirname,
@@ -44,6 +53,7 @@ export default new Router({
     { path: '/product/:id', component: Product, name: 'Product', beforeEnter: requireAuth },
     { path: '/products', component: Products, name: 'Products', beforeEnter: requireAuth },
     { path: '/newproduct', component: Product, name: 'NewProduct', beforeEnter: requireAuth },
+    { path: '/checks', component: Checks, name: 'Checks', beforeEnter: requireAuth },
     { path: '/login', component: Login, name: 'Login' },
     { path: '/signup', component: SignUp, name: 'SignUp' },
     { path: '/changePassword', component: ChangePassword, name: 'ChangePassword' },

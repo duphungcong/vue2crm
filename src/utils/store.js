@@ -10,7 +10,8 @@ const state = {
   user: null,
   loading: false,
   searching: '',
-  error: null
+  error: null,
+  following: null
 }
 
 const mutations = {
@@ -25,6 +26,12 @@ const mutations = {
   },
   clearError (state) {
     state.error = null
+  },
+  setFollowing (state, payload) {
+    state.following = payload
+  },
+  stopFollowing(state) {
+    state.following = null
   }
 }
 
@@ -74,6 +81,12 @@ const actions = {
   },
   clearError ({commit}) {
     commit('clearError')
+  },
+  setFollowing({commit}) {
+    commit('setFollowing', true)
+  },
+  stopFollowing ({commit}) {
+    commit('stopFollowing')
   }
 }
 
@@ -86,6 +99,9 @@ const getters = {
   },
   loading (state) {
     return state.loading
+  },
+  following (state) {
+    return state.following
   }
 }
 

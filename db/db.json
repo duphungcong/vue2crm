@@ -655,6 +655,13 @@
       "unitPrice": 222,
       "unitInStock": 23,
       "id": 26
+    },
+    {
+      "categoryId": 2,
+      "productName": "Hu tiu bo vien",
+      "unitPrice": "232",
+      "unitInStock": "12",
+      "id": 27
     }
   ],
   "categories": [

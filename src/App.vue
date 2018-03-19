@@ -39,6 +39,8 @@
               <v-icon>more_vert</v-icon>
             </v-btn>
             <v-list>
+              <v-list-tile v-if="!userIsFollowingCheck" @click="onFollowing">Follow check</v-list-tile>
+              <v-list-tile v-if="userIsFollowingCheck"  @click="onStopFollowing">Stop following check</v-list-tile>
               <v-list-tile @click="onLogOut">Logout</v-list-tile>
             </v-list>
           </v-menu>
@@ -88,6 +90,7 @@
       </v-container>
     </v-content>
     <v-btn
+      v-if="userIsFollowingCheck"
       fab
       bottom
       right
@@ -97,69 +100,7 @@
       @click.stop="sheet = !sheet">
       <v-icon>add</v-icon>
     </v-btn>
-    <!-- <v-dialog v-model="dialog" width="800px">
-      <v-card>
-        <v-card-title
-          class="grey lighten-4 py-4 title"
-        >
-          Create contact
-        </v-card-title>
-        <v-container grid-list-sm class="pa-4">
-          <v-layout row wrap>
-            <v-flex xs12 align-center justify-space-between>
-              <v-layout align-center>
-                <v-avatar size="40px" class="mr-3">
-                  <img
-                    src="//ssl.gstatic.com/s2/oz/images/sge/grey_silhouette.png"
-                    alt=""
-                  >
-                </v-avatar>
-                <v-text-field
-                  placeholder="Name"
-                ></v-text-field>
-              </v-layout>
-            </v-flex>
-            <v-flex xs6>
-              <v-text-field
-                prepend-icon="business"
-                placeholder="Company"
-              ></v-text-field>
-            </v-flex>
-            <v-flex xs6>
-              <v-text-field
-                placeholder="Job title"
-              ></v-text-field>
-            </v-flex>
-            <v-flex xs12>
-              <v-text-field
-                prepend-icon="mail"
-                placeholder="Email"
-              ></v-text-field>
-            </v-flex>
-            <v-flex xs12>
-              <v-text-field
-                type="tel"
-                prepend-icon="phone"
-                placeholder="(000) 000 - 0000"
-                mask="phone"
-              ></v-text-field>
-            </v-flex>
-            <v-flex xs12>
-              <v-text-field
-                prepend-icon="notes"
-                placeholder="Notes"
-              ></v-text-field>
-            </v-flex>
-          </v-layout>
-        </v-container>
-        <v-card-actions>
-          <v-btn flat color="primary">More</v-btn>
-          <v-spacer></v-spacer>
-          <v-btn flat color="primary" @click="dialog = false">Cancel</v-btn>
-          <v-btn flat @click="dialog = false">Save</v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog> -->
+    
     <v-bottom-sheet v-model="sheet" inset="">
       <!-- <v-btn slot="activator" color="purple" dark>Click me</v-btn> -->
       <v-list>
@@ -186,18 +127,21 @@
       dialog: false,
       drawer: null,
       menuItem: '',
-      items: [
+      followingItems: [
         { icon: 'contacts', text: 'Dashboard', link: 'Dashboard', vertical: 'Dashboard' },
         { icon: 'history', text: 'Orders', link: 'Orders', vertical: 'Order' },
         { icon: 'content_copy', text: 'Customers', link: 'Customers', vertical: 'Customer' },
         { icon: 'settings', text: 'Products', link: 'Products', vertical: 'Product' },
         { icon: 'chat_bubble', text: 'About', link: 'About', vertical: 'About' }
       ],
+      noFollowingItems: [
+        { icon: 'contacts', text: 'Checks', link: 'Checks', vertical: 'Checks' }
+      ],
       sheet: false,
       tiles: [
         { img: 'keep.png', title: 'NRC' },
         { img: 'inbox.png', title: 'Spare order' },
-        { img: 'hangouts.png', title: 'Add task card into WP' }
+        { img: 'hangouts.png', title: 'Add additional tasks' }
       ]
     }),
     props: {
@@ -237,6 +181,15 @@
       },
       activeMenuItem () {
         return this.menuItem
+      },
+      items () {
+        if (this.$store.getters.following !== null) {
+          return this.followingItems
+        }
+        return this.noFollowingItems
+      },
+      userIsFollowingCheck () {
+        return this.$store.getters.following !== null
       }
     },
     methods: {
@@ -248,6 +201,12 @@
       },
       onLogOut () {
         this.$store.dispatch('logOut')
+      },
+      onFollowing () {
+        this.$store.dispatch('setFollowing')
+      },
+      onStopFollowing () {
+        this.$store.dispatch('stopFollowing')
       }
     },
     mounted() {
