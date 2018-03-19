@@ -55,8 +55,10 @@ new Vue({
     firebase.initializeApp(config)
     firebase.auth().onAuthStateChanged((user) => {
       if (user) {
+        console.log('yes')
         this.$store.dispatch('autoSignIn', user)
       } else {
+        console.log('no')
         this.$store.dispatch('logOut')
       }
     })

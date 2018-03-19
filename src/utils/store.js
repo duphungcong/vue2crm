@@ -99,12 +99,10 @@ const store = new Vuex.Store({
 
 store.watch(
   (state) => state.user, (newValue, oldValue) => {
-    console.log(oldValue)
-    console.log(newValue)
-    if (newValue !== null && newValue !== undefined) {
-      router.replace('/')
-    } else {
-      router.replace('login')
+    if (oldValue == null) {
+      router.push('/')
+    } else if (newValue == null) {
+      router.push('login')
     }
   }
 )
