@@ -29,9 +29,6 @@ const mutations = {
   },
   setFollowing (state, payload) {
     state.following = payload
-  },
-  stopFollowing(state) {
-    state.following = null
   }
 }
 
@@ -82,11 +79,17 @@ const actions = {
   clearError ({commit}) {
     commit('clearError')
   },
+  beginLoading ({commit}) {
+    commit('setLoading', true)
+  },
+  endLoading ({commit}) {
+    commit('setLoading', false)
+  },
   setFollowing({commit}) {
     commit('setFollowing', true)
   },
   stopFollowing ({commit}) {
-    commit('stopFollowing')
+    commit('setFollowing', null)
   }
 }
 

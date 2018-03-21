@@ -1,0 +1,16 @@
+{
+  "checks": [
+    {
+      "aircraft": "A358",
+      "title": "A04 + 18MO"
+    },
+    {
+      "aircraft": "A601",
+      "title": "P01"
+    },
+    {
+      "aircraft": "A864",
+      "title": "A02"
+    }
+  ]
+}

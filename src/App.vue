@@ -94,7 +94,7 @@
       fab
       bottom
       right
-      color="pink"
+      color="red"
       dark
       fixed
       @click.stop="sheet = !sheet">
@@ -196,18 +196,20 @@
       }
     },
     watch: {
-      user (value) {
-        if (value !== null) {
+      user (newValue, oldValue) {
+        if (oldValue === null && newValue !== null) {
           this.$router.push('/')
-        } else {
+        }
+        if (oldValue !== null && newValue === null) {
           this.$router.push('login')
         }
       },
-      following (value) {
-        if (value == null) {
-          this.$router.replace('checks')
-        } else {
-          this.$router.replace('/')
+      following (newValue, oldValue) {
+        if (oldValue === null && newValue !== null) {
+          this.$router.push('/')
+        }
+        if (oldValue !== null && newValue === null) {
+          this.$router.push('checks')
         }
       }
     },
