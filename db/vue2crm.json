@@ -1,0 +1,42 @@
+{
+  "checks": [
+    {
+      "aircraft": "A358",
+      "name": "A04 + 18MO"
+    },
+    {
+      "aircraft": "A601",
+      "name": "P01"
+    },
+    {
+      "aircraft": "A326",
+      "name": "A02"
+    }
+  ],
+  "aircraft": [
+    {
+      "name": "A354"
+    },
+    {
+      "name": "A356"
+    },
+    {
+      "name": "A357"
+    },
+    {
+      "name": "A358"
+    },
+    {
+      "name": "A601"
+    },
+    {
+      "name": "A603"
+    },
+    {
+      "name": "A605"
+    },
+    {
+      "name": "A326"
+    }
+  ]
+}

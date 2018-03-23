@@ -17,7 +17,7 @@
           class="elevation-1">
           <template slot="items" slot-scope="props" class="body-2">
             <td class="body-2">{{ props.item.aircraft }}</td>
-            <td class="text-xs-left">{{ props.item.title}}</td>
+            <td class="text-xs-left">{{ props.item.name }}</td>
             <td class="text-xs-right">
               <v-btn fab small dark class="teal" @click.native="edit(props.item)">
                 <v-icon>edit</v-icon>
@@ -30,6 +30,7 @@
         </v-data-table>
       </v-card>
     </v-flex>
+    <loading-progress></loading-progress>
   </v-container>
 </template>
 
@@ -53,9 +54,9 @@ export default {
           value: 'aircraft'
         },
         {
-          text: 'Title',
+          text: 'Name',
           left: true,
-          value: 'title'
+          value: 'name'
         },
         {
           text: '',
@@ -74,15 +75,16 @@ export default {
           for (let key in obj) {
             this.checks.push({
               aircraft: obj[key].aircraft,
-              title: obj[key].title
+              name: obj[key].name
             })
           }
+          this.$store.dispatch('endLoading')
         },
         (error) => {
           console.log(error)
+          this.$store.dispatch('endLoading')
         }
       )
-      this.$store.dispatch('endLoading')
     },
     add() {
       this.$router.push('newcheck')

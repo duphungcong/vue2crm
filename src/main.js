@@ -11,6 +11,7 @@ import appUtil from './utils/app-util'
 import firebase from 'firebase'
 
 import VueProgressBar from 'vue-progressbar'
+import LoadingProgress from './components/shared/LoadingProgress.vue'
 
 const options = {
   color: '#2196f3',
@@ -30,6 +31,7 @@ Vue.use(VueProgressBar, options)
 
 Vue.use(Vuetify)
 Vue.config.productionTip = false
+Vue.component('loading-progress', LoadingProgress)
 
 window.Store = store
 Vue.prototype.api = api

@@ -11,7 +11,7 @@ import Customer from '@/components/Customer'
 import Products from '@/components/Products'
 import Product from '@/components/Product'
 import Checks from '@/components/Checks'
-import Check from '@/components/Check'
+import NewCheck from '@/components/NewCheck'
 
 import Login from '@/components/Login'
 import SignUp from '@/components/SignUp'
@@ -87,7 +87,7 @@ let router = new Router({
         requireFollowing: false
       }
     },
-    { path: '/newcheck', component: Check, name: 'Check', meta: {
+    { path: '/newcheck', component: NewCheck, name: 'NewCheck', meta: {
         requireAuth: true,
         requireFollowing: false
       }
