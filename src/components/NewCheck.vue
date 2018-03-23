@@ -1,40 +1,66 @@
 <template>
   <v-container fluid>
     <v-flex xs12>
-      <v-card class="grey lighten-4 elevation-0">
-        <v-card-title>
-          {{ title }}
-          <v-spacer></v-spacer>
-          <v-btn fab small @click.native="cancel()">
-            <v-icon>cancel</v-icon>
-          </v-btn>
-          &nbsp;
-          <v-btn fab small class="blue" @click.native="save()">
-            <v-icon>save</v-icon>
-          </v-btn>
-        </v-card-title>
-        <v-card-text>
-          <v-container fluid grid-list-md>
-            <v-layout row wrap class="px-10">
-              <v-flex md6 xs12>
-                <v-text-field name="checkName" label="Check" hint="Check name is required" value="Input text" v-model="check.name"
-                  class="input-group--focused" required></v-text-field>
-              </v-flex>
-              <v-flex md6 xs12>
-                <v-select v-bind:items="aircraftList" label="Aircraft" v-model="check.aircraft" item-text="name" item-value="name" class="input-group--focused" required></v-select>
-              </v-flex>
-              <v-flex md6 xs12>
-                Start Date<br>
-                <v-date-picker v-model="check.startDate" landscape></v-date-picker>
-              </v-flex>
-              <v-flex md6 xs12>
-                Finish Date<br>
-                <v-date-picker v-model="check.finishDate" landscape></v-date-picker>
-              </v-flex>
-            </v-layout>
-          </v-container>
-        </v-card-text>
-      </v-card>
+      <v-stepper v-model="e1">
+        <v-stepper-header>
+          <v-stepper-step step="1" :complete="e1 > 1">Create check</v-stepper-step>
+          <v-divider></v-divider>
+          <v-stepper-step step="2" :complete="e1 > 2">Import WP</v-stepper-step>
+          <v-divider></v-divider>
+          <v-stepper-step step="3" :complete="e1 > 3">Finish</v-stepper-step>
+        </v-stepper-header>
+        <v-stepper-items>
+          <v-stepper-content step="1">
+            <v-card class="grey lighten-4 elevation-0">
+              <v-card-text>
+                <v-container fluid grid-list-md>
+                  <v-layout row wrap class="px-10">
+                    <v-flex md6 xs12>
+                      <v-text-field name="checkName" label="Check" hint="Check name is required" value="Input text" v-model="check.name"
+                        class="input-group--focused" required></v-text-field>
+                    </v-flex>
+                    <v-flex md6 xs12>
+                      <v-select v-bind:items="aircraftList" label="Aircraft" v-model="check.aircraft" item-text="name" item-value="name" class="input-group--focused" required></v-select>
+                    </v-flex>
+                    <v-flex md6 xs12>
+                      Start Date<br>
+                      <v-date-picker v-model="check.startDate"></v-date-picker>
+                    </v-flex>
+                    <v-flex md6 xs12>
+                      Finish Date<br>
+                      <v-date-picker v-model="check.finishDate"></v-date-picker>
+                    </v-flex>
+                  </v-layout>
+                </v-container>
+              </v-card-text>
+            </v-card>
+            <v-btn @click.native="cancel()">Cancel</v-btn>
+            <v-btn color="primary" @click.native="e1 = 2">Next</v-btn>
+          </v-stepper-content>
+          <v-stepper-content step="2">
+            <v-card class="grey lighten-4 elevation-0">
+              <v-card-text>
+                <v-form>
+                  <label for="file">Import WP CONTROL</label><br>
+                  <input type="file" id="file" @change="onFileChange">
+                </v-form>
+              </v-card-text>
+              <v-card-title pl-0>Number of task cards: {{ numberTaskCard }}</v-card-title>
+            </v-card>
+            <v-btn @click.native="e1 = 1">Back</v-btn>
+            <v-btn color="primary" @click.native="e1 = 3" :disabled="!readingIsCompleted">Next</v-btn>
+          </v-stepper-content>
+          <v-stepper-content step="3">
+            <v-card class="grey lighten-4 elevation-0">
+              <v-card-text>
+                <p>Last Step</p>
+              </v-card-text>
+            </v-card>
+            <v-btn @click.native="e1 = 2">Back</v-btn>
+            <v-btn color="primary" @click.native="save()" :disabled="!readingIsCompleted">Save</v-btn>
+          </v-stepper-content>
+        </v-stepper-items>
+      </v-stepper>
     </v-flex>
   </v-container>
 </template>
@@ -42,6 +68,9 @@
 <script>
 
 import firebase from 'firebase'
+import XLSX from 'xlsx'
+
+const makeCols = refstr => Array(XLSX.utils.decode_range(refstr).e.c + 1).fill(0).map((x, i) => ({name: XLSX.utils.encode_col(i), key: i}))
 
 export default {
   name: 'NewCheck',
@@ -53,8 +82,17 @@ export default {
         name: '',
         aircraft: '',
         startDate: '',
-        finishDate: ''
-      }
+        finishDate: '',
+        workpack: []
+      },
+      e1: 0,
+      cols: [],
+      readingIsCompleted: false
+    }
+  },
+  computed: {
+    numberTaskCard () {
+      return this.check.workpack.length
     }
   },
   methods: {
@@ -86,6 +124,31 @@ export default {
           console.log(error)
         }
       )
+    },
+    onFileChange(e) {
+      const files = e.target.files || e.dataTransfer.files
+      if (files && files[0]) {
+        this.readFile(files[0])
+      }
+    },
+    readFile(file) {
+      const reader = new FileReader()
+      reader.onload = (e) => {
+        /* Parse data */
+        console.log('go in to read function')
+        const bstr = e.target.result
+        const wb = XLSX.read(bstr, {type: 'binary'})
+        /* Get first worksheet */
+        const wsname = wb.SheetNames[0]
+        const ws = wb.Sheets[wsname]
+        /* Convert array of arrays */
+        const data = XLSX.utils.sheet_to_json(ws, {header: 1})
+        /* Update state */
+        this.check.workpack = data
+        this.cols = makeCols(ws['!ref'])
+        this.readingIsCompleted = true
+      }
+      reader.readAsBinaryString(file)
     }
   },
   mounted() {
