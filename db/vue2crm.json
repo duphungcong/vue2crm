@@ -1,18 +1,5 @@
 {
-  "checks": [
-    {
-      "aircraft": "A358",
-      "name": "A04 + 18MO"
-    },
-    {
-      "aircraft": "A601",
-      "name": "P01"
-    },
-    {
-      "aircraft": "A326",
-      "name": "A02"
-    }
-  ],
+  "checks": [],
   "aircraft": [
     {
       "name": "A354"
@@ -38,5 +25,6 @@
     {
       "name": "A326"
     }
-  ]
+  ],
+  "ams": []
 }

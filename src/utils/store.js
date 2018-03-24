@@ -11,7 +11,8 @@ const state = {
   loading: false,
   searching: '',
   error: null,
-  following: null
+  following: null,
+  check: null
 }
 
 const mutations = {

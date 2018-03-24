@@ -19,6 +19,9 @@
             <td class="body-2">{{ props.item.aircraft }}</td>
             <td class="text-xs-left">{{ props.item.name }}</td>
             <td class="text-xs-right">
+              <v-btn fab small dark class="green" @click.native="divideZone(props.item)">
+                <v-icon>edit</v-icon>
+              </v-btn>
               <v-btn fab small dark class="teal" @click.native="edit(props.item)">
                 <v-icon>edit</v-icon>
               </v-btn>
@@ -74,6 +77,7 @@ export default {
           const obj = data.val()
           for (let key in obj) {
             this.checks.push({
+              id: key,
               aircraft: obj[key].aircraft,
               name: obj[key].name
             })
@@ -88,6 +92,9 @@ export default {
     },
     add() {
       this.$router.push('newcheck')
+    },
+    divideZone(item) {
+      this.$router.push({ name: 'ZoneDivision', params: { id: item.id } })
     }
   },
   mounted() {

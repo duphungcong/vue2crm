@@ -12,6 +12,8 @@ import Products from '@/components/Products'
 import Product from '@/components/Product'
 import Checks from '@/components/Checks'
 import NewCheck from '@/components/NewCheck'
+import ZoneDivision from '@/components/ZoneDivision'
+import MaintSchedule from '@/components/MaintSchedule'
 
 import Login from '@/components/Login'
 import SignUp from '@/components/SignUp'
@@ -88,6 +90,16 @@ let router = new Router({
       }
     },
     { path: '/newcheck', component: NewCheck, name: 'NewCheck', meta: {
+        requireAuth: true,
+        requireFollowing: false
+      }
+    },
+    { path: '/zonedivision/:id', component: ZoneDivision, name: 'ZoneDivision', meta: {
+        requireAuth: true,
+        requireFollowing: false
+      }
+    },
+    { path: '/maintschedule', component: MaintSchedule, name: 'MaintSchedule', meta: {
         requireAuth: true,
         requireFollowing: false
       }

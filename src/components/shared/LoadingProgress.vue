@@ -1,9 +1,15 @@
 <template>
-  <v-dialog v-model="loading" persistent max-width="60px">
+  <v-dialog v-model="loading" persistent max-width="100" max-height="100">
     <v-card class="v-card">
-      <v-progress-circular indeterminate color="primary"></v-progress-circular>
+      <v-card-text>
+        <v-progress-circular 
+        indeterminate
+        color="primary"
+        :size="60"
+        :width="3"></v-progress-circular>
+      </v-card-text>
     </v-card>
-</v-dialog>
+  </v-dialog>
 </template>
 
 <script>

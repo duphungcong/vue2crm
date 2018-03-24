@@ -135,7 +135,8 @@
         { icon: 'chat_bubble', text: 'About', link: 'About', vertical: 'About' }
       ],
       noFollowingItems: [
-        { icon: 'contacts', text: 'Checks', link: 'Checks', vertical: 'Checks' }
+        { icon: 'contacts', text: 'Checks', link: 'Checks', vertical: 'Checks' },
+        { icon: 'contacts', text: 'AMS', link: 'MaintSchedule', vertical: 'MaintSchedule' }
       ],
       sheet: false,
       tiles: [
