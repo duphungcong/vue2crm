@@ -34,7 +34,7 @@
                 </v-container>
               </v-card-text>
             </v-card>
-            <v-btn @click.native="cancel()">Cancel</v-btn>
+            <v-btn @click.native="dialogConfirm = true">Cancel</v-btn>
             <v-btn color="primary" @click.native="e1 = 2">Next</v-btn>
           </v-stepper-content>
           <v-stepper-content step="2">
@@ -53,15 +53,28 @@
           <v-stepper-content step="3">
             <v-card class="grey lighten-4 elevation-0">
               <v-card-text>
-                <p>Last Step</p>
+                <p>Check: <strong>{{ check.name }}</strong></p>
+                <p>Aircraft: <strong>{{ check.aircraft }}</strong></p>
+                <p>Task Cards: <strong>{{ numberTaskCard }}</strong></p>
+                <p>From: <strong>{{ check.startDate }}</strong></p>
+                <p>To: <strong>{{ check.finishDate }}</strong></p>
               </v-card-text>
             </v-card>
             <v-btn @click.native="e1 = 2">Back</v-btn>
-            <v-btn color="primary" @click.native="save()" :disabled="!readingIsCompleted">Save</v-btn>
+            <v-btn color="primary" @click.native="save()">Save</v-btn>
           </v-stepper-content>
         </v-stepper-items>
       </v-stepper>
     </v-flex>
+    <v-dialog v-model="dialogConfirm" max-width="290">
+      <v-card>
+        <v-card-title>Do you want to cancel your progress?</v-card-title>
+        <v-card-actions>
+          <v-btn color="blue" flat="flat" @click.native="dialogConfirm = false">No</v-btn>
+          <v-btn flat="flat" @click.native="cancel()">Yes</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-container>
 </template>
 
@@ -87,7 +100,8 @@ export default {
       },
       e1: 0,
       cols: [],
-      readingIsCompleted: false
+      readingIsCompleted: false,
+      dialogConfirm: false
     }
   },
   computed: {
@@ -108,6 +122,7 @@ export default {
       )
     },
     cancel() {
+      this.dialogConfirm = false
       this.$router.push('checks')
     },
     getAircraftList() {
