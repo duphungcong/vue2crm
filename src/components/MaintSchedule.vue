@@ -1,36 +1,38 @@
 <template>
   <v-container fluid>
-    <v-flex xs12>
-      <v-card>
-        <v-card-title>Import AMS</v-card-title>
-        <v-card-text>
-          <v-radio-group v-model="aircraftType">
-            <v-radio
-              label="A321"
-              value="amsA321"
-              ></v-radio>
-            <v-radio
-              label="B787"
-              value="amsB787"
-              ></v-radio>  
-            <v-radio
-              label="ATR72"
-              value="amsATR"
-              ></v-radio>
-          </v-radio-group>
-          <v-form>
-            <input type="file" id="file" @change="onFileChange">
-          </v-form>
-          &nbsp;
-          <p>Number of task cards: {{ numberTaskCard }}</p>
-        </v-card-text>
-        <v-card-actions>
-          <v-btn @click.native="cancel()">Cancel</v-btn>
-          <v-btn class="primary" @click.native="save()" :disabled="!readingIsCompleted || aircraftType == null">Save</v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-flex>
-    <loading-progress></loading-progress>
+    <v-layout row justify-space-around="">
+      <v-flex xs12>
+        <v-card>
+          <v-card-title>Import AMS</v-card-title>
+          <v-card-text>
+            <v-radio-group v-model="aircraftType">
+              <v-radio
+                label="A321"
+                value="amsA321"
+                ></v-radio>
+              <v-radio
+                label="B787"
+                value="amsB787"
+                ></v-radio>  
+              <v-radio
+                label="ATR72"
+                value="amsATR"
+                ></v-radio>
+            </v-radio-group>
+            <v-form>
+              <input type="file" id="file" @change="onFileChange">
+            </v-form>
+            &nbsp;
+            <p>Number of task cards: {{ numberTaskCard }}</p>
+          </v-card-text>
+          <v-card-actions>
+            <v-btn @click.native="cancel()">Cancel</v-btn>
+            <v-btn class="primary" @click.native="save()" :disabled="!readingIsCompleted || aircraftType == null">Save</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-flex>
+      <loading-progress></loading-progress>
+    </v-layout>
   </v-container>
 </template>
 

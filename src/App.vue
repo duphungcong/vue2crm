@@ -81,13 +81,7 @@
       </v-btn>
     </v-toolbar>
     <v-content>
-      <v-container fluid fill-height>
-        <v-layout>
-          <v-flex row>
-            <router-view></router-view>
-          </v-flex>
-        </v-layout>
-      </v-container>
+      <router-view></router-view>
     </v-content>
     <v-btn
       v-if="userIsFollowingCheck"

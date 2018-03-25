@@ -1,39 +1,42 @@
 <template>
   <v-container fluid>
-    <v-flex xs12>
-      <v-card>
-        <v-card-title>
-          Checks
-          <v-spacer></v-spacer>
-          <v-btn fab small dark class="blue" @click.native.stop="rightDrawer = !rightDrawer">
-            <v-icon>search</v-icon>
-          </v-btn>
-          &nbsp;
-          <v-btn fab small dark class="red" @click.native="add">
-            <v-icon>add</v-icon>
-          </v-btn>
-        </v-card-title>
-        <v-data-table v-bind:headers="headers" v-bind:items="checks" v-bind:search="search" v-bind:pagination.sync="pagination" hide-actions
-          class="elevation-1">
-          <template slot="items" slot-scope="props" class="body-2">
-            <td class="body-2">{{ props.item.aircraft }}</td>
-            <td class="text-xs-left">{{ props.item.name }}</td>
-            <td class="text-xs-right">
-              <v-btn fab small dark class="green" @click.native="divideZone(props.item)">
-                <v-icon>edit</v-icon>
-              </v-btn>
-              <v-btn fab small dark class="teal" @click.native="edit(props.item)">
-                <v-icon>edit</v-icon>
-              </v-btn>
-              <v-btn fab small class="cyan" @click.native="remove(props.item)">
-                <v-icon>delete</v-icon>
-              </v-btn>
-            </td>
-          </template>
-        </v-data-table>
-      </v-card>
-    </v-flex>
-    <loading-progress></loading-progress>
+    <v-layout row justify-space-around>
+      <v-flex xs12>
+        <v-card>
+          <v-card-title>
+            List of checks
+            <v-spacer></v-spacer>
+            <v-btn fab small dark class="blue" @click.native.stop="rightDrawer = !rightDrawer">
+              <v-icon>search</v-icon>
+            </v-btn>
+            &nbsp;
+            <v-btn fab small dark class="red" @click.native="add">
+              <v-icon>add</v-icon>
+            </v-btn>
+          </v-card-title>
+          <v-card-text>
+            <v-data-table overflow v-bind:headers="headers" v-bind:items="checks" v-bind:search="search" v-bind:pagination.sync="pagination" class="elevation-1" expand>
+              <template slot="items" slot-scope="props" class="body-2">
+                <td class="body-2">{{ props.item.aircraft }}</td>
+                <td class="text-xs-left">{{ props.item.name }}</td>
+                <td class="text-xs-right">
+                  <v-btn fab small dark class="green" @click.native="divideZone(props.item)">
+                    <v-icon>edit</v-icon>
+                  </v-btn>
+                  <v-btn fab small dark class="teal" @click.native="edit(props.item)">
+                    <v-icon>edit</v-icon>
+                  </v-btn>
+                  <v-btn fab small class="cyan" @click.native="remove(props.item)">
+                    <v-icon>delete</v-icon>
+                  </v-btn>
+                </td>
+              </template>
+            </v-data-table>
+          </v-card-text>
+        </v-card>
+      </v-flex>
+      <loading-progress></loading-progress>
+    </v-layout>
   </v-container>
 </template>
 
@@ -102,3 +105,4 @@ export default {
   }
 }
 </script>
+

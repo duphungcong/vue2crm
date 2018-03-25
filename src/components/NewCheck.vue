@@ -1,5 +1,6 @@
 <template>
-  <v-container fluid>
+<v-container fluid>
+  <v-layout row justify-space-around>
     <v-flex xs12>
       <v-stepper v-model="e1">
         <v-stepper-header>
@@ -75,7 +76,8 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
-  </v-container>
+  </v-layout>
+</v-container>
 </template>
 
 <script>

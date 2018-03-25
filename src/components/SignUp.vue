@@ -1,7 +1,7 @@
 <template>
 <v-container fluid>
-  <v-layout row wrap>
-    <v-flex xs4 offset-xs4 justify-space-between>
+  <v-layout row>
+    <v-flex md4 offset-md4>
       <h1> &nbsp; </h1>
       <v-card>
         <v-card-title class="blue darken-1">
