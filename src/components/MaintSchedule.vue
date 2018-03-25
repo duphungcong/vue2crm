@@ -1,9 +1,9 @@
 <template>
-  <v-container fluid>
+  <v-container fluid grid-list-sm>
     <v-layout row justify-space-around="">
       <v-flex xs12>
         <v-card>
-          <v-card-title>Import AMS</v-card-title>
+          <v-card-title><h3>Import AMS</h3></v-card-title>
           <v-card-text>
             <v-radio-group v-model="aircraftType">
               <v-radio

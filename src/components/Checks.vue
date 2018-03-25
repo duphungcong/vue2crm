@@ -1,6 +1,5 @@
 <template>
-  <v-container fluid>
-    <v-layout row justify-space-around>
+  <v-container fluid grid-list-sm>
       <v-flex xs12>
         <v-card>
           <v-card-title>
@@ -14,7 +13,6 @@
               <v-icon>add</v-icon>
             </v-btn>
           </v-card-title>
-          <v-card-text>
             <v-data-table overflow v-bind:headers="headers" v-bind:items="checks" v-bind:search="search" v-bind:pagination.sync="pagination" class="elevation-1" expand>
               <template slot="items" slot-scope="props" class="body-2">
                 <td class="body-2">{{ props.item.aircraft }}</td>
@@ -32,11 +30,9 @@
                 </td>
               </template>
             </v-data-table>
-          </v-card-text>
         </v-card>
       </v-flex>
       <loading-progress></loading-progress>
-    </v-layout>
   </v-container>
 </template>
 

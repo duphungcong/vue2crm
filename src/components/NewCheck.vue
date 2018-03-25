@@ -1,6 +1,5 @@
 <template>
-<v-container fluid>
-  <v-layout row justify-space-around>
+  <v-container fluid grid-list-sm>
     <v-flex xs12>
       <v-stepper v-model="e1">
         <v-stepper-header>
@@ -12,47 +11,42 @@
         </v-stepper-header>
         <v-stepper-items>
           <v-stepper-content step="1">
-            <v-card class="grey lighten-4 elevation-0">
-              <v-card-text>
-                <v-container fluid grid-list-md>
-                  <v-layout row wrap class="px-10">
-                    <v-flex md6 xs12>
-                      <v-text-field name="checkName" label="Check" hint="Check name is required" value="Input text" v-model="check.name"
-                        class="input-group--focused" required></v-text-field>
-                    </v-flex>
-                    <v-flex md6 xs12>
-                      <v-select v-bind:items="aircraftList" label="Aircraft" v-model="check.aircraft" item-text="name" item-value="name" class="input-group--focused" required></v-select>
-                    </v-flex>
-                    <v-flex md6 xs12>
-                      Start Date<br>
-                      <v-date-picker v-model="check.startDate"></v-date-picker>
-                    </v-flex>
-                    <v-flex md6 xs12>
-                      Finish Date<br>
-                      <v-date-picker v-model="check.finishDate"></v-date-picker>
-                    </v-flex>
-                  </v-layout>
-                </v-container>
-              </v-card-text>
-            </v-card>
+            <v-layout row wrap class="px-10">
+              <v-flex md6 xs12>
+                <v-text-field name="checkName" label="Check" hint="Check name is required" value="Input text" v-model="check.name"
+                  class="input-group--focused" required></v-text-field>
+              </v-flex>
+              <v-flex md6 xs12>
+                <v-select v-bind:items="aircraftList" label="Aircraft" v-model="check.aircraft" item-text="name" item-value="name" class="input-group--focused" required></v-select>
+              </v-flex>
+              <v-flex md6 xs12>
+                Start Date<br>
+                <v-date-picker v-model="check.startDate"></v-date-picker>
+              </v-flex>
+              <v-flex md6 xs12>
+                Finish Date<br>
+                <v-date-picker v-model="check.finishDate"></v-date-picker>
+              </v-flex>
+            </v-layout> 
             <v-btn @click.native="dialogConfirm = true">Cancel</v-btn>
             <v-btn color="primary" @click.native="e1 = 2">Next</v-btn>
           </v-stepper-content>
           <v-stepper-content step="2">
-            <v-card class="grey lighten-4 elevation-0">
+            <v-card class="lighten-4 elevation-0">
+              <v-card-title><h3>Import WP CONTROL</h3></v-card-title>
               <v-card-text>
                 <v-form>
-                  <label for="file">Import WP CONTROL</label><br>
                   <input type="file" id="file" @change="onFileChange">
                 </v-form>
               </v-card-text>
-              <v-card-title pl-0>Number of task cards: {{ numberTaskCard }}</v-card-title>
+              <p>Number of task cards: {{ numberTaskCard }}</p>
             </v-card>
             <v-btn @click.native="e1 = 1">Back</v-btn>
             <v-btn color="primary" @click.native="e1 = 3" :disabled="!readingIsCompleted">Next</v-btn>
           </v-stepper-content>
           <v-stepper-content step="3">
-            <v-card class="grey lighten-4 elevation-0">
+            <v-card class="lighten-4 elevation-0">
+              <v-card-title><h3>Review and submit</h3></v-card-title>
               <v-card-text>
                 <p>Check: <strong>{{ check.name }}</strong></p>
                 <p>Aircraft: <strong>{{ check.aircraft }}</strong></p>
@@ -76,8 +70,7 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
-  </v-layout>
-</v-container>
+  </v-container>
 </template>
 
 <script>
