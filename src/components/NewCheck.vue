@@ -31,7 +31,7 @@
               </v-flex>
             </v-layout> 
             <v-btn @click.native="dialogConfirmCancel = true">Cancel</v-btn>
-            <v-btn color="primary" @click.native="e1 = 2">Next</v-btn>
+            <v-btn color="primary" @click.native="e1 = 2" :disabled="!inputCheckInfoCompleted">Next</v-btn>
           </v-stepper-content>
           <v-stepper-content step="2">
             <v-card class="lighten-4 elevation-0">
@@ -71,8 +71,8 @@
                     <v-btn icon class="mx-0" @click="editItem(props.item)">
                       <v-icon color="teal">edit</v-icon>
                     </v-btn>
-                    <v-btn icon class="mx-0" @click="deleteItem(props.item)">
-                      <v-icon color="pink">delete</v-icon>
+                    <v-btn icon class="mx-0" @click="linkItem(props.item)">
+                      <v-icon color="teal">link</v-icon>
                     </v-btn>
                   </td>
                 </template>
@@ -98,7 +98,7 @@
     </v-flex>
     <v-dialog v-model="dialogConfirmCancel" max-width="290">
       <v-card>
-        <v-card-title>Do you want to cancelCheck your progress?</v-card-title>
+        <v-card-title>Do you want to cancel your progress?</v-card-title>
         <v-card-actions>
           <v-btn color="blue" flat="flat" @click.native="dialogConfirmCancel = false">No</v-btn>
           <v-btn flat="flat" @click.native="cancelCheck()">Yes</v-btn>
@@ -141,6 +141,17 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+    <v-dialog v-model="dialogLinkItem" max-width="500">
+      <v-card>
+        <v-card-title><span class="headline">Link to EO</span></v-card-title>
+        <v-card-text>Hello</v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="blue darken-1" flat @click.native="closeLinkItem()">Cancel</v-btn>
+          <v-btn color="blue darken-1" flat @click.native="saveLinkItem()">Save</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
     <loading-progress></loading-progress>
   </v-container>
 </template>
@@ -158,6 +169,7 @@ export default {
     return {
       title: '',
       aircraftList: [],
+      eoList: [],
       check: {
         name: '',
         aircraft: '',
@@ -170,6 +182,7 @@ export default {
       scanningIsCompleted: false,
       dialogConfirmCancel: false,
       dialogEditItem: false,
+      dialogLinkItem: false,
       headers: [
         { text: 'WP ITEM', left: true, value: 'WP_ITEM' },
         { text: 'TASK', left: true, value: 'TASKNAME' },
@@ -183,7 +196,7 @@ export default {
         { text: 'ZONE DIVISION', left: true, value: 'ZONEDIVISION' },
         { text: 'REMARK', left: true, value: 'REMARKS' }
       ],
-      editedIndex: -1,
+      itemIndex: -1,
       defaultItem: {
         'AMS MH': 0,
         'MAC MH': 0,
@@ -198,6 +211,12 @@ export default {
   computed: {
     numberTaskCard () {
       return this.check.workpack.length
+    },
+    inputCheckInfoCompleted () {
+      return this.check.name.length !== 0
+              && this.check.aircraft.length !== 0
+              && this.check.startDate.length !== 0
+              && this.check.finishDate.length !== 0
     }
   },
   methods: {
@@ -230,6 +249,9 @@ export default {
           console.log(error)
         }
       )
+    },
+    getEOList() {
+      return
     },
     onFileChange(e) {
       const files = e.target.files || e.dataTransfer.files
@@ -291,7 +313,7 @@ export default {
       }
     },
     editItem(item) {
-      this.editedIndex = this.check.workpack.indexOf(item)
+      this.itemIndex = this.check.workpack.indexOf(item)
       this.editedItem = Object.assign({}, item)
       this.dialogEditItem = true
     },
@@ -299,18 +321,37 @@ export default {
       this.dialogEditItem = false
       setTimeout(() => {
         this.editedItem = Object.assign({}, this.defaultItem)
-        this.editedIndex = -1
+        this.itemIndex = -1
       }, 300)
     },
     saveEditItem() {
-      if (this.editedIndex > -1) {
-        Object.assign(this.check.workpack[this.editedIndex], this.editedItem)
+      if (this.itemIndex > -1) {
+        Object.assign(this.check.workpack[this.itemIndex], this.editedItem)
       }
       this.closeEditItem()
+    },
+    linkItem(item) {
+      this.itemIndex = this.check.workpack.indexOf(item)
+      this.editedItem = Object.assign({}, item)
+      this.dialogLinkItem = true
+    },
+    closeLinkItem() {
+      this.dialogLinkItem = false
+      setTimeout(() => {
+        this.editedItem = Object.assign({}, this.defaultItem)
+        this.itemIndex = -1
+      }, 300)
+    },
+    saveLinkItem() {
+      if (this.itemIndex > -1) {
+        Object.assign(this.check.workpack[this.itemIndex], this.editedItem)
+      }
+      this.closeLinkItem()
     }
   },
   mounted() {
     this.getAircraftList()
+    this.getEOList()
     this.title = 'New Check'
   }
 }
