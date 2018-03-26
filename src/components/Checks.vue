@@ -3,7 +3,7 @@
       <v-flex xs12>
         <v-card>
           <v-card-title>
-            List of checks
+            <h3>List of checks</h3>
             <v-spacer></v-spacer>
             <v-btn fab small dark class="blue" @click.native.stop="rightDrawer = !rightDrawer">
               <v-icon>search</v-icon>
@@ -13,7 +13,7 @@
               <v-icon>add</v-icon>
             </v-btn>
           </v-card-title>
-            <v-data-table overflow v-bind:headers="headers" v-bind:items="checks" v-bind:search="search" v-bind:pagination.sync="pagination" class="elevation-1" expand>
+            <v-data-table v-bind:headers="headers" v-bind:items="checks" v-bind:search="search" v-bind:pagination.sync="pagination">
               <template slot="items" slot-scope="props" class="body-2">
                 <td class="body-2">{{ props.item.aircraft }}</td>
                 <td class="text-xs-left">{{ props.item.name }}</td>
