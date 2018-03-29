@@ -1,6 +1,6 @@
 <template>
   <v-container fluid grid-list-sm>
-    <v-layout row justify-space-around="">
+    <v-layout row justify-space-around>
       <v-flex xs12>
         <v-card>
           <v-card-title><h3>Import AMS</h3></v-card-title>

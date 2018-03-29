@@ -12,7 +12,7 @@ import Products from '@/components/Products'
 import Product from '@/components/Product'
 import Checks from '@/components/Checks'
 import NewCheck from '@/components/NewCheck'
-import ZoneDivision from '@/components/ZoneDivision'
+import EditCheck from '@/components/EditCheck'
 import MaintSchedule from '@/components/MaintSchedule'
 
 import Login from '@/components/Login'
@@ -94,7 +94,7 @@ let router = new Router({
         requireFollowing: false
       }
     },
-    { path: '/zonedivision/:id', component: ZoneDivision, name: 'ZoneDivision', meta: {
+    { path: '/editcheck/:id', component: EditCheck, name: 'EditCheck', meta: {
         requireAuth: true,
         requireFollowing: false
       }

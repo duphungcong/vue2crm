@@ -19,7 +19,7 @@ export default {
     }
   },
   created() {
-    console.log('loading-progress component')
+    console.log('LoadingProgress - created')
   },
   computed: {
     loading () {

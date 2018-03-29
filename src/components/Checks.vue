@@ -9,7 +9,7 @@
               <v-icon>search</v-icon>
             </v-btn>
             &nbsp;
-            <v-btn fab small dark class="red" @click.native="add">
+            <v-btn fab small dark class="red" @click.native="addCheck">
               <v-icon>add</v-icon>
             </v-btn>
           </v-card-title>
@@ -18,14 +18,11 @@
                 <td class="body-2">{{ props.item.aircraft }}</td>
                 <td class="text-xs-left">{{ props.item.name }}</td>
                 <td class="text-xs-right">
-                  <v-btn fab small dark class="green" @click.native="divideZone(props.item)">
-                    <v-icon>edit</v-icon>
+                  <v-btn icon class="mx-0" @click.native="editCheck(props.item)">
+                    <v-icon color="green" >edit</v-icon>
                   </v-btn>
-                  <v-btn fab small dark class="teal" @click.native="edit(props.item)">
-                    <v-icon>edit</v-icon>
-                  </v-btn>
-                  <v-btn fab small class="cyan" @click.native="remove(props.item)">
-                    <v-icon>delete</v-icon>
+                  <v-btn icon class="mx-0" @click.native="removeCheck(props.item)">
+                    <v-icon color="red">delete</v-icon>
                   </v-btn>
                 </td>
               </template>
@@ -89,11 +86,11 @@ export default {
         }
       )
     },
-    add() {
+    addCheck() {
       this.$router.push('newcheck')
     },
-    divideZone(item) {
-      this.$router.push({ name: 'ZoneDivision', params: { id: item.id } })
+    editCheck(item) {
+      this.$router.push({ name: 'EditCheck', params: { id: item.id } })
     }
   },
   mounted() {
