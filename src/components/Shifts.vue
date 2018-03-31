@@ -36,7 +36,7 @@ export default {
   },
   computed: {
     currentShift () {
-      let today = Date.now()
+      let today = Date.now(7)
       let start = new Date(this.check.startDate)
       let diff = new Date(today - start)
       return diff.getUTCDate()
