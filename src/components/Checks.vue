@@ -20,6 +20,9 @@
                 <td class="body-2">{{ props.item.startDate }}</td>
                 <td class="body-2">{{ props.item.finishDate }}</td>
                 <td class="text-xs-right">
+                  <v-btn icon class="mx-0" @click.native="followCheck(props.item)">
+                    <v-icon color="green">touch_app</v-icon>
+                  </v-btn>
                   <v-btn icon class="mx-0" @click.native="shiftManagement(props.item)">
                     <v-icon color="green">sort</v-icon>
                   </v-btn>
@@ -96,6 +99,9 @@ export default {
     },
     shiftManagement(item) {
       this.$router.push({ name: 'Shifts', params: { id: item.id } })
+    },
+    followCheck(item) {
+      this.$store.dispatch('setFollowing')
     }
   },
   mounted() {
