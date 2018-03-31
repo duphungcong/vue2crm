@@ -1,7 +1,7 @@
 <template>
   <v-container fluid grid-list-sm>
     <v-card class="lighten-4 elevation-0">
-      <v-data-table :headers="headers" :items="check.workpack" expand>
+      <v-data-table :headers="headers" :items="check.workpack" expand :pagination.sync="pagination">
         <template slot="items" slot-scope="props" class="body-0">
           <td class="body-0">{{ props.item.WP_ITEM }}</td>
           <td class="body-0">{{ props.item.TASKNAME }}</td>
@@ -35,7 +35,12 @@ export default {
   data () {
     return {
       checkId: null,
-      check: null,
+      check: [],
+      pagination: {
+        page: 1,
+        totalItems: 0,
+        rowsPerPage: 10
+      },
       headers: [
         { text: 'WP ITEM', left: true, value: 'WP_ITEM' },
         { text: 'TASK', left: true, value: 'TASKNAME' },

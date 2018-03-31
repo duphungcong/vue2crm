@@ -204,7 +204,8 @@ export default {
         aircraft: '',
         startDate: '',
         finishDate: '',
-        workpack: []
+        workpack: [],
+        shifts: []
       },
       e1: 0,
       readingIsCompleted: false,
@@ -259,6 +260,17 @@ export default {
   },
   methods: {
     saveCheck() {
+      let start = new Date(this.check.startDate)
+      let finish = new Date(this.check.finishDate)
+      let diff = new Date(finish - start)
+      let numberOfShift = diff.getUTCDate()
+      for (let n = 0; n < numberOfShift; n++) {
+        this.check.shifts.push({
+          elect: true,
+          air: true,
+          hyd: true
+        })
+      }
       const check = this.check
       firebase.database().ref('checks').push(check).then(
         (data) => {

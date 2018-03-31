@@ -14,6 +14,8 @@ import Checks from '@/components/Checks'
 import NewCheck from '@/components/NewCheck'
 import EditCheck from '@/components/EditCheck'
 import MaintSchedule from '@/components/MaintSchedule'
+import Shifts from '@/components/Shifts'
+import Shift from '@/components/Shift'
 
 import Login from '@/components/Login'
 import SignUp from '@/components/SignUp'
@@ -100,6 +102,18 @@ let router = new Router({
       }
     },
     { path: '/maintschedule', component: MaintSchedule, name: 'MaintSchedule', meta: {
+        requireAuth: true,
+        requireFollowing: false
+      }
+    },
+    {
+      path: '/shifts/:id', component: Shifts, name: 'Shifts', meta: {
+        requireAuth: true,
+        requireFollowing: false
+      }
+    },
+    {
+      path: '/shift', component: Shift, name: 'Shift', meta: {
         requireAuth: true,
         requireFollowing: false
       }

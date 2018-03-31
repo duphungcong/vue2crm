@@ -16,10 +16,18 @@
             <v-data-table v-bind:headers="headers" v-bind:items="checks" v-bind:search="search" v-bind:pagination.sync="pagination">
               <template slot="items" slot-scope="props" class="body-2">
                 <td class="body-2">{{ props.item.aircraft }}</td>
-                <td class="text-xs-left">{{ props.item.name }}</td>
+                <td class="body-2">{{ props.item.name }}</td>
+                <td class="body-2">{{ props.item.startDate }}</td>
+                <td class="body-2">{{ props.item.finishDate }}</td>
                 <td class="text-xs-right">
+                  <v-btn icon class="mx-0" @click.native="shiftManagement(props.item)">
+                    <v-icon color="green">sort</v-icon>
+                  </v-btn>
+                  <v-btn icon class="mx-0" @click.native="taskManagement(props.item)">
+                    <v-icon color="green">assignment</v-icon>
+                  </v-btn>
                   <v-btn icon class="mx-0" @click.native="editCheck(props.item)">
-                    <v-icon color="green" >edit</v-icon>
+                    <v-icon color="green">edit</v-icon>
                   </v-btn>
                   <v-btn icon class="mx-0" @click.native="removeCheck(props.item)">
                     <v-icon color="red">delete</v-icon>
@@ -43,25 +51,17 @@ export default {
     return {
       search: '',
       pagination: {
-          page: 1,
-          totalItems: 0,
-          rowsPerPage: 10
-        },
-        headers: [{
-          text: 'Aircraft',
-          left: true,
-          value: 'aircraft'
-        },
-        {
-          text: 'Name',
-          left: true,
-          value: 'name'
-        },
-        {
-          text: '',
-          sortable: false,
-          value: ''
-        }],
+        page: 1,
+        totalItems: 0,
+        rowsPerPage: 10
+      },
+      headers: [
+        { text: 'Aircraft', left: true, value: 'aircraft' },
+        { text: 'Name', left: true, value: 'name' },
+        { text: 'From', left: true, value: 'startDate' },
+        { text: 'To', left: true, value: 'finishDate' },
+        { text: '', sortable: false, value: '' }
+      ],
       checks: []
     }
   },
@@ -75,7 +75,9 @@ export default {
             this.checks.push({
               id: key,
               aircraft: obj[key].aircraft,
-              name: obj[key].name
+              name: obj[key].name,
+              startDate: obj[key].startDate,
+              finishDate: obj[key].finishDate
             })
           }
           this.$store.dispatch('endLoading')
@@ -91,6 +93,9 @@ export default {
     },
     editCheck(item) {
       this.$router.push({ name: 'EditCheck', params: { id: item.id } })
+    },
+    shiftManagement(item) {
+      this.$router.push({ name: 'Shifts', params: { id: item.id } })
     }
   },
   mounted() {
