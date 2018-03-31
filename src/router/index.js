@@ -21,7 +21,7 @@ import Login from '@/components/Login'
 import SignUp from '@/components/SignUp'
 import ChangePassword from '@/components/ChangePassword'
 
-import store from '@/utils/store'
+import store from '@/store'
 
 Vue.use(Router)
 
@@ -109,13 +109,13 @@ let router = new Router({
     {
       path: '/shifts/:id', component: Shifts, name: 'Shifts', meta: {
         requireAuth: true,
-        requireFollowing: false
+        requireFollowing: true
       }
     },
     {
       path: '/shift', component: Shift, name: 'Shift', meta: {
         requireAuth: true,
-        requireFollowing: false
+        requireFollowing: true
       }
     },
     { path: '/login', component: Login, name: 'Login' },
@@ -150,10 +150,17 @@ router.beforeEach((to, from, next) => {
   let requireFollowing = to.matched.some(record => record.meta.requireFollowing)
 
   if (requireAuth && !isAuth) {
-    next('login')
+    console.log('step 1')
+    next('/login')
   } else if (requireFollowing && !isFollowing) {
-    next('checks')
+    // console.log('step 2')
+    // console.log('requireFollowing : ' + requireFollowing)
+    // console.log('isFollowing : ' + isFollowing)
+    next('/checks')
   } else {
+    // console.log('step 3')
+    // console.log('requireFollowing : ' + requireFollowing)
+    // console.log('isFollowing : ' + isFollowing)
     next()
   }
 })

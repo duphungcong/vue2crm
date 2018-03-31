@@ -39,7 +39,6 @@
               <v-icon>more_vert</v-icon>
             </v-btn>
             <v-list>
-              <v-list-tile v-if="!userIsFollowingCheck" @click="onFollowing">Follow check</v-list-tile>
               <v-list-tile v-if="userIsFollowingCheck"  @click="onStopFollowing">Stop following check</v-list-tile>
               <v-list-tile @click="onLogOut">Logout</v-list-tile>
             </v-list>
@@ -126,7 +125,8 @@
         { icon: 'history', text: 'Orders', link: 'Orders', vertical: 'Order' },
         { icon: 'content_copy', text: 'Customers', link: 'Customers', vertical: 'Customer' },
         { icon: 'settings', text: 'Products', link: 'Products', vertical: 'Product' },
-        { icon: 'chat_bubble', text: 'About', link: 'About', vertical: 'About' }
+        { icon: 'chat_bubble', text: 'About', link: 'About', vertical: 'About' },
+        { icon: 'assignment', text: 'Shifts', link: 'Shifts', vertical: 'Shifts' }
       ],
       noFollowingItems: [
         { icon: 'contacts', text: 'Checks', link: 'Checks', vertical: 'Checks' },
@@ -201,25 +201,22 @@
       },
       following (newValue, oldValue) {
         if (oldValue === null && newValue !== null) {
+          // console.log('go to /')
           this.$router.push('/')
         }
         if (oldValue !== null && newValue === null) {
-          this.$router.push('checks')
+          // console.log('go to check')
+          this.$router.push('/checks')
         }
       }
     },
     methods: {
       clickMenu (item) {
         this.menuItem = item.text
-        this.$router.push({
-          name: item.link
-        })
+        this.$router.push({ name: item.link, params: { id: this.$store.getters.following } })
       },
       onLogOut () {
         this.$store.dispatch('logOut')
-      },
-      onFollowing () {
-        this.$store.dispatch('setFollowing')
       },
       onStopFollowing () {
         this.$store.dispatch('stopFollowing')

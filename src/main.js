@@ -4,7 +4,7 @@ import Vue from 'vue'
 import Vuetify from 'vuetify'
 import App from './App'
 import router from './router'
-import store from './utils/store'
+import store from './store'
 import api from './utils/backend-api'
 import appUtil from './utils/app-util'
 

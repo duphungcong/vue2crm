@@ -86,8 +86,8 @@ const actions = {
   endLoading ({commit}) {
     commit('setLoading', false)
   },
-  setFollowing({commit}) {
-    commit('setFollowing', true)
+  setFollowing({commit}, payload) {
+    commit('setFollowing', payload)
   },
   stopFollowing ({commit}) {
     commit('setFollowing', null)
