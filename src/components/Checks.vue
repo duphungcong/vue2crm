@@ -76,7 +76,7 @@ export default {
           const obj = data.val()
           for (let key in obj) {
             this.checks.push({
-              uid: key,
+              id: key,
               aircraft: obj[key].aircraft,
               name: obj[key].name,
               startDate: obj[key].startDate,
@@ -95,10 +95,10 @@ export default {
       this.$router.push('newcheck')
     },
     editCheck(item) {
-      this.$router.push({ name: 'EditCheck', params: { id: item.uid } })
+      this.$router.push({ name: 'EditCheck', params: { id: item.id } })
     },
     followCheck(item) {
-      this.$store.dispatch('setFollowing', item.uid)
+      this.$store.dispatch('setFollowing', item.id)
     }
   },
   mounted() {

@@ -16,6 +16,9 @@ import EditCheck from '@/components/EditCheck'
 import MaintSchedule from '@/components/MaintSchedule'
 import Shifts from '@/components/Shifts'
 import Shift from '@/components/Shift'
+import Tasks from '@/components/Tasks'
+import ShiftBar from '@/components/ShiftBar'
+import Barcode from '@/components/Barcode'
 
 import Login from '@/components/Login'
 import SignUp from '@/components/SignUp'
@@ -107,13 +110,31 @@ let router = new Router({
       }
     },
     {
-      path: '/shifts/:id', component: Shifts, name: 'Shifts', meta: {
+      path: '/shifts', component: Shifts, name: 'Shifts', meta: {
         requireAuth: true,
         requireFollowing: true
       }
     },
     {
       path: '/shift', component: Shift, name: 'Shift', meta: {
+        requireAuth: true,
+        requireFollowing: true
+      }
+    },
+    {
+      path: '/shiftbar', component: ShiftBar, name: 'ShiftBar', meta: {
+        requireAuth: true,
+        requireFollowing: true
+      }
+    },
+    {
+      path: '/tasks', component: Tasks, name: 'Tasks', meta: {
+        requireAuth: true,
+        requireFollowing: true
+      }
+    },
+    {
+      path: '/barcode', component: Barcode, name: 'Barcode', meta: {
         requireAuth: true,
         requireFollowing: true
       }

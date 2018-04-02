@@ -54,24 +54,24 @@
             <v-btn @click.native="e1 = 2">Back</v-btn>
             <v-btn color="primary" @click.native="e1 = 4">Next</v-btn>
             <v-card class="lighten-4 elevation-0">
-              <v-data-table :headers="headers" :items="check.workpack" expand>
+              <v-data-table :headers="headers" :items="workpack" expand>
                 <template slot="items" slot-scope="props" class="body-0">
-                  <td class="body-0">{{ props.item.WP_ITEM }}</td>
-                  <td class="body-0">{{ props.item.TASKNAME }}</td>
-                  <td class="body-0">{{ props.item.ZONE }}</td>
-                  <td class="body-0">{{ props.item.TASKTYPE }}</td>
-                  <td class="body-0">{{ props.item.TASKTITLE }}</td>
-                  <td class="body-0">{{ props.item['AMS MH'] }}</td>
-                  <td class="body-0">{{ props.item['MAC MH'] }}</td>
-                  <td class="body-0">{{ props.item.MEN }}</td>
-                  <td class="body-0">{{ props.item.HOUR }}</td>
-                  <td class="body-0">{{ props.item.ZONEDIVISION }}</td>
-                  <td class="body-0">{{ props.item.REMARKS }}</td>
+                  <td class="body-0">{{ props.item.wpItem }}</td>
+                  <td class="body-0">{{ props.item.taskName }}</td>
+                  <td class="body-0">{{ props.item.zone }}</td>
+                  <td class="body-0">{{ props.item.taskType }}</td>
+                  <td class="body-0">{{ props.item.taskTitle }}</td>
+                  <td class="body-0">{{ props.item.amsMH }}</td>
+                  <td class="body-0">{{ props.item.macMH }}</td>
+                  <td class="body-0">{{ props.item.men }}</td>
+                  <td class="body-0">{{ props.item.hour }}</td>
+                  <td class="body-0">{{ props.item.zoneDivision }}</td>
+                  <td class="body-0">{{ props.item.remarks }}</td>
                   <td class="justify-center layout px-0">
                     <v-btn icon class="mx-0" @click="editItem(props.item)">
                       <v-icon color="teal">edit</v-icon>
                     </v-btn>
-                    <v-btn icon class="mx-0" @click="linkItem(props.item)" :disabled="!props.item.TASKNAME.includes('VN ')">
+                    <v-btn icon class="mx-0" @click="linkItem(props.item)" :disabled="!props.item.taskName.includes('VN ')">
                       <v-icon color="teal">link</v-icon>
                     </v-btn>
                   </td>
@@ -114,22 +114,22 @@
           <v-container grid-list-md>
             <v-layout wrap>
               <v-flex xs12 sm3 md3>
-                <v-text-field type="number" label="AMS MH" v-model="editedItem['AMS MH']"></v-text-field>
+                <v-text-field type="number" label="AMS MH" v-model="editedItem.amsMH"></v-text-field>
               </v-flex>
               <v-flex xs12 sm3 md3>
-                <v-text-field type="number" label="MAC MH" v-model="editedItem['MAC MH']"></v-text-field>
+                <v-text-field type="number" label="MAC MH" v-model="editedItem.macMH"></v-text-field>
               </v-flex>
               <v-flex xs12 sm3 md3>
-                <v-text-field type="number" label="MEN" v-model="editedItem.MEN"></v-text-field>
+                <v-text-field type="number" label="MEN" v-model="editedItem.men"></v-text-field>
               </v-flex>
               <v-flex xs12 sm3 md3>
-                <v-text-field type="number" label="HOUR" v-model="editedItem.HOUR"></v-text-field>
+                <v-text-field type="number" label="HOUR" v-model="editedItem.hour"></v-text-field>
               </v-flex>
               <v-flex xs12 sm12 md12>
-                <v-text-field multi-line rows="2" label="ZONE DIVISION" v-model="editedItem.ZONEDIVISION"></v-text-field>
+                <v-text-field multi-line rows="2" label="ZONE DIVISION" v-model="editedItem.zoneDivision"></v-text-field>
               </v-flex>
               <v-flex xs12 sm12 md12>
-                <v-text-field multi-line rows="2" no-resize label="REMARKS" v-model="editedItem.REMARKS"></v-text-field>
+                <v-text-field multi-line rows="2" no-resize label="REMARKS" v-model="editedItem.remarks"></v-text-field>
               </v-flex>
             </v-layout>
           </v-container>
@@ -154,22 +154,22 @@
                 <v-select cache-items clearable open-on-clear :items="eoList" label="Select EO" v-model="linkedItem" item-text="NAME" class="input-group--focused" required autocomplete @keyup.native.enter="addEO"></v-select>
               </v-flex>
               <v-flex xs12 sm3 md3>
-                <v-text-field type="number" label="AMS MH" v-model="linkedItem['AMS MH']"></v-text-field>
+                <v-text-field type="number" label="AMS MH" v-model="linkedItem.amsMH"></v-text-field>
               </v-flex>
               <v-flex xs12 sm3 md3>
-                <v-text-field type="number" label="MAC MH" v-model="linkedItem['MAC MH']"></v-text-field>
+                <v-text-field type="number" label="MAC MH" v-model="linkedItem.macMH"></v-text-field>
               </v-flex>
               <v-flex xs12 sm3 md3>
-                <v-text-field type="number" label="MEN" v-model="linkedItem.MEN"></v-text-field>
+                <v-text-field type="number" label="MEN" v-model="linkedItem.men"></v-text-field>
               </v-flex>
               <v-flex xs12 sm3 md3>
-                <v-text-field type="number" label="HOUR" v-model="linkedItem.HOUR"></v-text-field>
+                <v-text-field type="number" label="HOUR" v-model="linkedItem.hour"></v-text-field>
               </v-flex>
               <v-flex xs12 sm12 md12>
-                <v-text-field label="ZONE DIVISION" v-model="linkedItem.ZONEDIVISION"></v-text-field>
+                <v-text-field label="ZONE DIVISION" v-model="linkedItem.zoneDivision"></v-text-field>
               </v-flex>
               <v-flex xs12 sm12 md12>
-                <v-text-field label="REMARKS" v-model="linkedItem.REMARKS"></v-text-field>
+                <v-text-field label="REMARKS" v-model="linkedItem.remarks"></v-text-field>
               </v-flex>
             </v-layout>
           </v-container>
@@ -204,9 +204,9 @@ export default {
         aircraft: '',
         startDate: '',
         finishDate: '',
-        workpack: [],
         shifts: []
       },
+      workpack: [],
       e1: 0,
       readingIsCompleted: false,
       scanningIsCompleted: false,
@@ -214,26 +214,26 @@ export default {
       dialogEditItem: false,
       dialogLinkItem: false,
       headers: [
-        { text: 'WP ITEM', left: true, value: 'WP_ITEM' },
-        { text: 'TASK', left: true, value: 'TASKNAME' },
-        { text: 'ZONE', left: true, value: 'ZONE' },
-        { text: 'TYPE', left: true, value: 'TASKTYPE' },
-        { text: 'TITLE', left: true, value: 'TASKTITLE' },
-        { text: 'AMS MH', left: true, value: 'AMS MH' },
-        { text: 'MAC MH', left: true, value: 'MAC MH' },
-        { text: 'MEN', left: true, value: 'MEN' },
-        { text: 'HOUR', left: true, value: 'HOUR' },
-        { text: 'ZONE DIVISION', left: true, value: 'ZONEDIVISION' },
-        { text: 'REMARK', left: true, value: 'REMARKS' }
+        { text: 'WP ITEM', left: true, value: 'wpItem' },
+        { text: 'TASK', left: true, value: 'taskName' },
+        { text: 'ZONE', left: true, value: 'zone' },
+        { text: 'TYPE', left: true, value: 'taskType' },
+        { text: 'TITLE', left: true, value: 'taskTitle' },
+        { text: 'AMS MH', left: true, value: 'amsMH' },
+        { text: 'MAC MH', left: true, value: 'macMH' },
+        { text: 'men', left: true, value: 'men' },
+        { text: 'hour', left: true, value: 'hour' },
+        { text: 'ZONE DIVISION', left: true, value: 'zoneDivision' },
+        { text: 'REMARK', left: true, value: 'remarks' }
       ],
       itemIndex: -1,
       defaultItem: {
-        'AMS MH': 0,
-        'MAC MH': 0,
-        MEN: 0,
-        HOUR: 0,
-        ZONEDIVISION: 'N/A',
-        REMARKS: 'NIL'
+        amsMH: 0,
+        macMH: 0,
+        men: 0,
+        hour: 0,
+        zoneDivision: 'N/A',
+        remarks: 'NIL'
       },
       editedItem: {},
       linkedItem: {}
@@ -241,7 +241,7 @@ export default {
   },
   computed: {
     numberTaskCard () {
-      return this.check.workpack.length
+      return this.workpack.length
     },
     inputCheckInfoCompleted () {
       // return this.check.name.length !== 0
@@ -271,10 +271,14 @@ export default {
           hyd: true
         })
       }
-      const check = this.check
-      firebase.database().ref('checks').push(check).then(
+      let newCheckKey = firebase.database().ref().child('checks').push().key
+      let updates = {}
+      updates['/checks/' + newCheckKey] = this.check
+      updates['/workpacks/' + newCheckKey] = this.workpack
+
+      firebase.database().ref().update(updates).then(
         (data) => {
-          this.$router.push('checks')
+          this.$router.push('/checks')
         },
         (error) => {
           console.log(error)
@@ -329,9 +333,10 @@ export default {
         const wsname = wb.SheetNames[0]
         const ws = wb.Sheets[wsname]
         /* Convert array of arrays */
-        const data = XLSX.utils.sheet_to_json(ws, {header: 0})
+        const data = XLSX.utils.sheet_to_json(ws, { header: ['wpItem', 'taskName', 'zone', 'taskType', 'taskTitle'] })
         /* Update state */
-        this.check.workpack = data
+        data.shift()
+        this.workpack = data
         this.cols = makeCols(ws['!ref'])
         this.readingIsCompleted = true
       }
@@ -340,31 +345,31 @@ export default {
     scanZoneDivision() {
       let count = 0
       this.$store.dispatch('beginLoading')
-      for (let key1 in this.check.workpack) {
-        let taskName = this.check.workpack[key1].TASKNAME
-        firebase.database().ref('amsA321').orderByChild('TASKNAME').equalTo(taskName).limitToFirst(1).once('value').then(
+      for (let key1 in this.workpack) {
+        let taskName = this.workpack[key1].taskName
+        firebase.database().ref('amsA321').orderByChild('taskName').equalTo(taskName).limitToFirst(1).once('value').then(
           (data) => {
             count++
             const obj = data.val()
             if (obj !== null && obj !== undefined) {
               for (let key2 in obj) {
-                this.check.workpack[key1].uid = key2
-                this.check.workpack[key1].ZONEDIVISION = obj[key2].ZONEDIVISION || ''
-                this.check.workpack[key1]['AMS MH'] = obj[key2]['AMS MH'] || ''
-                this.check.workpack[key1]['MAC MH'] = obj[key2]['MAC MH'] || ''
-                this.check.workpack[key1].MEN = obj[key2].MEN || ''
-                this.check.workpack[key1].HOUR = obj[key2].HOUR || ''
-                this.check.workpack[key1].REMARKS = obj[key2].REMARKS || ''
+                this.workpack[key1].taskID = key2
+                this.workpack[key1].zoneDivision = obj[key2].zoneDivision || ''
+                this.workpack[key1].amsMH = obj[key2].amsMH || ''
+                this.workpack[key1].macMH = obj[key2].macMH || ''
+                this.workpack[key1].men = obj[key2].men || ''
+                this.workpack[key1].hour = obj[key2].hour || ''
+                this.workpack[key1].remarks = obj[key2].remarks || ''
               }
             } else {
-              this.check.workpack[key1].ZONEDIVISION = ''
-              this.check.workpack[key1]['AMS MH'] = ''
-              this.check.workpack[key1]['MAC MH'] = ''
-              this.check.workpack[key1].MEN = ''
-              this.check.workpack[key1].HOUR = ''
-              this.check.workpack[key1].REMARKS = ''
+              this.workpack[key1].zoneDivision = ''
+              this.workpack[key1].amsMH = ''
+              this.workpack[key1].macMH = ''
+              this.workpack[key1].men = ''
+              this.workpack[key1].hour = ''
+              this.workpack[key1].remarks = ''
             }
-            if (count === this.check.workpack.length) {
+            if (count === this.workpack.length) {
               this.$store.dispatch('endLoading')
               this.scanningIsCompleted = true
               this.e1 = 3
@@ -372,7 +377,7 @@ export default {
           },
           (error) => {
             count++
-            if (count === this.check.workpack.length) {
+            if (count === this.workpack.length) {
               this.$store.dispatch('endLoading')
               this.scanningIsCompleted = true
             }
@@ -382,7 +387,7 @@ export default {
       }
     },
     editItem(item) {
-      this.itemIndex = this.check.workpack.indexOf(item)
+      this.itemIndex = this.workpack.indexOf(item)
       this.editedItem = Object.assign({}, item)
       this.dialogEditItem = true
     },
@@ -394,18 +399,18 @@ export default {
       }, 300)
     },
     saveEditItem() {
-      if (this.itemIndex > -1 && this.editedItem.TASKNAME.includes('VN ')) {
+      if (this.itemIndex > -1 && this.editedItem.taskName.includes('VN ')) {
         let editedProps = {
-          'AMS MH': this.editedItem['AMS MH'],
-          'MAC MH': this.editedItem['MAC MH'],
-          'MEN': this.editedItem['MEN'],
-          'HOUR': this.editedItem['HOUR'],
-          'ZONEDIVISION': this.editedItem['ZONEDIVISION'],
-          'REMARKS': this.editedItem['REMARKS']
+          amsMH: this.editedItem.amsMH,
+          macMH: this.editedItem.macMH,
+          men: this.editedItem.men,
+          hour: this.editedItem.hour,
+          zoneDivision: this.editedItem.zoneDivision,
+          remarks: this.editedItem.remarks
         }
         if (this.editedItem.uid !== null && this.editedItem.uid !== undefined) {
           console.log('edit')
-          Object.assign(this.check.workpack[this.itemIndex], editedProps)
+          Object.assign(this.workpack[this.itemIndex], editedProps)
           firebase.database().ref('amsA321').child(this.editedItem.uid).update(editedProps).then(
             (data) => {
               console.log(data)
@@ -419,7 +424,7 @@ export default {
             (data) => {
               console.log(data.key)
               this.editedItem.uid = data.key
-              Object.assign(this.check.workpack[this.itemIndex], this.editedItem)
+              Object.assign(this.workpack[this.itemIndex], this.editedItem)
             },
             (error) => {
               console.log('NewCheck - saveEditItem' + error)
@@ -430,7 +435,7 @@ export default {
       this.closeEditItem()
     },
     linkItem(item) {
-      this.itemIndex = this.check.workpack.indexOf(item)
+      this.itemIndex = this.workpack.indexOf(item)
       this.editedItem = Object.assign({}, item)
       this.linkedItem = Object.assign({}, item)
       this.dialogLinkItem = true
@@ -446,14 +451,14 @@ export default {
     saveLinkItem() {
       if (this.itemIndex > -1) {
         let editedProps = {
-          'AMS MH': this.linkedItem['AMS MH'],
-          'MAC MH': this.linkedItem['MAC MH'],
-          'MEN': this.linkedItem['MEN'],
-          'HOUR': this.linkedItem['HOUR'],
-          'ZONEDIVISION': this.linkedItem['ZONEDIVISION'],
-          'REMARKS': this.linkedItem['REMARKS']
+          amsMH: this.linkedItem.amsMH,
+          macMH: this.linkedItem.macMH,
+          men: this.linkedItem.men,
+          hour: this.linkedItem.hour,
+          zoneDivision: this.linkedItem.zoneDivision,
+          remarks: this.linkedItem.remarks
         }
-        Object.assign(this.check.workpack[this.itemIndex], editedProps)
+        Object.assign(this.workpack[this.itemIndex], editedProps)
         firebase.database().ref('eo').child(this.linkedItem.uid).update(editedProps).then(
           (data) => {
             // console.log(data)
@@ -467,10 +472,10 @@ export default {
     },
     addEO(e) {
       let found = this.eoList.find((item) => {
-        return item['NAME'] === e.target.value
+        return item['name'] === e.target.value
       })
       if (found === undefined) {
-        let newEO = { 'NAME': e.target.value }
+        let newEO = { 'name': e.target.value }
         this.eoList.push(newEO)
         firebase.database().ref('eo').push(newEO).then(
           (data) => {

@@ -69,7 +69,7 @@ export default {
             this.count++
             if (this.count === this.numberTaskCard) {
               this.$store.dispatch('endLoading')
-              this.$router.push('checks')
+              this.$router.push('/checks')
             }
           },
           (error) => {
@@ -101,8 +101,9 @@ export default {
         const wsname = wb.SheetNames[0]
         const ws = wb.Sheets[wsname]
         /* Convert array of arrays */
-        const data = XLSX.utils.sheet_to_json(ws, {header: 0})
+        const data = XLSX.utils.sheet_to_json(ws, { header: ['taskName', 'zone', 'taskType', 'taskTitle', 'amsMH', 'macMH', 'men', 'hour', 'zoneDivision', 'remarks'] })
         /* Update state */
+        data.shift()
         this.maintSchedule = data
         this.cols = makeCols(ws['!ref'])
         this.readingIsCompleted = true

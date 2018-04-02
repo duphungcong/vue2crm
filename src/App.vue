@@ -57,12 +57,14 @@
         <v-toolbar-side-icon @click.stop="drawer = !drawer"></v-toolbar-side-icon>
         <span class="hidden-sm-and-down">PLN TEAM</span>
       </v-toolbar-title>
-      <v-text-field
+      <!-- <v-text-field
         flat
+        single-line
         solo-inverted
         prepend-icon="search"
         label="Search"
-        class="hidden-sm-and-down"></v-text-field>
+        class="hidden-sm-and-down"></v-text-field> -->
+      <!-- <v-text-field append-icon="search" label="Search" single-line hide-details v-model="search"></v-text-field>   -->
       <v-spacer></v-spacer>
       <v-btn icon>
         <v-icon>apps</v-icon>
@@ -126,7 +128,8 @@
         { icon: 'content_copy', text: 'Customers', link: 'Customers', vertical: 'Customer' },
         { icon: 'settings', text: 'Products', link: 'Products', vertical: 'Product' },
         { icon: 'chat_bubble', text: 'About', link: 'About', vertical: 'About' },
-        { icon: 'assignment', text: 'Shifts', link: 'Shifts', vertical: 'Shifts' }
+        { icon: 'assignment', text: 'Shifts', link: 'Shifts', vertical: 'Shifts' },
+        { icon: 'assignment', text: 'Tasks', link: 'Tasks', vertical: 'Tasks' }
       ],
       noFollowingItems: [
         { icon: 'contacts', text: 'Checks', link: 'Checks', vertical: 'Checks' },
@@ -213,7 +216,7 @@
     methods: {
       clickMenu (item) {
         this.menuItem = item.text
-        this.$router.push({ name: item.link, params: { id: this.$store.getters.following } })
+        this.$router.push({ name: item.link })
       },
       onLogOut () {
         this.$store.dispatch('logOut')

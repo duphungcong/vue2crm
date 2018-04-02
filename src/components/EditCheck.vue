@@ -1,24 +1,24 @@
 <template>
   <v-container fluid grid-list-sm>
     <v-card class="lighten-4 elevation-0">
-      <v-data-table :headers="headers" :items="check.workpack" expand :pagination.sync="pagination">
+      <v-data-table :headers="headers" :items="workpack" expand :pagination.sync="pagination">
         <template slot="items" slot-scope="props" class="body-0">
-          <td class="body-0">{{ props.item.WP_ITEM }}</td>
-          <td class="body-0">{{ props.item.TASKNAME }}</td>
-          <td class="body-0">{{ props.item.ZONE }}</td>
-          <td class="body-0">{{ props.item.TASKTYPE }}</td>
-          <td class="body-0">{{ props.item.TASKTITLE }}</td>
-          <td class="body-0">{{ props.item['AMS MH'] }}</td>
-          <td class="body-0">{{ props.item['MAC MH'] }}</td>
-          <td class="body-0">{{ props.item.MEN }}</td>
-          <td class="body-0">{{ props.item.HOUR }}</td>
-          <td class="body-0">{{ props.item.ZONEDIVISION }}</td>
-          <td class="body-0">{{ props.item.REMARKS }}</td>
+          <td class="body-0">{{ props.item.wpItem }}</td>
+          <td class="body-0">{{ props.item.taskName }}</td>
+          <td class="body-0">{{ props.item.zone }}</td>
+          <td class="body-0">{{ props.item.taskType }}</td>
+          <td class="body-0">{{ props.item.taskTitle }}</td>
+          <td class="body-0">{{ props.item.amsMH }}</td>
+          <td class="body-0">{{ props.item.macMH }}</td>
+          <td class="body-0">{{ props.item.men }}</td>
+          <td class="body-0">{{ props.item.hour }}</td>
+          <td class="body-0">{{ props.item.zoneDivision }}</td>
+          <td class="body-0">{{ props.item.remarks }}</td>
           <td class="justify-center layout px-0">
             <v-btn icon class="mx-0" @click="editItem(props.item)">
               <v-icon color="teal">edit</v-icon>
             </v-btn>
-            <v-btn icon class="mx-0" @click="linkItem(props.item)" :disabled="!props.item.TASKNAME.includes('VN ')">
+            <v-btn icon class="mx-0" @click="linkItem(props.item)" :disabled="!props.item.taskName.includes('VN ')">
               <v-icon color="teal">link</v-icon>
             </v-btn>
           </td>
@@ -35,50 +35,54 @@ export default {
   data () {
     return {
       checkId: null,
-      check: [],
+      check: {},
+      workpack: [],
       pagination: {
         page: 1,
         totalItems: 0,
         rowsPerPage: 10
       },
       headers: [
-        { text: 'WP ITEM', left: true, value: 'WP_ITEM' },
-        { text: 'TASK', left: true, value: 'TASKNAME' },
-        { text: 'ZONE', left: true, value: 'ZONE' },
-        { text: 'TYPE', left: true, value: 'TASKTYPE' },
-        { text: 'TITLE', left: true, value: 'TASKTITLE' },
-        { text: 'AMS MH', left: true, value: 'AMS MH' },
-        { text: 'MAC MH', left: true, value: 'MAC MH' },
-        { text: 'MEN', left: true, value: 'MEN' },
-        { text: 'HOUR', left: true, value: 'HOUR' },
-        { text: 'ZONE DIVISION', left: true, value: 'ZONEDIVISION' },
-        { text: 'REMARK', left: true, value: 'REMARKS' }
+        { text: 'WP ITEM', left: true, value: 'wpItem' },
+        { text: 'TASK', left: true, value: 'taskName' },
+        { text: 'zone', left: true, value: 'zone' },
+        { text: 'TYPE', left: true, value: 'taskType' },
+        { text: 'TITLE', left: true, value: 'taskTitle' },
+        { text: 'AMS MH', left: true, value: 'amsMH' },
+        { text: 'MAC MH', left: true, value: 'macMH' },
+        { text: 'MEN', left: true, value: 'men' },
+        { text: 'HOUR', left: true, value: 'hour' },
+        { text: 'zone DIVISION', left: true, value: 'zoneDivision' },
+        { text: 'REMARK', left: true, value: 'remarks' }
       ],
       itemIndex: -1,
       defaultItem: {
-        'AMS MH': 0,
-        'MAC MH': 0,
-        MEN: 0,
-        HOUR: 0,
-        ZONEDIVISION: 'N/A',
-        REMARKS: 'NIL'
+        amsMH: 0,
+        macMH: 0,
+        men: 0,
+        hour: 0,
+        zoneDivision: 'N/A',
+        remarks: 'NIL'
       },
       editedItem: {},
       linkedItem: {}
     }
   },
   methods: {
-    loadCheckById(id) {
-      this.checkId = id
-      firebase.database().ref('checks').once('value').then(
+    loadCheck() {
+      firebase.database().ref('checks').child(this.checkId).once('value').then(
         (data) => {
-          const obj = data.val()
-          for (let key in obj) {
-            if (key === this.checkId) {
-              this.check = obj[key]
-              return
-            }
-          }
+          this.check = data.val()
+        },
+        (error) => {
+          console.log(error)
+        }
+      )
+    },
+    loadWorkPack() {
+      firebase.database().ref('workpacks').child(this.checkId).once('value').then(
+        (data) => {
+          this.workpack = data.val()
         },
         (error) => {
           console.log(error)
@@ -87,7 +91,9 @@ export default {
     }
   },
   mounted() {
-    this.loadCheckById(this.$route.params.id)
+    this.checkId = this.$route.params.id
+    this.loadCheck()
+    this.loadWorkPack()
   }
 }
 </script>

@@ -1,5 +1,5 @@
 <template>
-  <v-container id="dashboard" fluid grid-list-lg class="mx-0 pa-0">
+  <v-container id="dashboard" fluid grid-list-sm>
         <v-layout row wrap>
             <v-flex md3 sm6 xs12>
                 <v-card class="cyan darken-3" light>
