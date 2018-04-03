@@ -100,13 +100,13 @@
       <!-- <v-btn slot="activator" color="purple" dark>Click me</v-btn> -->
       <v-list>
         <v-list-tile
-          v-for="tile in tiles"
-          :key="tile.title"
+          v-for="item in bottomSheetTitles"
+          :key="item.title"
           @click="sheet = false">
-          <v-list-tile-title class="text-xs-right pr-2">{{ tile.title }}</v-list-tile-title>
+          <v-list-tile-title class="text-xs-right pr-2">{{ item.title }}</v-list-tile-title>
           <v-list-tile-avatar>
             <v-avatar size="32px" tile>
-              <img :src="`https://vuetifyjs.com/static/doc-images/bottom-sheets/${tile.img}`" :alt="tile.title">
+              <img :src="`https://vuetifyjs.com/static/doc-images/bottom-sheets/${item.img}`" :alt="item.title">
             </v-avatar>
           </v-list-tile-avatar>
         </v-list-tile>
@@ -124,21 +124,21 @@
       menuItem: '',
       followingItems: [
         { icon: 'contacts', text: 'Dashboard', link: 'Dashboard', vertical: 'Dashboard' },
-        { icon: 'history', text: 'Orders', link: 'Orders', vertical: 'Order' },
-        { icon: 'content_copy', text: 'Customers', link: 'Customers', vertical: 'Customer' },
-        { icon: 'settings', text: 'Products', link: 'Products', vertical: 'Product' },
-        { icon: 'chat_bubble', text: 'About', link: 'About', vertical: 'About' },
+        // { icon: 'history', text: 'Orders', link: 'Orders', vertical: 'Order' },
+        // { icon: 'content_copy', text: 'Customers', link: 'Customers', vertical: 'Customer' },
+        // { icon: 'settings', text: 'Products', link: 'Products', vertical: 'Product' },
+        // { icon: 'chat_bubble', text: 'About', link: 'About', vertical: 'About' },
         { icon: 'assignment', text: 'Shifts', link: 'Shifts', vertical: 'Shifts' },
         { icon: 'assignment', text: 'Tasks', link: 'Tasks', vertical: 'Tasks' },
-        { icon: 'assignment', text: 'Barcode Receive', link: 'BarcodeIn', vertical: 'Barcode Receive' },
-        { icon: 'assignment', text: 'Barcode Take Out', link: 'BarcodeOut', vertical: 'Barcode Take Out' }
+        { icon: 'assignment', text: 'Barcode Receive', link: 'BarcodeIn', vertical: 'BarcodeIn' },
+        { icon: 'assignment', text: 'Barcode Take Out', link: 'BarcodeOut', vertical: 'BarcodeOut' }
       ],
       noFollowingItems: [
         { icon: 'contacts', text: 'Checks', link: 'Checks', vertical: 'Checks' },
         { icon: 'contacts', text: 'AMS', link: 'MaintSchedule', vertical: 'MaintSchedule' }
       ],
       sheet: false,
-      tiles: [
+      bottomSheetTitles: [
         { img: 'keep.png', title: 'NRC' },
         { img: 'inbox.png', title: 'Spare order' },
         { img: 'hangouts.png', title: 'Add additional tasks' }
