@@ -13,6 +13,8 @@ import firebase from 'firebase'
 import VueProgressBar from 'vue-progressbar'
 import LoadingProgress from './components/shared/LoadingProgress.vue'
 
+import VueBarcodeScanner from 'vue-barcode-scanner'
+
 const options = {
   color: '#2196f3',
   failedColor: '#874b4b',
@@ -27,11 +29,19 @@ const options = {
   inverse: false
 }
 
+const barcodeOptions = {
+  // sound: true, // default is false
+  // soundSrc: '/static/sound.wav', // default is blank
+  sensitivity: 300, // default is 100
+  requiredAttr: true // default is false
+}
+
 Vue.use(VueProgressBar, options)
 
 Vue.use(Vuetify)
 Vue.config.productionTip = false
 Vue.component('loading-progress', LoadingProgress)
+Vue.use(VueBarcodeScanner, barcodeOptions)
 
 window.Store = store
 Vue.prototype.api = api

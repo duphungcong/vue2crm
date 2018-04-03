@@ -18,7 +18,8 @@ import Shifts from '@/components/Shifts'
 import Shift from '@/components/Shift'
 import Tasks from '@/components/Tasks'
 import ShiftBar from '@/components/ShiftBar'
-import Barcode from '@/components/Barcode'
+import BarcodeIn from '@/components/BarcodeIn'
+import BarcodeOut from '@/components/BarcodeOut'
 
 import Login from '@/components/Login'
 import SignUp from '@/components/SignUp'
@@ -134,7 +135,13 @@ let router = new Router({
       }
     },
     {
-      path: '/barcode', component: Barcode, name: 'Barcode', meta: {
+      path: '/barcodein', component: BarcodeIn, name: 'BarcodeIn', meta: {
+        requireAuth: true,
+        requireFollowing: true
+      }
+    },
+    {
+      path: '/barcodeout', component: BarcodeOut, name: 'BarcodeOut', meta: {
         requireAuth: true,
         requireFollowing: true
       }
@@ -142,8 +149,8 @@ let router = new Router({
     { path: '/login', component: Login, name: 'Login' },
     { path: '/signup', component: SignUp, name: 'SignUp' },
     { path: '/changePassword', component: ChangePassword, name: 'ChangePassword' },
-    { path: '/', redirect: 'dashboard' },
-    { path: '*', redirect: 'login' }
+    { path: '/', redirect: '/dashboard' },
+    { path: '*', redirect: '/dashboard' }
   ],
   meta: {
     progress: {
@@ -171,7 +178,7 @@ router.beforeEach((to, from, next) => {
   let requireFollowing = to.matched.some(record => record.meta.requireFollowing)
 
   if (requireAuth && !isAuth) {
-    console.log('step 1')
+    // console.log('step 1')
     next('/login')
   } else if (requireFollowing && !isFollowing) {
     // console.log('step 2')

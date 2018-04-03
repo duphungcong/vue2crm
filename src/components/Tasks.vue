@@ -35,8 +35,8 @@
                     <td class="body-0">{{ props.item.taskTitle }}</td>
                     <td class="body-0">{{ props.item.zoneDivision }}</td>
                     <td class="body-0">{{ props.item.remarks }}</td>
+                    <td class="body-0">{{ props.item.status }}</td>
                     <td class="justify-center layout px-0">
-                      <shiftbar></shiftbar>
                     </td>
                   </template>
                 </v-data-table>
@@ -46,6 +46,7 @@
         </v-card>
       </v-flex>
     </v-layout>
+    <loading-progress></loading-progress>
   </v-container>
 </template>
 
@@ -72,7 +73,8 @@ export default {
         { text: 'TYPE', left: true, value: 'taskType' },
         { text: 'TITLE', left: true, value: 'taskTitle' },
         { text: 'ZONE DIVISION', left: true, value: 'zoneDivision' },
-        { text: 'REMARKS', left: true, value: 'remarks' }
+        { text: 'REMARKS', left: true, value: 'remarks' },
+        { text: 'STATUS', left: true, value: 'status' }
       ],
       pagination: {
         page: 1,
@@ -98,13 +100,16 @@ export default {
       )
     },
     loadWorkpack() {
+      this.$store.dispatch('beginLoading')
       firebase.database().ref('workpacks').child(this.checkId).once('value').then(
         (data) => {
           this.workpack = data.val()
-          this.workpackByTab = this.workpack.filter(task => task.zoneDivision.includes('100-200-800'))
+          this.showTab()
+          this.$store.dispatch('endLoading')
         },
         (error) => {
           console.log(error)
+          this.$store.dispatch('endLoading')
         }
       )
     },
@@ -120,9 +125,10 @@ export default {
         'tab-7': 'CLEANING',
         'tab-8': 'N/A'
       })[tab]
-
-      this.workpackByTab = this.workpack.filter(task => task.zoneDivision.includes(zoneByTab(this.tabs)))
-      // this.workpackByTab = this.workpack.filter(task => task.zoneDivision.indexOf(zoneByTab(this.tabs)) > -1)
+      this.$store.dispatch('beginLoading')
+      // this.workpackByTab = this.workpack.filter(task => task.zoneDivision.includes(zoneByTab(this.tabs)))
+      this.workpackByTab = this.workpack.filter(task => task.zoneDivision.indexOf(zoneByTab(this.tabs)) === 0)
+      this.$store.dispatch('endLoading')
     }
   },
   components: {

@@ -266,6 +266,7 @@ export default {
       let numberOfShift = diff.getUTCDate()
       for (let n = 0; n < numberOfShift; n++) {
         this.check.shifts.push({
+          number: n + 1,
           elect: true,
           air: true,
           hyd: true
@@ -354,20 +355,22 @@ export default {
             if (obj !== null && obj !== undefined) {
               for (let key2 in obj) {
                 this.workpack[key1].taskID = key2
-                this.workpack[key1].zoneDivision = obj[key2].zoneDivision || ''
+                this.workpack[key1].zoneDivision = obj[key2].zoneDivision || 'N/A'
                 this.workpack[key1].amsMH = obj[key2].amsMH || ''
                 this.workpack[key1].macMH = obj[key2].macMH || ''
                 this.workpack[key1].men = obj[key2].men || ''
                 this.workpack[key1].hour = obj[key2].hour || ''
                 this.workpack[key1].remarks = obj[key2].remarks || ''
+                this.workpack[key1].shifts = []
               }
             } else {
-              this.workpack[key1].zoneDivision = ''
+              this.workpack[key1].zoneDivision = 'N/A'
               this.workpack[key1].amsMH = ''
               this.workpack[key1].macMH = ''
               this.workpack[key1].men = ''
               this.workpack[key1].hour = ''
               this.workpack[key1].remarks = ''
+              this.workpack[key1].shifts = []
             }
             if (count === this.workpack.length) {
               this.$store.dispatch('endLoading')

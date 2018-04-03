@@ -5,18 +5,18 @@
           <v-layout row wrap pr-2>
             <v-flex lg12 md12 xs12>
               <v-tooltip bottom>
-                <v-btn flat outline block class="elevation-1" :class="{ currentShift: current }" slot="activator" >Shift {{ number }}</v-btn>
+                <v-btn flat outline block class="elevation-1" :class="{ currentShift: current }" slot="activator" >Shift {{ shift.number }}</v-btn>
                 <span>{{ date }}</span>
               </v-tooltip>
             </v-flex>
             <v-flex lg12 md12 xs12>
-              <v-btn block class="elevation-1" @click.native="changeElect" :class="{ green: status.elect }">ELECT</v-btn>
+              <v-btn block class="elevation-1" @click.native="changeElect" :class="{ green: shift.elect }">ELECT</v-btn>
             </v-flex>
             <v-flex lg12 md12 xs12>
-              <v-btn block :disabled="!status.elect" class="elevation-1" @click.native="changeAir" :class="{ blue: status.air }" >AIR</v-btn>
+              <v-btn block :disabled="!shift.elect" class="elevation-1" @click.native="changeAir" :class="{ blue: shift.air }" >AIR</v-btn>
             </v-flex>
             <v-flex lg12 md12 xs12>
-              <v-btn block :disabled="!status.elect" class="elevation-1" @click.native="changeHyd" :class="{ orange: status.hyd }">HYD</v-btn>
+              <v-btn block :disabled="!shift.elect" class="elevation-1" @click.native="changeHyd" :class="{ orange: shift.hyd }">HYD</v-btn>
             </v-flex>
           </v-layout>
         </v-card-actions>
@@ -31,16 +31,10 @@ export default {
     return {}
   },
   props: {
-    number: {
-      type: Number,
-      default: () => {
-        return 0
-      }
-    },
-    status: {
+    shift: {
       type: Object,
       default: () => {
-        return { elect: true, air: true, hyd: true }
+        return { number: -1, elect: true, air: true, hyd: true }
       }
     },
     current: {
@@ -55,20 +49,20 @@ export default {
   },
   methods: {
     changeElect() {
-      this.status.elect = !this.status.elect
-      if (!this.status.elect) {
-        this.status.air = false
-        this.status.hyd = false
+      this.shift.elect = !this.shift.elect
+      if (!this.shift.elect) {
+        this.shift.air = false
+        this.shift.hyd = false
       }
-      this.$emit('change', { status: this.status, number: this.number })
+      this.$emit('change', { shift: this.shift })
     },
     changeAir() {
-      this.status.air = !this.status.air
-      this.$emit('change', { status: this.status, number: this.number })
+      this.shift.air = !this.shift.air
+      this.$emit('change', { shift: this.shift })
     },
     changeHyd() {
-      this.status.hyd = !this.status.hyd
-      this.$emit('change', { status: this.status, number: this.number })
+      this.shift.hyd = !this.shift.hyd
+      this.$emit('change', { shift: this.shift })
     }
   },
   created() {

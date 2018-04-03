@@ -99,13 +99,56 @@
       "avatar": "/assets/img/avatar2.png"
     },
     {
-      "isActive": true,
+      "isActive": false,
       "age": 38,
       "id": 11,
       "firstName": "Mark",
       "lastName": "Carney",
       "email": "test@test.com",
-      "avatar": "/assets/img/avatar5.png"
+      "avatar": "/assets/img/avatar5.png",
+      "orders": [
+        {
+          "id": 15,
+          "reference": "order-11-15-1-2",
+          "customerId": 11,
+          "products": [
+            {
+              "id": 5,
+              "productName": "Product EPEIM",
+              "categoryId": 2,
+              "unitInStock": null,
+              "unitPrice": 21.5
+            },
+            {
+              "id": 19,
+              "productName": "Product XKXDO",
+              "categoryId": 3,
+              "unitInStock": null,
+              "unitPrice": 9.2,
+              "category": {
+                "id": 3,
+                "categoryName": "Confections",
+                "description": "Desserts, candies, and sweet breads",
+                "picture": null
+              },
+              "text": "Product XKXDO",
+              "value": 19
+            }
+          ],
+          "amount": 222,
+          "orderDate": "2017-01-19",
+          "shippedDate": "2017-01-16",
+          "shipAddress": {
+            "address": "Gran Vía, 0123",
+            "city": "Madrid",
+            "zipcode": "10298",
+            "country": "Spain"
+          },
+          "quantity": 12,
+          "price": 33
+        }
+      ],
+      "orderRecord": 1
     },
     {
       "isActive": false,
@@ -117,12 +160,14 @@
       "avatar": "/assets/img/avatar1.png"
     },
     {
-      "isActive": true,
+      "isActive": false,
       "firstName": "John",
       "lastName": "Doe",
       "age": 88,
       "email": "john.doe@test.com",
-      "id": 13
+      "id": 13,
+      "orders": [],
+      "orderRecord": 0
     },
     {
       "avatar": null,

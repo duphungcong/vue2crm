@@ -9,13 +9,12 @@
             </v-card-actions>
           </v-card>
       </v-flex>
-      <v-flex lg1 md1 sm1 xs1 v-for="n in check.shifts.length" :key="n">
+      <v-flex lg1 md1 sm1 xs1 v-for="shift in check.shifts" :key="shift.number">
         <shift
-          :date="dateOfShift(n)"
-          :current="isCurrentShift(n)"
-          :number="Number.parseInt(n)"
-          :status="check.shifts[n-1]"
-          @change="updateStatus($event)"></shift>
+          :date="dateOfShift(shift.number)"
+          :current="isCurrentShift(shift.number)"
+          :shift="shift"
+          @change="updateStatus($event, shift)"></shift>
       </v-flex>
     </v-layout>
     <v-snackbar
@@ -44,9 +43,7 @@ export default {
   data () {
     return {
       checkId: null,
-      check: {
-        shifts: []
-      },
+      check: {},
       msg: '',
       snackbar: false,
       y: 'top',
@@ -74,8 +71,8 @@ export default {
         }
       )
     },
-    updateStatus(event) {
-      this.check.shifts[event.number - 1] = event.status
+    updateStatus(event, shift) {
+      shift = event
     },
     isCurrentShift(n) {
       return this.currentShift === n

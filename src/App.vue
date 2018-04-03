@@ -129,7 +129,9 @@
         { icon: 'settings', text: 'Products', link: 'Products', vertical: 'Product' },
         { icon: 'chat_bubble', text: 'About', link: 'About', vertical: 'About' },
         { icon: 'assignment', text: 'Shifts', link: 'Shifts', vertical: 'Shifts' },
-        { icon: 'assignment', text: 'Tasks', link: 'Tasks', vertical: 'Tasks' }
+        { icon: 'assignment', text: 'Tasks', link: 'Tasks', vertical: 'Tasks' },
+        { icon: 'assignment', text: 'Barcode Receive', link: 'BarcodeIn', vertical: 'Barcode Receive' },
+        { icon: 'assignment', text: 'Barcode Take Out', link: 'BarcodeOut', vertical: 'Barcode Take Out' }
       ],
       noFollowingItems: [
         { icon: 'contacts', text: 'Checks', link: 'Checks', vertical: 'Checks' },
