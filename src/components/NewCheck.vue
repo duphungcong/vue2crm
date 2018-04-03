@@ -68,10 +68,10 @@
                   <td class="body-0">{{ props.item.zoneDivision }}</td>
                   <td class="body-0">{{ props.item.remarks }}</td>
                   <td class="justify-center layout px-0">
-                    <v-btn icon class="mx-0" @click="editItem(props.item)">
+                    <v-btn icon class="mx-0" @click="editItem(props.item)" v-if="!props.item.taskName.includes('VN ')">
                       <v-icon color="teal">edit</v-icon>
                     </v-btn>
-                    <v-btn icon class="mx-0" @click="linkItem(props.item)" :disabled="!props.item.taskName.includes('VN ')">
+                    <v-btn icon class="mx-0" @click="linkItem(props.item)" v-if="props.item.taskName.includes('VN ')">
                       <v-icon color="teal">link</v-icon>
                     </v-btn>
                   </td>
@@ -148,10 +148,10 @@
           <v-container grid-list-md>
             <v-layout wrap>
               <v-flex xs12 sm12 md12>
-                 <v-text-field disabled label="TITLE" v-model="editedItem['TASKTITLE']"></v-text-field>
+                 <v-text-field disabled label="TITLE" v-model="editedItem.taskTitle"></v-text-field>
               </v-flex>
               <v-flex xs12 sm12 md12>
-                <v-select cache-items clearable open-on-clear :items="eoList" label="Select EO" v-model="linkedItem" item-text="NAME" class="input-group--focused" required autocomplete @keyup.native.enter="addEO"></v-select>
+                <v-select clearable open-on-clear :items="eoList" label="Select EO" v-model="linkedItem" item-text="name" class="input-group--focused" required autocomplete @keyup.native.enter="addEO"></v-select>
               </v-flex>
               <v-flex xs12 sm3 md3>
                 <v-text-field type="number" label="AMS MH" v-model="linkedItem.amsMH"></v-text-field>
@@ -310,7 +310,7 @@ export default {
         (data) => {
           const obj = data.val()
           for (let key in obj) {
-            this.eoList.push(Object.assign({}, obj[key], { uid: key }))
+            this.eoList.push(Object.assign({}, obj[key], { id: key }))
           }
         },
         (error) => {
@@ -402,7 +402,7 @@ export default {
       }, 300)
     },
     saveEditItem() {
-      if (this.itemIndex > -1 && this.editedItem.taskName.includes('VN ')) {
+      if (this.itemIndex > -1 && !this.editedItem.taskName.includes('VN ')) {
         let editedProps = {
           amsMH: this.editedItem.amsMH,
           macMH: this.editedItem.macMH,
@@ -411,10 +411,10 @@ export default {
           zoneDivision: this.editedItem.zoneDivision,
           remarks: this.editedItem.remarks
         }
-        if (this.editedItem.uid !== null && this.editedItem.uid !== undefined) {
+        if (this.editedItem.taskID !== null && this.editedItem.taskID !== undefined) {
           console.log('edit')
           Object.assign(this.workpack[this.itemIndex], editedProps)
-          firebase.database().ref('amsA321').child(this.editedItem.uid).update(editedProps).then(
+          firebase.database().ref('amsA321').child(this.editedItem.taskID).update(editedProps).then(
             (data) => {
               console.log(data)
             },
@@ -426,7 +426,7 @@ export default {
           firebase.database().ref('amsA321').push(this.editedItem).then(
             (data) => {
               console.log(data.key)
-              this.editedItem.uid = data.key
+              this.editedItem.taskID = data.key
               Object.assign(this.workpack[this.itemIndex], this.editedItem)
             },
             (error) => {
@@ -461,10 +461,10 @@ export default {
           zoneDivision: this.linkedItem.zoneDivision,
           remarks: this.linkedItem.remarks
         }
-        Object.assign(this.workpack[this.itemIndex], editedProps)
-        firebase.database().ref('eo').child(this.linkedItem.uid).update(editedProps).then(
+        firebase.database().ref('eo').child(this.linkedItem.id).update(editedProps).then(
           (data) => {
-            // console.log(data)
+            editedProps.taskID = this.linkedItem.id
+            Object.assign(this.workpack[this.itemIndex], editedProps)
           },
           (error) => {
             console.log(error)
@@ -482,7 +482,7 @@ export default {
         this.eoList.push(newEO)
         firebase.database().ref('eo').push(newEO).then(
           (data) => {
-            this.eoList[this.eoList.length - 1].uid = data.key
+            this.eoList[this.eoList.length - 1].id = data.key
           },
           (error) => {
             console.log(error)
