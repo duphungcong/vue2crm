@@ -28,7 +28,7 @@
                        <v-icon color="green" slot="activator">edit</v-icon><span>edit</span>
                     </v-tooltip>
                   </v-btn>
-                  <v-btn icon class="mx-0" @click.native="deleteDialog = true, deleteCheckId = props.item.id">
+                  <v-btn icon class="mx-0" @click.native="dialogDelete = true, deletedCheckId = props.item.id">
                     <v-tooltip bottom>
                        <v-icon color="red" slot="activator">delete</v-icon><span>delete</span>
                     </v-tooltip>
@@ -42,14 +42,14 @@
         </v-card>
       </v-flex>
       <loading-progress></loading-progress>
-      <v-dialog v-model="deleteDialog" persistent max-width="290">
+      <v-dialog v-model="dialogDelete" persistent max-width="290">
         <v-card>
           <v-card-title class="headline">Delete this check?</v-card-title>
           <v-card-text>You can not roll back</v-card-text>
           <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn color="green darken-1" flat @click.native="deleteDialog = false, deleteCheckId = ''">No</v-btn>
-            <v-btn color="red darken-1" flat @click.native="deleteDialog =  false, deleteCheck(deleteCheckId)">Delete</v-btn>
+            <v-btn color="green darken-1" flat @click.native="dialogDelete = false, deletedCheckId = ''">No</v-btn>
+            <v-btn color="red darken-1" flat @click.native="dialogDelete =  false, deleteCheck(deletedCheckId)">Delete</v-btn>
           </v-card-actions>
         </v-card>
     </v-dialog>
@@ -79,8 +79,8 @@ export default {
         { text: '', sortable: false, value: '' }
       ],
       checks: [],
-      deleteDialog: false,
-      deleteCheckId: ''
+      dialogDelete: false,
+      deletedCheckId: ''
     }
   },
   methods: {
@@ -128,14 +128,14 @@ export default {
     },
     deleteCheck() {
       let updates = {}
-      updates['/checks/' + this.deleteCheckId] = null
-      updates['/workpacks' + this.deleteCheckId] = null
+      updates['/checks/' + this.deletedCheckId] = null
+      updates['/workpacks' + this.deletedCheckId] = null
       firebase.database().ref().update(updates).then(
         (data) => {
-          this.deleteCheckId = ''
+          this.deletedCheckId = ''
         },
         (error) => {
-          this.deleteCheckId = ''
+          this.deletedCheckId = ''
           console.log(error)
         }
       )

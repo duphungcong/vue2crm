@@ -3,7 +3,7 @@
     <v-layout row wrap>
       <v-flex xs4 pl-2>
         <v-text-field
-          label="Scan Input"
+          label="Scan Task"
           autofocus
           @change.native="onBarcodeScanned(barcode)"
           v-model="barcode"></v-text-field>
@@ -86,7 +86,7 @@
 import firebase from 'firebase'
 
 export default {
-  name: 'Barcode',
+  name: 'BarcodeIn',
   data () {
     return {
       checkId: '',
@@ -142,9 +142,11 @@ export default {
         return item.wpItem === wpItem
       })
       if (found === undefined) {
+        let time = Date.now(7)
         this.scan.push({
           wpItem: wpItem,
           remarks: '',
+          time: time,
           updateSuccess: false,
           updateFail: false,
           done: false,
@@ -175,14 +177,34 @@ export default {
         firebase.database().ref('workpacks/' + this.checkId).orderByChild('wpItem').equalTo(element.wpItem).limitToFirst(1).once('value').then(
           (data) => {
             console.log(data.val())
+            let status
+            if (element.notYet === true) {
+              status = 'notYet'
+            }
+            if (element.inProgress === true) {
+              status = 'inProgress'
+            }
+            if (element.done === true) {
+              status = 'done'
+            }
             const obj = data.val()
             if (obj !== null && obj !== undefined) {
               for (let key in obj) {
-                obj[key].remarks = element.remarks
+                if (element.remarks !== null && element.remarks !== undefined) {
+                  obj[key].remarks = element.remarks
+                }
+                obj[key].status = status
+                obj[key].logs = obj[key].logs || []
+                obj[key].logs.push({
+                  status: status,
+                  person: 'PPC',
+                  time: element.time,
+                  remarks: element.remarks
+                })
                 firebase.database().ref('workpacks/' + this.checkId + '/' + key).update(obj[key]).then(
                   (data) => {
                     console.log('update completed')
-                     element.updateSuccess = true
+                    element.updateSuccess = true
                   },
                   (error) => {
                     console.log(error)

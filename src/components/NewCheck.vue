@@ -362,6 +362,7 @@ export default {
                 this.workpack[key1].hour = obj[key2].hour || ''
                 this.workpack[key1].remarks = obj[key2].remarks || ''
                 this.workpack[key1].shifts = []
+                this.workpack[key1].status = 'notYet'
               }
             } else {
               this.workpack[key1].zoneDivision = 'N/A'
@@ -371,6 +372,7 @@ export default {
               this.workpack[key1].hour = ''
               this.workpack[key1].remarks = ''
               this.workpack[key1].shifts = []
+              this.workpack[key1].status = 'notYet'
             }
             if (count === this.workpack.length) {
               this.$store.dispatch('endLoading')
