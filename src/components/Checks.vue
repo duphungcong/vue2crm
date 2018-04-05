@@ -127,11 +127,12 @@ export default {
       this.$router.push({ name: 'EditCheck', params: { id: item.id } })
     },
     deleteCheck() {
-      let updates = {}
-      updates['/checks/' + this.deletedCheckId] = null
-      updates['/workpacks' + this.deletedCheckId] = null
-      firebase.database().ref().update(updates).then(
+      let removes = {}
+      removes['/checks/' + this.deletedCheckId] = null
+      removes['/workpacks/' + this.deletedCheckId] = null
+      firebase.database().ref().update(removes).then(
         (data) => {
+          this.checks = this.checks.filter(element => element.id !== this.deletedCheckId)
           this.deletedCheckId = ''
         },
         (error) => {

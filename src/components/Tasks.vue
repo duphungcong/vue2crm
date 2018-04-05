@@ -1,8 +1,7 @@
 <template>
-  <v-container fluid grid-list-sm>
-    <v-layout row wrap>
-      <v-flex lg12 md12 sm12 xs12>
-        <v-card>
+  <v-container fluid pa-1>
+      <v-flex xs12>
+        <v-card class="elevation-0">
           <v-tabs
             height="40"
             fixed-tabs
@@ -25,27 +24,26 @@
               :key="i"
               :id="'tab-' + i"
             >
-              <v-card class="lighten-4 elevation-0">
-                <v-data-table :headers="headers" :items="workpackByTab" :pagination.sync="pagination" expand>
-                  <template slot="items" slot-scope="props" class="body-0">
-                    <td class="body-0">{{ props.item.wpItem }}</td>
-                    <td class="body-0">{{ props.item.taskName }}</td>
-                    <td class="body-0">{{ props.item.zone }}</td>
-                    <td class="body-0">{{ props.item.taskType }}</td>
-                    <td class="body-0">{{ props.item.taskTitle }}</td>
-                    <td class="body-0">{{ props.item.zoneDivision }}</td>
-                    <td class="body-0">{{ props.item.remarks }}</td>
-                    <td class="body-0">{{ props.item.status }}</td>
-                    <td class="justify-center layout px-0">
-                    </td>
-                  </template>
-                </v-data-table>
-              </v-card>
+              <v-data-table
+              :headers="headers"
+              :items="workpackByTab"
+              :pagination.sync="pagination"
+              >
+              <template slot="items" slot-scope="props">
+                <td class="body-0">{{ props.item.taskTitle }}</td>
+                <td class="body-0"><v-chip v-for="shift in props.item.shifts" :key="shift.number" label color="primary" text-color="white">{{ shift.number }}</v-chip></td>
+                <td class="body-0">{{ props.item.taskName }}</td>
+                <td class="body-0">{{ props.item.zone }}</td>
+                <td class="body-0">{{ props.item.taskType }}</td>
+                <td class="body-0">{{ props.item.zoneDivision }}</td>
+                <td class="justify-center layout px-0">
+                </td>
+              </template>
+            </v-data-table>
             </v-tab-item>
           </v-tabs-items>
         </v-card>
       </v-flex>
-    </v-layout>
     <loading-progress></loading-progress>
   </v-container>
 </template>
@@ -53,7 +51,6 @@
 <script>
 
 import firebase from 'firebase'
-import ShiftBar from './ShiftBar.vue'
 
 export default {
   name: 'Tasks',
@@ -67,19 +64,18 @@ export default {
       workpackByTab: [],
       tabs: 'tab-1',
       headers: [
-        { text: 'WP ITEM', left: true, value: 'wpItem' },
+        { text: 'TITLE', left: true, value: 'taskTitle' },
+        { text: 'STATUS', left: true, value: 'status' },
         { text: 'TASK', left: true, value: 'taskName' },
         { text: 'ZONE', left: true, value: 'zone' },
         { text: 'TYPE', left: true, value: 'taskType' },
-        { text: 'TITLE', left: true, value: 'taskTitle' },
-        { text: 'ZONE DIVISION', left: true, value: 'zoneDivision' },
-        { text: 'REMARKS', left: true, value: 'remarks' },
-        { text: 'STATUS', left: true, value: 'status' }
+        { text: 'ZONE DIVISION', left: true, value: 'zoneDivision' }
       ],
       pagination: {
         page: 1,
         totalItems: 0,
-        rowsPerPage: 10
+        rowsPerPage: 10,
+        sortBy: 'zoneDivision'
       }
     }
   },
@@ -130,9 +126,6 @@ export default {
       this.workpackByTab = this.workpack.filter(task => task.zoneDivision.indexOf(zoneByTab(this.tabs)) === 0)
       this.$store.dispatch('endLoading')
     }
-  },
-  components: {
-    shiftbar: ShiftBar
   },
   mounted() {
     this.checkId = this.$store.getters.following
