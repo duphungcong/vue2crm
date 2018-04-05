@@ -354,6 +354,7 @@ export default {
             const obj = data.val()
             if (obj !== null && obj !== undefined) {
               for (let key2 in obj) {
+                let randomShift = Math.floor(Math.random() * Math.floor(10))
                 this.workpack[key1].taskID = key2
                 this.workpack[key1].zoneDivision = obj[key2].zoneDivision || 'N/A'
                 this.workpack[key1].amsMH = obj[key2].amsMH || ''
@@ -361,17 +362,18 @@ export default {
                 this.workpack[key1].men = obj[key2].men || ''
                 this.workpack[key1].hour = obj[key2].hour || ''
                 this.workpack[key1].remarks = obj[key2].remarks || ''
-                this.workpack[key1].shifts = [ { number: 1 } ]
+                this.workpack[key1].shifts = [ { number: randomShift } ]
                 this.workpack[key1].status = 'notYet'
               }
             } else {
+              let randomShift = Math.floor(Math.random() * Math.floor(10))
               this.workpack[key1].zoneDivision = 'N/A'
               this.workpack[key1].amsMH = ''
               this.workpack[key1].macMH = ''
               this.workpack[key1].men = ''
               this.workpack[key1].hour = ''
               this.workpack[key1].remarks = ''
-              this.workpack[key1].shifts = [ { number: 1 } ]
+              this.workpack[key1].shifts = [ { number: randomShift } ]
               this.workpack[key1].status = 'notYet'
             }
             if (count === this.workpack.length) {
@@ -414,20 +416,20 @@ export default {
           remarks: this.editedItem.remarks
         }
         if (this.editedItem.taskID !== null && this.editedItem.taskID !== undefined) {
-          console.log('edit')
+          // console.log('edit')
           Object.assign(this.workpack[this.itemIndex], editedProps)
           firebase.database().ref('amsA321').child(this.editedItem.taskID).update(editedProps).then(
             (data) => {
-              console.log(data)
+              // console.log(data)
             },
             (error) => {
               console.log('NewCheck - saveEditItem' + error)
           })
         } else {
-          console.log('new')
+          // console.log('new')
           firebase.database().ref('amsA321').push(this.editedItem).then(
             (data) => {
-              console.log(data.key)
+              // console.log(data.key)
               this.editedItem.taskID = data.key
               Object.assign(this.workpack[this.itemIndex], this.editedItem)
             },

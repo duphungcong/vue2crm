@@ -17,33 +17,70 @@
             <v-tab href="#tab-6">Cabin</v-tab>
             <v-tab href="#tab-7">Cleaning</v-tab>
             <v-tab href="#tab-8">Uncategorized</v-tab>
+            <v-tab href="#tab-9">Removed</v-tab>
           </v-tabs>
           <v-tabs-items v-model="tabs">
             <v-tab-item
-              v-for="i in 8"
+              v-for="i in 9"
               :key="i"
-              :id="'tab-' + i"
-            >
+              :id="'tab-' + i">
+              <v-card class="elevation-0">
+                <v-card-title>
+                  <v-spacer></v-spacer>
+                  <v-text-field append-icon="search" label="Search" single-line hide-details v-model="search"></v-text-field>
+                </v-card-title>
+              </v-card>
+              &nbsp;
               <v-data-table
               :headers="headers"
               :items="workpackByTab"
               :pagination.sync="pagination"
+              :search="search"
+              item-key="taskName"
               >
               <template slot="items" slot-scope="props">
-                <td class="body-0">{{ props.item.taskTitle }}</td>
-                <td class="body-0"><v-chip v-for="shift in props.item.shifts" :key="shift.number" label color="primary" text-color="white">{{ shift.number }}</v-chip></td>
+                <td class="body-0" @click="props.expanded = !props.expanded">{{ props.item.taskTitle }}</td>
+                <td class="body-0"><v-chip v-for="shift in props.item.shifts" :key="shift.number" label :color="shiftColor(props.item.shifts, shift.number, props.item.status)">{{ shift.number }}</v-chip></td>
                 <td class="body-0">{{ props.item.taskName }}</td>
-                <td class="body-0">{{ props.item.zone }}</td>
                 <td class="body-0">{{ props.item.taskType }}</td>
                 <td class="body-0">{{ props.item.zoneDivision }}</td>
-                <td class="justify-center layout px-0">
+                <td class="text-xs-center">
+                  <v-btn icon class="mx-0" @click.native="editTask(props.item)">
+                    <v-tooltip bottom>
+                        <v-icon color="green" slot="activator">edit</v-icon><span>edit</span>
+                    </v-tooltip>
+                  </v-btn>
                 </td>
               </template>
+              <template slot="expand" slot-scope="props">
+                <v-card flat color="blue lighten-5" class="elevation-0">
+                  <v-card-actions>
+                    <v-btn icon class="mx-0" @click.native="deleteTask(props.item)" v-if="tabs !== 'tab-9'">
+                      <v-tooltip bottom>
+                          <v-icon color="red" slot="activator">delete</v-icon><span>delete</span>
+                      </v-tooltip>
+                    </v-btn>
+                  </v-card-actions>
+                  <v-card-text>
+                    <p>Zone: <strong>{{ props.item.zone }}</strong></p>
+                    <p>Remarks: <strong>{{ props.item.remarks }}</strong></p>
+                  </v-card-text>
+                </v-card>
+              </template>
             </v-data-table>
-            </v-tab-item>
-          </v-tabs-items>
-        </v-card>
-      </v-flex>
+          </v-tab-item>
+        </v-tabs-items>
+      </v-card>
+    </v-flex>
+    <v-dialog v-model="dialogDelete" max-width="290">
+      <v-card>
+        <v-card-title>Do you want to delete the task?</v-card-title>
+        <v-card-actions>
+          <v-btn flat @click.native="closeDeleteTask()">No</v-btn>
+          <v-btn flat color="red" @click.native="saveDeleteTask()">Delete</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
     <loading-progress></loading-progress>
   </v-container>
 </template>
@@ -67,16 +104,28 @@ export default {
         { text: 'TITLE', left: true, value: 'taskTitle' },
         { text: 'STATUS', left: true, value: 'status' },
         { text: 'TASK', left: true, value: 'taskName' },
-        { text: 'ZONE', left: true, value: 'zone' },
         { text: 'TYPE', left: true, value: 'taskType' },
-        { text: 'ZONE DIVISION', left: true, value: 'zoneDivision' }
+        { text: 'ZONE DIVISION', left: true, value: 'zoneDivision' },
+        { text: '', sortable: false, value: '' }
       ],
       pagination: {
         page: 1,
         totalItems: 0,
         rowsPerPage: 10,
         sortBy: 'zoneDivision'
-      }
+      },
+      search: '',
+      itemIndex: -1,
+      editedItem: null,
+      dialogDelete: false
+    }
+  },
+  computed: {
+    currentShift () {
+      let today = Date.now(7)
+      let start = new Date(this.check.startDate)
+      let diff = new Date(today - start)
+      return diff.getUTCDate()
     }
   },
   watch: {
@@ -119,12 +168,65 @@ export default {
         'tab-5': 'STRUCTURE',
         'tab-6': 'CABIN',
         'tab-7': 'CLEANING',
-        'tab-8': 'N/A'
+        'tab-8': 'N/A',
+        'tab-9': 'REMOVED'
       })[tab]
       this.$store.dispatch('beginLoading')
       // this.workpackByTab = this.workpack.filter(task => task.zoneDivision.includes(zoneByTab(this.tabs)))
       this.workpackByTab = this.workpack.filter(task => task.zoneDivision.indexOf(zoneByTab(this.tabs)) === 0)
       this.$store.dispatch('endLoading')
+    },
+    deleteTask(item) {
+      this.itemIndex = this.workpack.indexOf(item)
+      console.log(this.itemIndex)
+      this.editedItem = Object.assign({}, item)
+      this.dialogDelete = true
+    },
+    closeDeleteTask() {
+      this.dialogDelete = false
+      setTimeout(() => {
+        this.editedItem = null
+        this.itemIndex = -1
+      }, 300)
+    },
+    saveDeleteTask() {
+      this.editedItem.zoneDivision = 'REMOVED ' + this.editedItem.zoneDivision
+      if (this.itemIndex > -1) {
+        firebase.database().ref('/workpacks/' + this.checkId + '/' + this.itemIndex).update(this.editedItem).then(
+          (data) => {
+            //  console.log(data)
+            Object.assign(this.workpack[this.itemIndex], this.editedItem)
+            this.showTab()
+          },
+          (error) => {
+            console.log(error)
+          }
+        )
+      }
+      this.closeDeleteTask()
+    },
+    shiftColor(shifts, shiftNumber, taskStatus) {
+      let lastShiftNumber = shifts[shifts.length - 1].number
+      if (taskStatus === 'done') {
+        return 'green'
+      }
+      if (taskStatus === 'out') {
+        return 'blue-grey'
+      }
+      if (taskStatus === 'inProgress') {
+        if (shiftNumber < this.currentShift && shiftNumber === lastShiftNumber) {
+          return 'red'
+        } else {
+          return 'yellow'
+        }
+      }
+      if (taskStatus === 'notYet') {
+        if (shiftNumber <= this.currentShift) {
+          return 'red'
+        } else {
+          return 'grey lighten-3'
+        }
+      }
     }
   },
   mounted() {
