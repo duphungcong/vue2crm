@@ -354,7 +354,7 @@ export default {
             const obj = data.val()
             if (obj !== null && obj !== undefined) {
               for (let key2 in obj) {
-                let randomShift = Math.floor(Math.random() * Math.floor(10))
+                // let randomShift = Math.floor(Math.random() * Math.floor(10))
                 this.workpack[key1].taskID = key2
                 this.workpack[key1].zoneDivision = obj[key2].zoneDivision || 'N/A'
                 this.workpack[key1].amsMH = obj[key2].amsMH || ''
@@ -362,19 +362,19 @@ export default {
                 this.workpack[key1].men = obj[key2].men || ''
                 this.workpack[key1].hour = obj[key2].hour || ''
                 this.workpack[key1].remarks = obj[key2].remarks || ''
-                this.workpack[key1].shifts = [ { number: randomShift } ]
+                this.workpack[key1].shifts = [ 1 ]
                 this.workpack[key1].status = 'notYet'
                 this.workpack[key1].notes = ''
               }
             } else {
-              let randomShift = Math.floor(Math.random() * Math.floor(10))
+              // let randomShift = Math.floor(Math.random() * Math.floor(10))
               this.workpack[key1].zoneDivision = 'N/A'
               this.workpack[key1].amsMH = ''
               this.workpack[key1].macMH = ''
               this.workpack[key1].men = ''
               this.workpack[key1].hour = ''
               this.workpack[key1].remarks = ''
-              this.workpack[key1].shifts = [ { number: randomShift } ]
+              this.workpack[key1].shifts = [ 1 ]
               this.workpack[key1].status = 'notYet'
               this.workpack[key1].notes = ''
             }

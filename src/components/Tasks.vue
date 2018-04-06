@@ -40,15 +40,35 @@
               >
               <template slot="items" slot-scope="props">
                 <td class="body-0" @click="props.expanded = !props.expanded">{{ props.item.taskTitle }}</td>
-                <td class="body-0"><v-chip v-for="shift in props.item.shifts" :key="shift.number" label :color="shiftColor(props.item.shifts, shift.number, props.item.status)">{{ shift.number }}</v-chip></td>
+                <td class="body-0"><v-chip v-for="shift in props.item.shifts" :key="shift" label :color="shiftColor(props.item.shifts, shift, props.item.status)">{{ shift }}</v-chip></td>
                 <td class="body-0">{{ props.item.notes }}</td>
                 <td class="body-0">{{ props.item.wpItem }}</td>
                 <td class="body-0">{{ props.item.taskType }}</td>
                 <td class="body-0">{{ props.item.zoneDivision }}</td>
                 <td class="text-xs-center">
-                  <v-btn icon class="mx-0" @click.native="editShift(props.item)">
+                  <v-btn icon class="mx-0" @click.native="selectShift(props.item)">
                     <v-tooltip bottom>
-                        <v-icon color="green" slot="activator">assignment</v-icon><span>shift</span>
+                        <v-icon color="green" slot="activator">sort</v-icon><span>shift</span>
+                    </v-tooltip>
+                  </v-btn>
+                  <!-- Do not use menu due to poor render performance -->
+                  <!-- <v-menu transition="slide-x-reverse-transition" :close-on-content-click="false">
+                    <v-btn icon class="mx-0" slot="activator">
+                        <v-tooltip bottom>
+                          <v-icon color="green" slot="activator">sort</v-icon><span>shift</span>
+                      </v-tooltip>
+                    </v-btn>
+                    <v-list>
+                      <v-list-tile v-for="shift in check.shifts" :key="shift.number">
+                        <v-list-tile-action>
+                          <v-checkbox :label="shift.number.toString()" v-model="selectedShifts" :value="shift.number"></v-checkbox>
+                        </v-list-tile-action>
+                      </v-list-tile>
+                    </v-list>
+                  </v-menu> -->
+                  <v-btn icon class="mx-0" @click.native="showLog(props.item)">
+                    <v-tooltip bottom>
+                        <v-icon color="green" slot="activator">assignment</v-icon><span>log</span>
                     </v-tooltip>
                   </v-btn>
                 </td>
@@ -95,6 +115,7 @@
       <v-card>
         <v-card-title>Do you want to delete the task?</v-card-title>
         <v-card-actions>
+          <v-spacer></v-spacer>
           <v-btn flat @click.native="closeDeleteTask()">No</v-btn>
           <v-btn flat color="red" @click.native="saveDeleteTask()">Delete</v-btn>
         </v-card-actions>
@@ -131,8 +152,24 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="blue darken-1" flat @click.native="closeEditTask()">Cancel</v-btn>
+          <v-btn flat @click.native="closeEditTask()">Cancel</v-btn>
           <v-btn color="blue darken-1" flat @click.native="saveEditTask()">Save</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <v-dialog v-model="dialogSelectShift" max-width="800">
+      <v-card>
+        <v-card-text>
+          <v-layout row wrap>
+            <v-flex lg1 md1 sm1 xs1 v-for="shift in check.shifts" :key="shift.number">
+            <v-checkbox :label="shift.number.toString()" v-model="editedItem.shifts" :value="shift.number"></v-checkbox>
+          </v-flex>
+          </v-layout>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn flat @click.native="closeSelectShift()">Cancel</v-btn>
+          <v-btn color="blue darken-1" flat @click.native="saveSelectShift()">Save</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -175,6 +212,7 @@ export default {
       editedItem: {},
       dialogDelete: false,
       dialogEdit: false,
+      dialogSelectShift: false,
       newZone: [
         '100-200-800',
         '300-400',
@@ -274,6 +312,12 @@ export default {
         )
       }
     },
+    selectShift(item) {
+      this.itemIndex = this.workpack.indexOf(item)
+      console.log(this.itemIndex)
+      this.editedItem = Object.assign({}, item)
+      this.dialogSelectShift = true
+    },
     closeDeleteTask() {
       this.dialogDelete = false
       setTimeout(() => {
@@ -283,6 +327,13 @@ export default {
     },
     closeEditTask() {
       this.dialogEdit = false
+      setTimeout(() => {
+        this.editedItem = {}
+        this.itemIndex = -1
+      }, 300)
+    },
+    closeSelectShift() {
+      this.dialogSelectShift = false
       setTimeout(() => {
         this.editedItem = {}
         this.itemIndex = -1
@@ -318,8 +369,24 @@ export default {
       }
       this.closeEditTask()
     },
+    saveSelectShift() {
+      this.editedItem.shifts.sort((a, b) => {
+        return a - b
+      })
+      if (this.itemIndex > -1) {
+        firebase.database().ref('/workpacks/' + this.checkId + '/' + this.itemIndex).update(this.editedItem).then(
+          (data) => {
+            Object.assign(this.workpack[this.itemIndex], this.editedItem)
+          },
+          (error) => {
+            console.log(error)
+          }
+        )
+        this.closeSelectShift()
+      }
+    },
     shiftColor(shifts, shiftNumber, taskStatus) {
-      let lastShiftNumber = shifts[shifts.length - 1].number
+      let lastShiftNumber = shifts[shifts.length - 1]
       if (taskStatus === 'done') {
         return 'green'
       }
