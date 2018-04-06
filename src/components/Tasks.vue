@@ -395,7 +395,9 @@ export default {
       }
       if (taskStatus === 'inProgress') {
         if (shiftNumber < this.currentShift && shiftNumber === lastShiftNumber) {
-          return 'red'
+          return 'orange'
+        } else if (shiftNumber > this.currentShift) {
+          return 'grey lighten-3'
         } else {
           return 'yellow'
         }
