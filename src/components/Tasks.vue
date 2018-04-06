@@ -41,13 +41,14 @@
               <template slot="items" slot-scope="props">
                 <td class="body-0" @click="props.expanded = !props.expanded">{{ props.item.taskTitle }}</td>
                 <td class="body-0"><v-chip v-for="shift in props.item.shifts" :key="shift.number" label :color="shiftColor(props.item.shifts, shift.number, props.item.status)">{{ shift.number }}</v-chip></td>
-                <td class="body-0">{{ props.item.taskName }}</td>
+                <td class="body-0">{{ props.item.notes }}</td>
+                <td class="body-0">{{ props.item.wpItem }}</td>
                 <td class="body-0">{{ props.item.taskType }}</td>
                 <td class="body-0">{{ props.item.zoneDivision }}</td>
                 <td class="text-xs-center">
-                  <v-btn icon class="mx-0" @click.native="editTask(props.item)">
+                  <v-btn icon class="mx-0" @click.native="editShift(props.item)">
                     <v-tooltip bottom>
-                        <v-icon color="green" slot="activator">edit</v-icon><span>edit</span>
+                        <v-icon color="green" slot="activator">assignment</v-icon><span>shift</span>
                     </v-tooltip>
                   </v-btn>
                 </td>
@@ -55,6 +56,23 @@
               <template slot="expand" slot-scope="props">
                 <v-card flat color="blue lighten-5" class="elevation-0">
                   <v-card-actions>
+                    <v-btn icon class="mx-0" @click.native="editTask(props.item)">
+                      <v-tooltip bottom>
+                          <v-icon color="green" slot="activator">edit</v-icon><span>edit</span>
+                      </v-tooltip>
+                    </v-btn>
+                    <v-menu transition="slide-x-transition">
+                      <v-btn icon class="mx-0" slot="activator">
+                        <v-tooltip bottom>
+                            <v-icon color="green" slot="activator" medium>trending_flat</v-icon><span>move to</span>
+                        </v-tooltip>
+                      </v-btn>
+                      <v-list>
+                        <v-list-tile v-for="zone in newZone" :key="zone" @click="moveTask(zone, props.item)">
+                          <v-list-tile-title v-text="zone"></v-list-tile-title>
+                        </v-list-tile>
+                      </v-list>
+                    </v-menu>
                     <v-btn icon class="mx-0" @click.native="deleteTask(props.item)" v-if="tabs !== 'tab-9'">
                       <v-tooltip bottom>
                           <v-icon color="red" slot="activator">delete</v-icon><span>delete</span>
@@ -63,6 +81,7 @@
                   </v-card-actions>
                   <v-card-text>
                     <p>Zone: <strong>{{ props.item.zone }}</strong></p>
+                    <p>Task: <strong>{{ props.item.taskName }}</strong></p>
                     <p>Remarks: <strong>{{ props.item.remarks }}</strong></p>
                   </v-card-text>
                 </v-card>
@@ -78,6 +97,42 @@
         <v-card-actions>
           <v-btn flat @click.native="closeDeleteTask()">No</v-btn>
           <v-btn flat color="red" @click.native="saveDeleteTask()">Delete</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <v-dialog v-model="dialogEdit" max-width="500">
+      <v-card>
+        <v-card-title blue>
+          <span class="headline">Edit Task</span>
+        </v-card-title>
+        <v-card-text>
+          <v-container grid-list-sm>
+            <v-layout wrap>
+              <v-flex xs12 sm3 md3>
+                <v-text-field type="number" label="AMS MH" v-model="editedItem.amsMH"></v-text-field>
+              </v-flex>
+              <v-flex xs12 sm3 md3>
+                <v-text-field type="number" label="MAC MH" v-model="editedItem.macMH"></v-text-field>
+              </v-flex>
+              <v-flex xs12 sm3 md3>
+                <v-text-field type="number" label="MEN" v-model="editedItem.men"></v-text-field>
+              </v-flex>
+              <v-flex xs12 sm3 md3>
+                <v-text-field type="number" label="HOUR" v-model="editedItem.hour"></v-text-field>
+              </v-flex>
+              <v-flex xs12 sm12 md12>
+                <v-text-field multi-line rows="2" label="ZONE DIVISION" v-model="editedItem.zoneDivision"></v-text-field>
+              </v-flex>
+              <v-flex xs12 sm12 md12>
+                <v-text-field multi-line rows="2" no-resize label="REMARKS" v-model="editedItem.remarks"></v-text-field>
+              </v-flex>
+            </v-layout>
+          </v-container>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="blue darken-1" flat @click.native="closeEditTask()">Cancel</v-btn>
+          <v-btn color="blue darken-1" flat @click.native="saveEditTask()">Save</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -103,7 +158,8 @@ export default {
       headers: [
         { text: 'TITLE', left: true, value: 'taskTitle' },
         { text: 'STATUS', left: true, value: 'status' },
-        { text: 'TASK', left: true, value: 'taskName' },
+        { text: 'NOTE', left: true, value: 'notes' },
+        { text: 'WP ITEM', left: true, value: 'wpItem' },
         { text: 'TYPE', left: true, value: 'taskType' },
         { text: 'ZONE DIVISION', left: true, value: 'zoneDivision' },
         { text: '', sortable: false, value: '' }
@@ -116,8 +172,18 @@ export default {
       },
       search: '',
       itemIndex: -1,
-      editedItem: null,
-      dialogDelete: false
+      editedItem: {},
+      dialogDelete: false,
+      dialogEdit: false,
+      newZone: [
+        '100-200-800',
+        '300-400',
+        '500-600-700',
+        'AVIONIC',
+        'STRUCTURE',
+        'CABIN',
+        'CLEANING'
+      ]
     }
   },
   computed: {
@@ -182,10 +248,43 @@ export default {
       this.editedItem = Object.assign({}, item)
       this.dialogDelete = true
     },
+    editTask(item) {
+      this.itemIndex = this.workpack.indexOf(item)
+      console.log(this.itemIndex)
+      this.editedItem = Object.assign({}, item)
+      this.dialogEdit = true
+    },
+    moveTask(zone, item) {
+      this.itemIndex = this.workpack.indexOf(item)
+      // console.log(this.itemIndex)
+      this.editedItem = Object.assign({}, item)
+      this.editedItem.zoneDivision = zone + ' from ' + this.editedItem.zoneDivision
+      if (this.itemIndex > -1) {
+        firebase.database().ref('/workpacks/' + this.checkId + '/' + this.itemIndex).update(this.editedItem).then(
+          (data) => {
+            // console.log(data)
+            Object.assign(this.workpack[this.itemIndex], this.editedItem)
+            this.editedItem = {}
+            this.showTab()
+          },
+          (error) => {
+            console.log(error)
+            this.editedItem = {}
+          }
+        )
+      }
+    },
     closeDeleteTask() {
       this.dialogDelete = false
       setTimeout(() => {
-        this.editedItem = null
+        this.editedItem = {}
+        this.itemIndex = -1
+      }, 300)
+    },
+    closeEditTask() {
+      this.dialogEdit = false
+      setTimeout(() => {
+        this.editedItem = {}
         this.itemIndex = -1
       }, 300)
     },
@@ -194,7 +293,6 @@ export default {
       if (this.itemIndex > -1) {
         firebase.database().ref('/workpacks/' + this.checkId + '/' + this.itemIndex).update(this.editedItem).then(
           (data) => {
-            //  console.log(data)
             Object.assign(this.workpack[this.itemIndex], this.editedItem)
             this.showTab()
           },
@@ -204,6 +302,21 @@ export default {
         )
       }
       this.closeDeleteTask()
+    },
+    saveEditTask() {
+      if (this.itemIndex > -1) {
+        firebase.database().ref('/workpacks/' + this.checkId + '/' + this.itemIndex).update(this.editedItem).then(
+          (data) => {
+            Object.assign(this.workpack[this.itemIndex], this.editedItem)
+            this.showTab()
+          },
+          (error) => {
+            console.log(error)
+            this.closeEditTask()
+          }
+        )
+      }
+      this.closeEditTask()
     },
     shiftColor(shifts, shiftNumber, taskStatus) {
       let lastShiftNumber = shifts[shifts.length - 1].number

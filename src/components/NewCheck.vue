@@ -364,6 +364,7 @@ export default {
                 this.workpack[key1].remarks = obj[key2].remarks || ''
                 this.workpack[key1].shifts = [ { number: randomShift } ]
                 this.workpack[key1].status = 'notYet'
+                this.workpack[key1].notes = ''
               }
             } else {
               let randomShift = Math.floor(Math.random() * Math.floor(10))
@@ -375,6 +376,7 @@ export default {
               this.workpack[key1].remarks = ''
               this.workpack[key1].shifts = [ { number: randomShift } ]
               this.workpack[key1].status = 'notYet'
+              this.workpack[key1].notes = ''
             }
             if (count === this.workpack.length) {
               this.$store.dispatch('endLoading')

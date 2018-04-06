@@ -65,7 +65,7 @@
                   <span>{{ item.wpItem }}</span>
                 </v-flex>
                 <v-flex xs6>
-                  <v-text-field label="Remarks" v-model="item.remarks"></v-text-field>
+                  <v-text-field label="Remarks" v-model="item.notes"></v-text-field>
                 </v-flex>
                 <v-flex xs1 pl-3>
                   <v-icon color="red">delete</v-icon>
@@ -145,7 +145,7 @@ export default {
         let time = Date.now(7)
         this.scan.push({
           wpItem: wpItem,
-          remarks: '',
+          notes: '',
           time: time,
           updateSuccess: false,
           updateFail: false,
@@ -190,8 +190,8 @@ export default {
             const obj = data.val()
             if (obj !== null && obj !== undefined) {
               for (let key in obj) {
-                if (element.remarks !== null && element.remarks !== undefined) {
-                  obj[key].remarks = element.remarks
+                if (element.notes !== null && element.notes !== undefined) {
+                  obj[key].notes = element.notes
                 }
                 obj[key].status = status
                 obj[key].logs = obj[key].logs || []
@@ -199,7 +199,7 @@ export default {
                   status: status,
                   person: 'PPC',
                   time: element.time,
-                  remarks: element.remarks
+                  notes: element.notes
                 })
                 firebase.database().ref('workpacks/' + this.checkId + '/' + key).update(obj[key]).then(
                   (data) => {
