@@ -194,13 +194,20 @@ export default {
                   obj[key].notes = element.notes
                 }
                 obj[key].status = status
-                obj[key].logs = obj[key].logs || []
-                obj[key].logs.push({
+                // obj[key].logs = obj[key].logs || []
+                // obj[key].logs.push({
+                //   status: status,
+                //   person: 'PPC',
+                //   time: element.time,
+                //   notes: element.notes
+                // })
+                let log = {
                   status: status,
                   person: 'PPC',
                   time: element.time,
+                  action: 'receive',
                   notes: element.notes
-                })
+                }
                 firebase.database().ref('workpacks/' + this.checkId + '/' + key).update(obj[key]).then(
                   (data) => {
                     console.log('update completed')
@@ -209,6 +216,14 @@ export default {
                   (error) => {
                     console.log(error)
                     element.updateFail = true
+                  }
+                )
+                firebase.database().ref('taskLogs/' + this.checkId + '/' + key).push(log).then(
+                  (data) => {
+                    console.log('log - receive')
+                  },
+                  (error) => {
+                    console.log(error)
                   }
                 )
               }

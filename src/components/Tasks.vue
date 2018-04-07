@@ -32,7 +32,7 @@
               </v-card>
               &nbsp;
               <v-data-table
-              :headers="headers"
+              :headerTask="headerTask"
               :items="workpackByTab"
               :pagination.sync="pagination"
               :search="search"
@@ -173,6 +173,22 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+    <v-dialog v-model="dialogLog">
+      <v-card class="elevation-0">
+        <v-data-table
+          :items="taskLogs"
+          :headers="headerLog"
+          class="elevation-1">
+          <template slot="items" slot-scope="props">
+            <td class="boyd-0">{{ props.item.person }}</td>
+            <td class="boyd-0">{{ props.item.action }}</td>
+            <td class="boyd-0">{{ props.item.status }}</td>
+            <td class="boyd-0">{{ props.item.time }}</td>
+            <td class="boyd-0">{{ props.item.notes || 'NIL'}}</td>
+          </template>
+        </v-data-table>
+      </v-card>
+    </v-dialog>
     <loading-progress></loading-progress>
   </v-container>
 </template>
@@ -192,8 +208,15 @@ export default {
       workpack: [],
       workpackByTab: [],
       tabs: 'tab-1',
-      headers: [
-        { text: 'TITLE', left: true, value: 'taskTitle' },
+      headerLog: [
+        { text: 'PERSON', left: true, value: 'person' },
+        { text: 'ACTION', left: true, value: 'action' },
+        { text: 'STATUS', left: true, value: 'status' },
+        { text: 'TIME', left: true, value: 'time' },
+        { text: 'NOTES', left: true, value: 'notes' }
+      ],
+      headerTask: [
+        { text: 'TITLE', left: true, value: 'title' },
         { text: 'STATUS', left: true, value: 'status' },
         { text: 'NOTE', left: true, value: 'notes' },
         { text: 'WP ITEM', left: true, value: 'wpItem' },
@@ -213,6 +236,7 @@ export default {
       dialogDelete: false,
       dialogEdit: false,
       dialogSelectShift: false,
+      dialogLog: false,
       newZone: [
         '100-200-800',
         '300-400',
@@ -221,7 +245,8 @@ export default {
         'STRUCTURE',
         'CABIN',
         'CLEANING'
-      ]
+      ],
+      taskLogs: []
     }
   },
   computed: {
@@ -317,6 +342,27 @@ export default {
       console.log(this.itemIndex)
       this.editedItem = Object.assign({}, item)
       this.dialogSelectShift = true
+    },
+    showLog(item) {
+      this.itemIndex = this.workpack.indexOf(item)
+      if (this.itemIndex > -1) {
+        firebase.database().ref('taskLogs/' + this.checkId + '/' + this.itemIndex).once('value').then(
+          (data) => {
+            let obj = data.val()
+            console.log(obj)
+            for (let key in obj) {
+              this.taskLogs.push(obj[key])
+            }
+            this.taskLogs.sort((a, b) => {
+              return a.time - b.time
+            })
+          },
+          (error) => {
+            console.log(error)
+          }
+        )
+      }
+      this.dialogLog = true
     },
     closeDeleteTask() {
       this.dialogDelete = false

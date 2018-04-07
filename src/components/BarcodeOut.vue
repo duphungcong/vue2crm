@@ -6,7 +6,7 @@
           label="Scan Task"
           @change.native="onBarcodeScanned(barcode)"
           v-model="barcode"
-          :disabled="person !== null && person.length < 4"></v-text-field>
+          :disabled="person === null || person.length < 4"></v-text-field>
         <v-text-field
           autofocus
           counter="4"
@@ -141,13 +141,20 @@ export default {
                   obj[key].notes = element.notes
                 }
                 obj[key].status = 'out'
-                obj[key].logs = obj[key].logs || []
-                obj[key].logs.push({
+                // obj[key].logs = obj[key].logs || []
+                // obj[key].logs.push({
+                //   status: 'out',
+                //   person: element.person,
+                //   time: element.time,
+                //   notes: element.notes
+                // })
+                let log = {
                   status: 'out',
                   person: element.person,
                   time: element.time,
+                  action: 'take out',
                   notes: element.notes
-                })
+                }
                 firebase.database().ref('workpacks/' + this.checkId + '/' + key).update(obj[key]).then(
                   (data) => {
                     console.log('update completed')
@@ -156,6 +163,14 @@ export default {
                   (error) => {
                     console.log(error)
                     element.updateFail = true
+                  }
+                )
+                firebase.database().ref('taskLogs/' + this.checkId + '/' + key).push(log).then(
+                  (data) => {
+                    console.log('log - take out')
+                  },
+                  (error) => {
+                    console.log(error)
                   }
                 )
               }
