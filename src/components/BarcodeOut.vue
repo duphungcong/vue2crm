@@ -35,7 +35,7 @@
               <span>TIME</span>
             </v-flex>
             <v-flex xs5>
-              <span>REMARKS</span>
+              <span>NOTES</span>
             </v-flex>
             <v-flex xs1>
               <v-btn flat icon color="blue" @click.native="clear()">
@@ -100,12 +100,13 @@ export default {
         return item.wpItem === wpItem
       })
       if (found === undefined) {
-        let time = Date.now(7)
+        let now = Date.now(7)
+        let time = new Date(now)
         console.log(time)
         this.scan.push({
           wpItem: wpItem,
           person: this.person,
-          time: time,
+          time: time.toLocaleString(),
           notes: '',
           updateSuccess: false,
           updateFail: false
@@ -141,13 +142,6 @@ export default {
                   obj[key].notes = element.notes
                 }
                 obj[key].status = 'out'
-                // obj[key].logs = obj[key].logs || []
-                // obj[key].logs.push({
-                //   status: 'out',
-                //   person: element.person,
-                //   time: element.time,
-                //   notes: element.notes
-                // })
                 let log = {
                   status: 'out',
                   person: element.person,

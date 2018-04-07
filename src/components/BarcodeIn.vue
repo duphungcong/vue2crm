@@ -37,7 +37,7 @@
                 <span>TASK ITEM ({{ scan.length }})</span>
               </v-flex>
               <v-flex xs6>
-                <span>REMARKS</span>
+                <span>NOTES</span>
               </v-flex>
               <v-flex xs1>
                 <v-btn flat icon color="blue" @click.native="clear()">
@@ -142,11 +142,12 @@ export default {
         return item.wpItem === wpItem
       })
       if (found === undefined) {
-        let time = Date.now(7)
+        let now = Date.now(7)
+        let time = new Date(now)
         this.scan.push({
           wpItem: wpItem,
           notes: '',
-          time: time,
+          time: time.toLocaleString(),
           updateSuccess: false,
           updateFail: false,
           done: false,
@@ -194,13 +195,6 @@ export default {
                   obj[key].notes = element.notes
                 }
                 obj[key].status = status
-                // obj[key].logs = obj[key].logs || []
-                // obj[key].logs.push({
-                //   status: status,
-                //   person: 'PPC',
-                //   time: element.time,
-                //   notes: element.notes
-                // })
                 let log = {
                   status: status,
                   person: 'PPC',

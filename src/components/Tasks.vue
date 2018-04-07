@@ -32,19 +32,19 @@
               </v-card>
               &nbsp;
               <v-data-table
-              :headerTask="headerTask"
+              :headers="headerTask"
               :items="workpackByTab"
-              :pagination.sync="pagination"
+              :pagination.sync="paginationTask"
               :search="search"
-              item-key="taskName"
+              item-key="wpItem"
               >
               <template slot="items" slot-scope="props">
                 <td class="body-0" @click="props.expanded = !props.expanded">{{ props.item.taskTitle }}</td>
-                <td class="body-0"><v-chip v-for="shift in props.item.shifts" :key="shift" label :color="shiftColor(props.item.shifts, shift, props.item.status)">{{ shift }}</v-chip></td>
-                <td class="body-0">{{ props.item.notes }}</td>
-                <td class="body-0">{{ props.item.wpItem }}</td>
-                <td class="body-0">{{ props.item.taskType }}</td>
-                <td class="body-0">{{ props.item.zoneDivision }}</td>
+                <td class="body-0" @click="props.expanded = !props.expanded"><v-chip v-for="shift in props.item.shifts" :key="shift" label :color="shiftColor(props.item.shifts, shift, props.item.status)">{{ shift }}</v-chip></td>
+                <td class="body-0" @click="props.expanded = !props.expanded">{{ props.item.notes }}</td>
+                <td class="body-0" @click="props.expanded = !props.expanded">{{ props.item.wpItem }}</td>
+                <td class="body-0" @click="props.expanded = !props.expanded">{{ props.item.taskType }}</td>
+                <td class="body-0" @click="props.expanded = !props.expanded">{{ props.item.zoneDivision }}</td>
                 <td class="text-xs-center">
                   <v-btn icon class="mx-0" @click.native="selectShift(props.item)">
                     <v-tooltip bottom>
@@ -173,11 +173,13 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
-    <v-dialog v-model="dialogLog">
+    <v-dialog v-model="dialogLog" max-width="900">
       <v-card class="elevation-0">
         <v-data-table
           :items="taskLogs"
           :headers="headerLog"
+          :pagination.sync="paginationLog"
+          :loading="logLoading"
           class="elevation-1">
           <template slot="items" slot-scope="props">
             <td class="boyd-0">{{ props.item.person }}</td>
@@ -216,7 +218,7 @@ export default {
         { text: 'NOTES', left: true, value: 'notes' }
       ],
       headerTask: [
-        { text: 'TITLE', left: true, value: 'title' },
+        { text: 'TITLE', left: true, value: 'taskTitle' },
         { text: 'STATUS', left: true, value: 'status' },
         { text: 'NOTE', left: true, value: 'notes' },
         { text: 'WP ITEM', left: true, value: 'wpItem' },
@@ -224,11 +226,18 @@ export default {
         { text: 'ZONE DIVISION', left: true, value: 'zoneDivision' },
         { text: '', sortable: false, value: '' }
       ],
-      pagination: {
+      paginationTask: {
         page: 1,
         totalItems: 0,
         rowsPerPage: 10,
         sortBy: 'zoneDivision'
+      },
+      paginationLog: {
+        page: 1,
+        totalItems: 0,
+        rowsPerPage: 10,
+        sortBy: 'time',
+        descending: true
       },
       search: '',
       itemIndex: -1,
@@ -246,7 +255,8 @@ export default {
         'CABIN',
         'CLEANING'
       ],
-      taskLogs: []
+      taskLogs: [],
+      logLoading: false
     }
   },
   computed: {
@@ -260,6 +270,11 @@ export default {
   watch: {
     tabs (newValue, oldValue) {
       this.showTab()
+    },
+    dialogLog (newValue, oldValue) {
+      if (newValue === false) {
+        this.taskLogs = []
+      }
     }
   },
   methods: {
@@ -346,6 +361,7 @@ export default {
     showLog(item) {
       this.itemIndex = this.workpack.indexOf(item)
       if (this.itemIndex > -1) {
+        this.logLoading = true
         firebase.database().ref('taskLogs/' + this.checkId + '/' + this.itemIndex).once('value').then(
           (data) => {
             let obj = data.val()
@@ -353,12 +369,11 @@ export default {
             for (let key in obj) {
               this.taskLogs.push(obj[key])
             }
-            this.taskLogs.sort((a, b) => {
-              return a.time - b.time
-            })
+            this.logLoading = false
           },
           (error) => {
             console.log(error)
+            this.logLoading = false
           }
         )
       }

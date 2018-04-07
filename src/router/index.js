@@ -17,7 +17,6 @@ import MaintSchedule from '@/components/MaintSchedule'
 import Shifts from '@/components/Shifts'
 import Shift from '@/components/Shift'
 import Tasks from '@/components/Tasks'
-import ShiftBar from '@/components/ShiftBar'
 import BarcodeIn from '@/components/BarcodeIn'
 import BarcodeOut from '@/components/BarcodeOut'
 
@@ -118,12 +117,6 @@ let router = new Router({
     },
     {
       path: '/shift', component: Shift, name: 'Shift', meta: {
-        requireAuth: true,
-        requireFollowing: true
-      }
-    },
-    {
-      path: '/shiftbar', component: ShiftBar, name: 'ShiftBar', meta: {
         requireAuth: true,
         requireFollowing: true
       }
