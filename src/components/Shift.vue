@@ -73,8 +73,7 @@ export default {
 
 <style scoped>
   .currentShift {
-    border-width: 2px;
-    border-color: red
+    border: 2px solid red !important;
   }
 </style>
 

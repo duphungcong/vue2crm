@@ -19,6 +19,7 @@ import Shift from '@/components/Shift'
 import Tasks from '@/components/Tasks'
 import BarcodeIn from '@/components/BarcodeIn'
 import BarcodeOut from '@/components/BarcodeOut'
+import Time from '@/components/Time'
 
 import Login from '@/components/Login'
 import SignUp from '@/components/SignUp'
@@ -117,6 +118,12 @@ let router = new Router({
     },
     {
       path: '/shift', component: Shift, name: 'Shift', meta: {
+        requireAuth: true,
+        requireFollowing: true
+      }
+    },
+    {
+      path: '/time', component: Time, name: 'Time', meta: {
         requireAuth: true,
         requireFollowing: true
       }
