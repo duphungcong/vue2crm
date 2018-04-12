@@ -26,8 +26,17 @@
               :id="'tab-' + i">
               <v-card class="elevation-0">
                 <v-card-title>
-                  <v-spacer></v-spacer>
-                  <v-text-field append-icon="search" label="Search" single-line hide-details v-model="search"></v-text-field>
+                  <!-- <v-spacer></v-spacer>
+                  <v-text-field append-icon="search" label="Search" single-line hide-details v-model="search"></v-text-field> -->
+                  <v-layout row wrap>
+                    <v-flex xs12 sm3 md3>
+                      <v-select :items="check.shifts" v-model="selectedShift" clearable item-text="number" item-value="number" label="Shift"></v-select>
+                    </v-flex>
+                    <v-flex sm1 md1></v-flex>
+                    <v-flex xs12 sm3 md3>
+                      <v-select :items="taskStatus" v-model="selectedStatus" clearable label="Status"></v-select>
+                    </v-flex>
+                  </v-layout>
                 </v-card-title>
               </v-card>
               &nbsp;
@@ -35,7 +44,6 @@
               :headers="headerTask"
               :items="workpackByTab"
               :pagination.sync="paginationTask"
-              :search="search"
               item-key="wpItem"
               >
               <template slot="items" slot-scope="props">
@@ -51,21 +59,6 @@
                         <v-icon color="green" slot="activator">sort</v-icon><span>shift</span>
                     </v-tooltip>
                   </v-btn>
-                  <!-- Do not use menu due to poor render performance -->
-                  <!-- <v-menu transition="slide-x-reverse-transition" :close-on-content-click="false">
-                    <v-btn icon class="mx-0" slot="activator">
-                        <v-tooltip bottom>
-                          <v-icon color="green" slot="activator">sort</v-icon><span>shift</span>
-                      </v-tooltip>
-                    </v-btn>
-                    <v-list>
-                      <v-list-tile v-for="shift in check.shifts" :key="shift.number">
-                        <v-list-tile-action>
-                          <v-checkbox :label="shift.number.toString()" v-model="selectedShifts" :value="shift.number"></v-checkbox>
-                        </v-list-tile-action>
-                      </v-list-tile>
-                    </v-list>
-                  </v-menu> -->
                   <v-btn icon class="mx-0" @click.native="showLog(props.item)">
                     <v-tooltip bottom>
                         <v-icon color="green" slot="activator">assignment</v-icon><span>log</span>
@@ -209,6 +202,7 @@ export default {
       },
       workpack: [],
       workpackByTab: [],
+      workpackByTabBeforeFilter: [],
       tabs: 'tab-1',
       headerLog: [
         { text: 'PERSON', left: true, value: 'person' },
@@ -256,7 +250,15 @@ export default {
         'CLEANING'
       ],
       taskLogs: [],
-      logLoading: false
+      logLoading: false,
+      taskStatus: [
+        'done',
+        'inProgress',
+        'notYet',
+        'out'
+      ],
+      selectedShift: null,
+      selectedStatus: null
     }
   },
   computed: {
@@ -275,6 +277,12 @@ export default {
       if (newValue === false) {
         this.taskLogs = []
       }
+    },
+    selectedShift (newValue, oldValue) {
+      this.filterTask(newValue, this.selectedStatus)
+    },
+    selectedStatus (newValue, oldValue) {
+      this.filterTask(this.selectedShift, newValue)
     }
   },
   methods: {
@@ -317,7 +325,9 @@ export default {
       })[tab]
       this.$store.dispatch('beginLoading')
       // this.workpackByTab = this.workpack.filter(task => task.zoneDivision.includes(zoneByTab(this.tabs)))
+      // this.workpackByTabBeforeFilter = this.workpack.filter(task => task.zoneDivision.indexOf(zoneByTab(this.tabs)) === 0)
       this.workpackByTab = this.workpack.filter(task => task.zoneDivision.indexOf(zoneByTab(this.tabs)) === 0)
+      this.workpackByTabBeforeFilter = this.workpackByTab
       this.$store.dispatch('endLoading')
     },
     deleteTask(item) {
@@ -469,6 +479,32 @@ export default {
         } else {
           return 'grey lighten-3'
         }
+      }
+    },
+    filterTask(byShift, byStatus) {
+      function filterByShift(element) {
+        let shifts = element.shifts
+        let status = false
+        // console.log(shifts)
+        // console.log(shifts.length)
+        shifts.forEach((item, index, array) => {
+          // console.log(newValue)
+          // console.log(item)
+          if (item === byShift) {
+            // console.log('found')
+            status = true
+          }
+        })
+        return status
+      }
+      if (byShift === null && byStatus == null) {
+        this.workpackByTab = this.workpackByTabBeforeFilter
+      }
+      if (byShift !== null && byShift !== undefined) {
+        this.workpackByTab = this.workpackByTabBeforeFilter.filter(filterByShift)
+      }
+      if (byStatus !== null && byStatus !== undefined) {
+        this.workpackByTab = this.workpackByTab.filter(element => element.status === byStatus)
       }
     }
   },
