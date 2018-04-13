@@ -36,7 +36,7 @@
 <script>
 
 import firebase from 'firebase'
-import Shift from './Shift.vue'
+import Shift from './shared/Shift.vue'
 
 export default {
   name: 'Shifts',

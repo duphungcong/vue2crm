@@ -26,24 +26,26 @@
               :id="'tab-' + i">
               <v-card class="elevation-0">
                 <v-card-title>
-                  <!-- <v-spacer></v-spacer>
-                  <v-text-field append-icon="search" label="Search" single-line hide-details v-model="search"></v-text-field> -->
                   <v-layout row wrap>
-                    <v-flex xs12 sm3 md3>
+                    <v-flex xs12 sm2 md2>
                       <v-select :items="check.shifts" v-model="selectedShift" clearable item-text="number" item-value="number" label="Shift"></v-select>
                     </v-flex>
                     <v-flex sm1 md1></v-flex>
-                    <v-flex xs12 sm3 md3>
+                    <v-flex xs12 sm2 md2>
                       <v-select :items="taskStatus" v-model="selectedStatus" clearable label="Status"></v-select>
+                    </v-flex>
+                    <v-flex sm1 md1></v-flex>
+                    <v-flex>
+                      <v-text-field append-icon="search" label="Search" single-line hide-details v-model="search"></v-text-field>
                     </v-flex>
                   </v-layout>
                 </v-card-title>
               </v-card>
-              &nbsp;
               <v-data-table
               :headers="headerTask"
               :items="workpackByTab"
               :pagination.sync="paginationTask"
+              :search="search"
               item-key="wpItem"
               >
               <template slot="items" slot-scope="props">

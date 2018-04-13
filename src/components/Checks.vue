@@ -1,57 +1,57 @@
 <template>
   <v-container fluid grid-list-sm>
-      <v-flex xs12>
-        <v-card>
-          <v-card-title>
-            <v-btn fab small dark class="red" @click.native="addCheck">
-              <v-icon>add</v-icon>
-            </v-btn>
-            <v-spacer></v-spacer>
-            <v-text-field append-icon="search" label="Search" single-line hide-details v-model="search"></v-text-field>
-            &nbsp;
-          </v-card-title>
-            <v-data-table :headers="headers" :items="checks" :search="search" v-bind:pagination.sync="pagination">
-              <template slot="items" slot-scope="props" class="body-2">
-                <td class="body-2">{{ props.item.aircraft }}</td>
-                <td class="body-2">{{ props.item.name }}</td>
-                <td class="body-2">{{ formatDate(props.item.startDate) }}</td>
-                <td class="body-2">{{ formatDate(props.item.finishDate) }}</td>
-                <td class="body-2">{{ remainDay(props.item.startDate, props.item.finishDate) }}</td>
-                <td class="text-xs-right">
-                  <v-btn icon class="mx-0" @click.native="followCheck(props.item)">
-                    <v-tooltip bottom>
-                      <v-icon color="green" slot="activator">touch_app</v-icon><span>follow</span>
-                    </v-tooltip>
-                  </v-btn>
-                  <v-btn icon class="mx-0" @click.native="editCheck(props.item)">
-                    <v-tooltip bottom>
-                       <v-icon color="green" slot="activator">edit</v-icon><span>edit</span>
-                    </v-tooltip>
-                  </v-btn>
-                  <v-btn icon class="mx-0" @click.native="dialogDelete = true, deletedCheckId = props.item.id">
-                    <v-tooltip bottom>
-                       <v-icon color="red" slot="activator">delete</v-icon><span>delete</span>
-                    </v-tooltip>
-                  </v-btn>
-                </td>
-              </template>
-              <v-alert slot="no-results" :value="true" color="error" icon="warning">
-                Your search for "{{ search }}" found no results.
-              </v-alert>
-            </v-data-table>
-        </v-card>
-      </v-flex>
-      <loading-progress></loading-progress>
-      <v-dialog v-model="dialogDelete" persistent max-width="290">
-        <v-card>
-          <v-card-title class="headline">Delete this check?</v-card-title>
-          <v-card-text>You can not roll back</v-card-text>
-          <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-btn color="green darken-1" flat @click.native="dialogDelete = false, deletedCheckId = ''">No</v-btn>
-            <v-btn color="red darken-1" flat @click.native="dialogDelete =  false, deleteCheck(deletedCheckId)">Delete</v-btn>
-          </v-card-actions>
-        </v-card>
+    <v-flex xs12>
+      <v-card>
+        <v-card-title>
+          <v-btn fab small dark class="red" @click.native="addCheck">
+            <v-icon>add</v-icon>
+          </v-btn>
+          <v-spacer></v-spacer>
+          <v-text-field append-icon="search" label="Search" single-line hide-details v-model="search"></v-text-field>
+          &nbsp;
+        </v-card-title>
+        <v-data-table :headers="headers" :items="checks" :search="search" :pagination.sync="pagination">
+          <template slot="items" slot-scope="props" class="body-2">
+            <td class="body-2">{{ props.item.aircraft }}</td>
+            <td class="body-2">{{ props.item.name }}</td>
+            <td class="body-2">{{ formatDate(props.item.startDate) }}</td>
+            <td class="body-2">{{ formatDate(props.item.finishDate) }}</td>
+            <td class="body-2">{{ remainDay(props.item.startDate, props.item.finishDate) }}</td>
+            <td class="text-xs-right">
+              <v-btn icon class="mx-0" @click.native="followCheck(props.item)">
+                <v-tooltip bottom>
+                  <v-icon color="green" slot="activator">touch_app</v-icon><span>follow</span>
+                </v-tooltip>
+              </v-btn>
+              <v-btn icon class="mx-0" @click.native="editCheck(props.item)">
+                <v-tooltip bottom>
+                    <v-icon color="green" slot="activator">edit</v-icon><span>edit</span>
+                </v-tooltip>
+              </v-btn>
+              <v-btn icon class="mx-0" @click.native="dialogDelete = true, deletedCheckId = props.item.id">
+                <v-tooltip bottom>
+                    <v-icon color="red" slot="activator">delete</v-icon><span>delete</span>
+                </v-tooltip>
+              </v-btn>
+            </td>
+          </template>
+          <v-alert slot="no-results" :value="true" color="error" icon="warning">
+            Your search for "{{ search }}" found no results.
+          </v-alert>
+        </v-data-table>
+      </v-card>
+    </v-flex>
+    <loading-progress></loading-progress>
+    <v-dialog v-model="dialogDelete" persistent max-width="290">
+      <v-card>
+        <v-card-title class="headline">Delete this check?</v-card-title>
+        <v-card-text>You can not roll back</v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="green darken-1" flat @click.native="dialogDelete = false, deletedCheckId = ''">No</v-btn>
+          <v-btn color="red darken-1" flat @click.native="dialogDelete =  false, deleteCheck(deletedCheckId)">Delete</v-btn>
+        </v-card-actions>
+      </v-card>
     </v-dialog>
   </v-container>
 </template>
