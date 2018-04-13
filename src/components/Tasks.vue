@@ -83,7 +83,7 @@
                         </v-tooltip>
                       </v-btn>
                       <v-list>
-                        <v-list-tile v-for="zone in newZone" :key="zone" @click="moveTask(zone, props.item)">
+                        <v-list-tile v-for="zone in zoneSelection" :key="zone" @click="moveTask(zone, props.item)">
                           <v-list-tile-title v-text="zone"></v-list-tile-title>
                         </v-list-tile>
                       </v-list>
@@ -242,7 +242,7 @@ export default {
       dialogEdit: false,
       dialogSelectShift: false,
       dialogLog: false,
-      newZone: [
+      zoneSelection: [
         '100-200-800',
         '300-400',
         '500-600-700',

@@ -1,7 +1,14 @@
 <template>
   <v-container fluid grid-list-sm>
     <v-flex sx12>
-      <v-card class="elevation-0">
+      <v-card>
+        <v-card-title>
+          <v-select :items="zoneSelection" label="Select zone"></v-select>
+          <v-spacer></v-spacer>
+          <v-btn @click.native="exportZoneDivision" class="blue">Export to Excel
+            <v-icon right>file_download</v-icon>
+          </v-btn>
+        </v-card-title>
         <v-data-table :headers="headers" :items="workpack" :pagination.sync="pagination">
           <template slot="items" slot-scope="props" class="body-2">
             <td class="body-0">{{ props.item.wpItem }}</td>
@@ -108,7 +115,10 @@
 </template>
 
 <script>
+
 import firebase from 'firebase'
+import XLSX from 'xlsx'
+
 export default {
   name: 'EditCheck',
   data () {
@@ -148,7 +158,16 @@ export default {
       editedItem: {},
       linkedItem: {},
       dialogEditItem: false,
-      dialogLinkItem: false
+      dialogLinkItem: false,
+      zoneSelection: [
+        '100-200-800',
+        '300-400',
+        '500-600-700',
+        'AVIONIC',
+        'STRUCTURE',
+        'CABIN',
+        'CLEANING'
+      ]
     }
   },
   watch: {
@@ -320,6 +339,36 @@ export default {
           }
         )
       }
+    },
+    exportZoneDivision() {
+      let exportedWorkpack = []
+      this.workpack.forEach((element) => {
+        let item = {
+          WP_ITEM: element.wpItem,
+          TASK: element.taskName,
+          ZONE: element.zone,
+          TASK_TYPE: element.taskType,
+          TITLE: element.taskTitle,
+          AMS_MH: element.amsMH,
+          MAC_MH: element.macMH,
+          MEN: element.men,
+          HOURS: element.hour,
+          ZONE_DIVISION: element.zoneDivision,
+          REMARKS: element.remarks
+        }
+        exportedWorkpack.push(item)
+      })
+      // console.log(exportedWorkpack)
+      exportedWorkpack.sort((a, b) => {
+        return a.ZONE_DIVISION.localeCompare(b.ZONE_DIVISION) || a.WP_ITEM.localeCompare(b.WP_ITEM)
+      })
+      // console.log(exportedWorkpack)
+      let worksheet = XLSX.utils.json_to_sheet(Object.assign([], exportedWorkpack))
+      // console.log(worksheet)
+      let workbook = XLSX.utils.book_new()
+      XLSX.utils.book_append_sheet(workbook, worksheet, 'ZD')
+      // // console.log(workbook)
+      XLSX.writeFile(workbook, 'bfs26 - ' + this.check.aircraft + '.xlsx')
     }
   },
   mounted() {
