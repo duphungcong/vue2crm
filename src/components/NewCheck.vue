@@ -67,14 +67,6 @@
                   <td class="body-0">{{ props.item.hour }}</td>
                   <td class="body-0">{{ props.item.zoneDivision }}</td>
                   <td class="body-0">{{ props.item.remarks }}</td>
-                  <!-- <td class="justify-center layout px-0">
-                    <v-btn icon class="mx-0" @click="editItem(props.item)" v-if="!props.item.taskName.includes('VN ')">
-                      <v-icon color="teal">edit</v-icon>
-                    </v-btn>
-                    <v-btn icon class="mx-0" @click="linkItem(props.item)" v-if="props.item.taskName.includes('VN ')">
-                      <v-icon color="teal">link</v-icon>
-                    </v-btn>
-                  </td> -->
                 </template>
               </v-data-table>
             </v-card>
@@ -105,82 +97,6 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
-    <!-- <v-dialog v-model="dialogEditItem" max-width="500">
-      <v-card>
-        <v-card-title>
-          <span class="headline">Edit Item</span>
-        </v-card-title>
-        <v-card-text>
-          <v-container grid-list-md>
-            <v-layout wrap>
-              <v-flex xs12 sm3 md3>
-                <v-text-field type="number" label="AMS MH" v-model="editedItem.amsMH"></v-text-field>
-              </v-flex>
-              <v-flex xs12 sm3 md3>
-                <v-text-field type="number" label="MAC MH" v-model="editedItem.macMH"></v-text-field>
-              </v-flex>
-              <v-flex xs12 sm3 md3>
-                <v-text-field type="number" label="MEN" v-model="editedItem.men"></v-text-field>
-              </v-flex>
-              <v-flex xs12 sm3 md3>
-                <v-text-field type="number" label="HOUR" v-model="editedItem.hour"></v-text-field>
-              </v-flex>
-              <v-flex xs12 sm12 md12>
-                <v-text-field multi-line rows="2" label="ZONE DIVISION" v-model="editedItem.zoneDivision"></v-text-field>
-              </v-flex>
-              <v-flex xs12 sm12 md12>
-                <v-text-field multi-line rows="2" no-resize label="REMARKS" v-model="editedItem.remarks"></v-text-field>
-              </v-flex>
-            </v-layout>
-          </v-container>
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn color="blue darken-1" flat @click.native="closeEditItem()">Cancel</v-btn>
-          <v-btn color="blue darken-1" flat @click.native="saveEditItem()">Save</v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-    <v-dialog v-model="dialogLinkItem" max-width="500">
-      <v-card>
-        <v-card-title><span class="headline">Link to EO</span></v-card-title>
-        <v-card-text>
-          <v-container grid-list-md>
-            <v-layout wrap>
-              <v-flex xs12 sm12 md12>
-                 <v-text-field disabled label="TITLE" v-model="editedItem.taskTitle"></v-text-field>
-              </v-flex>
-              <v-flex xs12 sm12 md12>
-                <v-select clearable open-on-clear :items="eoList" label="Select EO" v-model="linkedItem" item-text="name" class="input-group--focused" required autocomplete @keyup.native.enter="addEO"></v-select>
-              </v-flex>
-              <v-flex xs12 sm3 md3>
-                <v-text-field type="number" label="AMS MH" v-model="linkedItem.amsMH"></v-text-field>
-              </v-flex>
-              <v-flex xs12 sm3 md3>
-                <v-text-field type="number" label="MAC MH" v-model="linkedItem.macMH"></v-text-field>
-              </v-flex>
-              <v-flex xs12 sm3 md3>
-                <v-text-field type="number" label="MEN" v-model="linkedItem.men"></v-text-field>
-              </v-flex>
-              <v-flex xs12 sm3 md3>
-                <v-text-field type="number" label="HOUR" v-model="linkedItem.hour"></v-text-field>
-              </v-flex>
-              <v-flex xs12 sm12 md12>
-                <v-text-field label="ZONE DIVISION" v-model="linkedItem.zoneDivision"></v-text-field>
-              </v-flex>
-              <v-flex xs12 sm12 md12>
-                <v-text-field label="REMARKS" v-model="linkedItem.remarks"></v-text-field>
-              </v-flex>
-            </v-layout>
-          </v-container>
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn color="blue darken-1" flat @click.native="closeLinkItem()">Cancel</v-btn>
-          <v-btn color="blue darken-1" flat @click.native="saveLinkItem()">Save</v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog> -->
     <loading-progress></loading-progress>
   </v-container>
 </template>
@@ -198,7 +114,6 @@ export default {
     return {
       title: '',
       aircraftList: [],
-      // eoList: [],
       check: {
         name: '',
         aircraft: '',
@@ -211,8 +126,6 @@ export default {
       readingIsCompleted: false,
       scanningIsCompleted: false,
       dialogConfirmCancel: false,
-      // dialogEditItem: false,
-      // dialogLinkItem: false,
       headers: [
         { text: 'WP ITEM', left: true, value: 'wpItem' },
         { text: 'TASK', left: true, value: 'taskName' },
@@ -226,17 +139,6 @@ export default {
         { text: 'ZONE DIVISION', left: true, value: 'zoneDivision' },
         { text: 'REMARK', left: true, value: 'remarks' }
       ]
-      // itemIndex: -1,
-      // defaultItem: {
-      //   amsMH: 0,
-      //   macMH: 0,
-      //   men: 0,
-      //   hour: 0,
-      //   zoneDivision: 'N/A',
-      //   remarks: 'NIL'
-      // },
-      // editedItem: {},
-      // linkedItem: {}
     }
   },
   computed: {
@@ -305,19 +207,6 @@ export default {
         }
       )
     },
-    // getEOList() {
-    //   firebase.database().ref('eo').once('value').then(
-    //     (data) => {
-    //       const obj = data.val()
-    //       for (let key in obj) {
-    //         this.eoList.push(Object.assign({}, obj[key], { id: key }))
-    //       }
-    //     },
-    //     (error) => {
-    //       console.log(error)
-    //     }
-    //   )
-    // },
     onFileChange(e) {
       const files = e.target.files || e.dataTransfer.files
       if (files && files[0]) {
@@ -354,7 +243,6 @@ export default {
             const obj = data.val()
             if (obj !== null && obj !== undefined) {
               for (let key2 in obj) {
-                // let randomShift = Math.floor(Math.random() * Math.floor(10))
                 this.workpack[key1].taskId = key2
                 this.workpack[key1].zoneDivision = obj[key2].zoneDivision || 'N/A'
                 this.workpack[key1].amsMH = obj[key2].amsMH || ''
@@ -367,7 +255,6 @@ export default {
                 this.workpack[key1].notes = ''
               }
             } else {
-              // let randomShift = Math.floor(Math.random() * Math.floor(10))
               this.workpack[key1].zoneDivision = 'N/A'
               this.workpack[key1].amsMH = ''
               this.workpack[key1].macMH = ''
@@ -395,111 +282,9 @@ export default {
         )
       }
     }
-    // editItem(item) {
-    //   this.itemIndex = this.workpack.indexOf(item)
-    //   this.editedItem = Object.assign({}, item)
-    //   this.dialogEditItem = true
-    // },
-    // closeEditItem() {
-    //   this.dialogEditItem = false
-    //   setTimeout(() => {
-    //     this.editedItem = Object.assign({}, this.defaultItem)
-    //     this.itemIndex = -1
-    //   }, 300)
-    // },
-    // saveEditItem() {
-    //   if (this.itemIndex > -1 && !this.editedItem.taskName.includes('VN ')) {
-    //     let editedProps = {
-    //       amsMH: this.editedItem.amsMH,
-    //       macMH: this.editedItem.macMH,
-    //       men: this.editedItem.men,
-    //       hour: this.editedItem.hour,
-    //       zoneDivision: this.editedItem.zoneDivision,
-    //       remarks: this.editedItem.remarks
-    //     }
-    //     if (this.editedItem.taskId !== null && this.editedItem.taskId !== undefined) {
-    //       // console.log('edit')
-    //       Object.assign(this.workpack[this.itemIndex], editedProps)
-    //       firebase.database().ref('amsA321').child(this.editedItem.taskId).update(editedProps).then(
-    //         (data) => {
-    //           // console.log(data)
-    //         },
-    //         (error) => {
-    //           console.log('NewCheck - saveEditItem' + error)
-    //       })
-    //     } else {
-    //       // console.log('new')
-    //       firebase.database().ref('amsA321').push(this.editedItem).then(
-    //         (data) => {
-    //           // console.log(data.key)
-    //           this.editedItem.taskId = data.key
-    //           Object.assign(this.workpack[this.itemIndex], this.editedItem)
-    //         },
-    //         (error) => {
-    //           console.log('NewCheck - saveEditItem' + error)
-    //         }
-    //       )
-    //     }
-    //   }
-    //   this.closeEditItem()
-    // },
-    // linkItem(item) {
-    //   this.itemIndex = this.workpack.indexOf(item)
-    //   this.editedItem = Object.assign({}, item)
-    //   this.linkedItem = Object.assign({}, item)
-    //   this.dialogLinkItem = true
-    // },
-    // closeLinkItem() {
-    //   this.dialogLinkItem = false
-    //   setTimeout(() => {
-    //     this.editedItem = Object.assign({}, this.defaultItem)
-    //     this.linkedItem = this.editedItem
-    //     this.itemIndex = -1
-    //   }, 300)
-    // },
-    // saveLinkItem() {
-    //   if (this.itemIndex > -1) {
-    //     let editedProps = {
-    //       amsMH: this.linkedItem.amsMH,
-    //       macMH: this.linkedItem.macMH,
-    //       men: this.linkedItem.men,
-    //       hour: this.linkedItem.hour,
-    //       zoneDivision: this.linkedItem.zoneDivision,
-    //       remarks: this.linkedItem.remarks
-    //     }
-    //     firebase.database().ref('eo').child(this.linkedItem.id).update(editedProps).then(
-    //       (data) => {
-    //         editedProps.taskId = this.linkedItem.id
-    //         Object.assign(this.workpack[this.itemIndex], editedProps)
-    //       },
-    //       (error) => {
-    //         console.log(error)
-    //       }
-    //     )
-    //   }
-    //   this.closeLinkItem()
-    // },
-    // addEO(e) {
-    //   let found = this.eoList.find((item) => {
-    //     return item['name'] === e.target.value
-    //   })
-    //   if (found === undefined) {
-    //     let newEO = { 'name': e.target.value }
-    //     this.eoList.push(newEO)
-    //     firebase.database().ref('eo').push(newEO).then(
-    //       (data) => {
-    //         this.eoList[this.eoList.length - 1].id = data.key
-    //       },
-    //       (error) => {
-    //         console.log(error)
-    //       }
-    //     )
-    //   }
-    // }
   },
   mounted() {
     this.getAircraftList()
-    // this.getEOList()
     this.title = 'New Check'
   }
 }
