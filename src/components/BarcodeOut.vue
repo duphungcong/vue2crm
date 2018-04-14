@@ -19,7 +19,7 @@
         </v-alert>
       </v-flex>
       <v-flex xs6>
-        <v-btn color="blue darken-2" dark @click.native="update()">UPDATE
+        <v-btn color="blue" dark @click.native="update()">UPDATE
           <v-icon dark right>arrow_forward</v-icon>
         </v-btn>
       </v-flex>

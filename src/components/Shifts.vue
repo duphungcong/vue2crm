@@ -5,7 +5,7 @@
          <v-card>
             <v-card-actions>
               <v-btn @click.native="reset">Reset</v-btn>
-              <v-btn @click.native="update" class="blue">Update</v-btn>
+              <v-btn @click.native="update" class="blue white--text">Update</v-btn>
             </v-card-actions>
           </v-card>
       </v-flex>
