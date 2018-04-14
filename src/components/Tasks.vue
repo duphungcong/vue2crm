@@ -1,109 +1,101 @@
 <template>
   <v-container fluid pa-1>
-      <v-flex xs12>
-        <v-card class="elevation-0">
-          <v-tabs
-            height="40"
-            fixed-tabs
-            slider-color="red"
-            show-arrows
-            v-model="tabs"
-          >
-            <v-tab href="#tab-1">Zone 128</v-tab>
-            <v-tab href="#tab-2">Zone 34</v-tab>
-            <v-tab href="#tab-3">Zone 567</v-tab>
-            <v-tab href="#tab-4">Avionic</v-tab>
-            <v-tab href="#tab-5">Structure</v-tab>
-            <v-tab href="#tab-6">Cabin</v-tab>
-            <v-tab href="#tab-7">Cleaning</v-tab>
-            <v-tab href="#tab-8">Uncategorized</v-tab>
-            <v-tab href="#tab-9">Removed</v-tab>
-          </v-tabs>
-          <v-tabs-items v-model="tabs">
-            <v-tab-item
-              v-for="i in 9"
-              :key="i"
-              :id="'tab-' + i">
-              <v-card class="elevation-0">
-                <v-card-title>
-                  <v-layout row wrap>
-                    <v-flex xs12 sm2 md2>
-                      <v-select :items="check.shifts" v-model="selectedShift" clearable item-text="number" item-value="number" label="Shift"></v-select>
-                    </v-flex>
-                    <v-flex sm1 md1></v-flex>
-                    <v-flex xs12 sm2 md2>
-                      <v-select :items="taskStatus" v-model="selectedStatus" clearable label="Status"></v-select>
-                    </v-flex>
-                    <v-flex sm1 md1></v-flex>
-                    <v-flex>
-                      <v-text-field append-icon="search" label="Search" single-line hide-details v-model="search"></v-text-field>
-                    </v-flex>
-                  </v-layout>
-                </v-card-title>
+    <v-flex xs12>
+      <v-card class="elevation-0">
+        <v-tabs
+          height="40"
+          fixed-tabs
+          slider-color="red"
+          show-arrows
+          v-model="tabs">
+          <v-tab href="#tab-1">Zone 128</v-tab>
+          <v-tab href="#tab-2">Zone 34</v-tab>
+          <v-tab href="#tab-3">Zone 567</v-tab>
+          <v-tab href="#tab-4">Avionic</v-tab>
+          <v-tab href="#tab-5">Structure</v-tab>
+          <v-tab href="#tab-6">Cabin</v-tab>
+          <v-tab href="#tab-7">Cleaning</v-tab>
+          <v-tab href="#tab-8">Uncategorized</v-tab>
+          <v-tab href="#tab-9">Removed</v-tab>
+        </v-tabs>
+        <v-card-actions>
+          <v-layout row wrap>
+            <v-flex xs12 sm2 md2>
+              <v-select :items="check.shifts" v-model="selectedShift" clearable item-text="number" item-value="number" label="Shift"></v-select>
+            </v-flex>
+            <v-flex sm1 md1></v-flex>
+            <v-flex xs12 sm2 md2>
+              <v-select :items="taskStatus" v-model="selectedStatus" clearable label="Status"></v-select>
+            </v-flex>
+            <v-flex sm1 md1></v-flex>
+            <v-flex>
+              <v-text-field append-icon="search" label="Search" single-line hide-details v-model="search"></v-text-field>
+            </v-flex>
+          </v-layout>
+        </v-card-actions>
+        <v-card-text>
+          <v-data-table
+            :headers="headerTask"
+            :items="workpackByTab"
+            :pagination.sync="paginationTask"
+            :search="search"
+            item-key="wpItem"
+            >
+            <template slot="items" slot-scope="props">
+              <td class="body-0" @click="props.expanded = !props.expanded">{{ props.item.taskTitle }}</td>
+              <td class="body-0" @click="props.expanded = !props.expanded"><v-chip v-for="shift in props.item.shifts" :key="shift" label :color="shiftColor(props.item.shifts, shift, props.item.status)">{{ shift }}</v-chip></td>
+              <td class="body-0" @click="props.expanded = !props.expanded">{{ props.item.notes }}</td>
+              <td class="body-0" @click="props.expanded = !props.expanded">{{ props.item.wpItem }}</td>
+              <td class="body-0" @click="props.expanded = !props.expanded">{{ props.item.taskType }}</td>
+              <td class="body-0" @click="props.expanded = !props.expanded">{{ props.item.zoneDivision }}</td>
+              <td class="text-xs-center">
+                <v-btn icon class="mx-0" @click.native="selectShift(props.item)">
+                  <v-tooltip bottom>
+                      <v-icon color="green" slot="activator">sort</v-icon><span>shift</span>
+                  </v-tooltip>
+                </v-btn>
+                <v-btn icon class="mx-0" @click.native="showLog(props.item)">
+                  <v-tooltip bottom>
+                      <v-icon color="green" slot="activator">assignment</v-icon><span>log</span>
+                  </v-tooltip>
+                </v-btn>
+              </td>
+            </template>
+            <template slot="expand" slot-scope="props">
+              <v-card flat color="blue lighten-5" class="elevation-0">
+                <v-card-actions>
+                  <v-btn icon class="mx-0" @click.native="editTask(props.item)">
+                    <v-tooltip bottom>
+                        <v-icon color="green" slot="activator">edit</v-icon><span>edit</span>
+                    </v-tooltip>
+                  </v-btn>
+                  <v-menu transition="slide-x-transition">
+                    <v-btn icon class="mx-0" slot="activator">
+                      <v-tooltip bottom>
+                          <v-icon color="green" slot="activator" medium>trending_flat</v-icon><span>move to</span>
+                      </v-tooltip>
+                    </v-btn>
+                    <v-list>
+                      <v-list-tile v-for="zone in zoneSelection" :key="zone" @click="moveTask(zone, props.item)">
+                        <v-list-tile-title v-text="zone"></v-list-tile-title>
+                      </v-list-tile>
+                    </v-list>
+                  </v-menu>
+                  <v-btn icon class="mx-0" @click.native="deleteTask(props.item)" v-if="tabs !== 'tab-9'">
+                    <v-tooltip bottom>
+                        <v-icon color="red" slot="activator">delete</v-icon><span>delete</span>
+                    </v-tooltip>
+                  </v-btn>
+                </v-card-actions>
+                <v-card-text>
+                  <p>Zone: <strong>{{ props.item.zone }}</strong></p>
+                  <p>Task: <strong>{{ props.item.taskName }}</strong></p>
+                  <p>Remarks: <strong>{{ props.item.remarks }}</strong></p>
+                </v-card-text>
               </v-card>
-              <v-data-table
-              :headers="headerTask"
-              :items="workpackByTab"
-              :pagination.sync="paginationTask"
-              :search="search"
-              item-key="wpItem"
-              >
-              <template slot="items" slot-scope="props">
-                <td class="body-0" @click="props.expanded = !props.expanded">{{ props.item.taskTitle }}</td>
-                <td class="body-0" @click="props.expanded = !props.expanded"><v-chip v-for="shift in props.item.shifts" :key="shift" label :color="shiftColor(props.item.shifts, shift, props.item.status)">{{ shift }}</v-chip></td>
-                <td class="body-0" @click="props.expanded = !props.expanded">{{ props.item.notes }}</td>
-                <td class="body-0" @click="props.expanded = !props.expanded">{{ props.item.wpItem }}</td>
-                <td class="body-0" @click="props.expanded = !props.expanded">{{ props.item.taskType }}</td>
-                <td class="body-0" @click="props.expanded = !props.expanded">{{ props.item.zoneDivision }}</td>
-                <td class="text-xs-center">
-                  <v-btn icon class="mx-0" @click.native="selectShift(props.item)">
-                    <v-tooltip bottom>
-                        <v-icon color="green" slot="activator">sort</v-icon><span>shift</span>
-                    </v-tooltip>
-                  </v-btn>
-                  <v-btn icon class="mx-0" @click.native="showLog(props.item)">
-                    <v-tooltip bottom>
-                        <v-icon color="green" slot="activator">assignment</v-icon><span>log</span>
-                    </v-tooltip>
-                  </v-btn>
-                </td>
-              </template>
-              <template slot="expand" slot-scope="props">
-                <v-card flat color="blue lighten-5" class="elevation-0">
-                  <v-card-actions>
-                    <v-btn icon class="mx-0" @click.native="editTask(props.item)">
-                      <v-tooltip bottom>
-                          <v-icon color="green" slot="activator">edit</v-icon><span>edit</span>
-                      </v-tooltip>
-                    </v-btn>
-                    <v-menu transition="slide-x-transition">
-                      <v-btn icon class="mx-0" slot="activator">
-                        <v-tooltip bottom>
-                            <v-icon color="green" slot="activator" medium>trending_flat</v-icon><span>move to</span>
-                        </v-tooltip>
-                      </v-btn>
-                      <v-list>
-                        <v-list-tile v-for="zone in zoneSelection" :key="zone" @click="moveTask(zone, props.item)">
-                          <v-list-tile-title v-text="zone"></v-list-tile-title>
-                        </v-list-tile>
-                      </v-list>
-                    </v-menu>
-                    <v-btn icon class="mx-0" @click.native="deleteTask(props.item)" v-if="tabs !== 'tab-9'">
-                      <v-tooltip bottom>
-                          <v-icon color="red" slot="activator">delete</v-icon><span>delete</span>
-                      </v-tooltip>
-                    </v-btn>
-                  </v-card-actions>
-                  <v-card-text>
-                    <p>Zone: <strong>{{ props.item.zone }}</strong></p>
-                    <p>Task: <strong>{{ props.item.taskName }}</strong></p>
-                    <p>Remarks: <strong>{{ props.item.remarks }}</strong></p>
-                  </v-card-text>
-                </v-card>
-              </template>
-            </v-data-table>
-          </v-tab-item>
-        </v-tabs-items>
+            </template>
+          </v-data-table>
+        </v-card-text>
       </v-card>
     </v-flex>
     <v-dialog v-model="dialogDelete" max-width="290">
