@@ -10,14 +10,14 @@
                             </v-flex>
                             <v-flex xs8>
                                 <div>
-                                    <div class="subheading">New Orders</div>
+                                    <div class="subheading">TASKs</div>
                                     <strong>120</strong>
                                 </div>
                             </v-flex>
                         </v-layout>
                         <v-layout row class="my-0">
                             <v-flex xs12 class="text-xs-right">
-                                <v-btn flat class="grey--text darken-1">More info</v-btn>
+                                <v-btn flat class="white--text">More info</v-btn>
                             </v-flex>
                         </v-layout>
                     </v-container>
@@ -32,14 +32,14 @@
                                 </v-flex>
                                 <v-flex xs8>
                                     <div>
-                                        <div class="subheadingfont">User Registrations</div>
+                                        <div class="subheadingfont">NRCs</div>
                                         <strong>780</strong>
                                     </div>
                                 </v-flex>
                             </v-layout>
                             <v-layout row class="my-0">
                                 <v-flex xs12 class="text-xs-right">
-                                    <v-btn flat class="grey--text darken-1">More info</v-btn>
+                                    <v-btn flat class="white--text">More info</v-btn>
                                 </v-flex>
                             </v-layout>
                         </v-container>
@@ -54,14 +54,14 @@
                                 </v-flex>
                                 <v-flex xs8>
                                     <div>
-                                        <div class="subheadingfont">Unique Visitors</div>
+                                        <div class="subheadingfont">SPAREs</div>
                                         <strong>78</strong>
                                     </div>
                                 </v-flex>
                             </v-layout>
                             <v-layout row class="my-0">
                                 <v-flex xs12 class="text-xs-right">
-                                    <v-btn flat class="grey--text darken-1">More info</v-btn>
+                                    <v-btn flat class="white--text">More info</v-btn>
                                 </v-flex>
                             </v-layout>
                         </v-container>
@@ -76,14 +76,14 @@
                                 </v-flex>
                                 <v-flex xs8>
                                     <div>
-                                        <div class="subheadingfont">Bounce Rate</div>
+                                        <div class="subheadingfont">TARs</div>
                                         <strong>53%</strong>
                                     </div>
                                 </v-flex>
                             </v-layout>
                             <v-layout row class="my-0">
                                 <v-flex xs12 class="text-xs-right">
-                                    <v-btn flat class="grey--text darken-1">More info</v-btn>
+                                    <v-btn flat class="white--text">More info</v-btn>
                                 </v-flex>
                             </v-layout>
                         </v-container>
