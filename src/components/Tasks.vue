@@ -217,7 +217,7 @@ export default {
       paginationTask: {
         page: 1,
         totalItems: 0,
-        rowsPerPage: 5,
+        rowsPerPage: 10,
         sortBy: 'zoneDivision'
       },
       paginationLog: {
@@ -306,6 +306,9 @@ export default {
     },
     showTab() {
       // console.log(this.tabs)
+      this.search = ''
+      this.selectedShift = null
+      this.selectedStatus = null
       const zoneByTab = (tab) => ({
         'tab-1': '100-200-800',
         'tab-2': '300-400',

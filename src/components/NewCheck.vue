@@ -355,7 +355,7 @@ export default {
             if (obj !== null && obj !== undefined) {
               for (let key2 in obj) {
                 // let randomShift = Math.floor(Math.random() * Math.floor(10))
-                this.workpack[key1].taskID = key2
+                this.workpack[key1].taskId = key2
                 this.workpack[key1].zoneDivision = obj[key2].zoneDivision || 'N/A'
                 this.workpack[key1].amsMH = obj[key2].amsMH || ''
                 this.workpack[key1].macMH = obj[key2].macMH || ''
@@ -417,10 +417,10 @@ export default {
           zoneDivision: this.editedItem.zoneDivision,
           remarks: this.editedItem.remarks
         }
-        if (this.editedItem.taskID !== null && this.editedItem.taskID !== undefined) {
+        if (this.editedItem.taskId !== null && this.editedItem.taskId !== undefined) {
           // console.log('edit')
           Object.assign(this.workpack[this.itemIndex], editedProps)
-          firebase.database().ref('amsA321').child(this.editedItem.taskID).update(editedProps).then(
+          firebase.database().ref('amsA321').child(this.editedItem.taskId).update(editedProps).then(
             (data) => {
               // console.log(data)
             },
@@ -432,7 +432,7 @@ export default {
           firebase.database().ref('amsA321').push(this.editedItem).then(
             (data) => {
               // console.log(data.key)
-              this.editedItem.taskID = data.key
+              this.editedItem.taskId = data.key
               Object.assign(this.workpack[this.itemIndex], this.editedItem)
             },
             (error) => {
@@ -469,7 +469,7 @@ export default {
         }
         firebase.database().ref('eo').child(this.linkedItem.id).update(editedProps).then(
           (data) => {
-            editedProps.taskID = this.linkedItem.id
+            editedProps.taskId = this.linkedItem.id
             Object.assign(this.workpack[this.itemIndex], editedProps)
           },
           (error) => {

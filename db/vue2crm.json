@@ -1,28 +1,356 @@
 {
   "aircraft": [
     {
-      "name": "A354"
+      "name": "A322",
+      "type": "A321"
     },
     {
-      "name": "A356"
+      "name": "A323",
+      "type": "A321"
     },
     {
-      "name": "A357"
+      "name": "A324",
+      "type": "A321"
     },
     {
-      "name": "A358"
+      "name": "A325",
+      "type": "A321"
     },
     {
-      "name": "A601"
+      "name": "A326",
+      "type": "A321"
     },
     {
-      "name": "A603"
+      "name": "A327",
+      "type": "A321"
     },
     {
-      "name": "A605"
+      "name": "A329",
+      "type": "A321"
     },
     {
-      "name": "A326"
+      "name": "A331",
+      "type": "A321"
+    },
+    {
+      "name": "A332",
+      "type": "A321"
+    },
+    {
+      "name": "A334",
+      "type": "A321"
+    },
+    {
+      "name": "A335",
+      "type": "A321"
+    },
+    {
+      "name": "A336",
+      "type": "A321"
+    },
+    {
+      "name": "A338",
+      "type": "A321"
+    },
+    {
+      "name": "A339",
+      "type": "A321"
+    },
+    {
+      "name": "A344",
+      "type": "A321"
+    },
+    {
+      "name": "A345",
+      "type": "A321"
+    },
+    {
+      "name": "A347",
+      "type": "A321"
+    },
+    {
+      "name": "A348",
+      "type": "A321"
+    },
+    {
+      "name": "A349",
+      "type": "A321"
+    },
+    {
+      "name": "A350",
+      "type": "A321"
+    },
+    {
+      "name": "A351",
+      "type": "A321"
+    },
+    {
+      "name": "A352",
+      "type": "A321"
+    },
+    {
+      "name": "A353",
+      "type": "A321"
+    },
+    {
+      "name": "A354",
+      "type": "A321"
+    },
+    {
+      "name": "A356",
+      "type": "A321"
+    },
+    {
+      "name": "A357",
+      "type": "A321"
+    },
+    {
+      "name": "A358",
+      "type": "A321"
+    },
+    {
+      "name": "A359",
+      "type": "A321"
+    },
+    {
+      "name": "A360",
+      "type": "A321"
+    },
+    {
+      "name": "A361",
+      "type": "A321"
+    },
+    {
+      "name": "A362",
+      "type": "A321"
+    },
+    {
+      "name": "A363",
+      "type": "A321"
+    },
+    {
+      "name": "A365",
+      "type": "A321"
+    },
+    {
+      "name": "A366",
+      "type": "A321"
+    },
+    {
+      "name": "A367",
+      "type": "A321"
+    },
+    {
+      "name": "A390",
+      "type": "A321"
+    },
+    {
+      "name": "A392",
+      "type": "A321"
+    },
+    {
+      "name": "A393",
+      "type": "A321"
+    },
+    {
+      "name": "A395",
+      "type": "A321"
+    },
+    {
+      "name": "A396",
+      "type": "A321"
+    },
+    {
+      "name": "A397",
+      "type": "A321"
+    },
+    {
+      "name": "A398",
+      "type": "A321"
+    },
+    {
+      "name": "A399",
+      "type": "A321"
+    },
+    {
+      "name": "A601",
+      "type": "A321"
+    },
+    {
+      "name": "A602",
+      "type": "A321"
+    },
+    {
+      "name": "A603",
+      "type": "A321"
+    },
+    {
+      "name": "A604",
+      "type": "A321"
+    },
+    {
+      "name": "A605",
+      "type": "A321"
+    },
+    {
+      "name": "A606",
+      "type": "A321"
+    },
+    {
+      "name": "A608",
+      "type": "A321"
+    },
+    {
+      "name": "A609",
+      "type": "A321"
+    },
+    {
+      "name": "A610",
+      "type": "A321"
+    },
+    {
+      "name": "A611",
+      "type": "A321"
+    },
+    {
+      "name": "A612",
+      "type": "A321"
+    },
+    {
+      "name": "A613",
+      "type": "A321"
+    },
+    {
+      "name": "A614",
+      "type": "A321"
+    },
+    {
+      "name": "A615",
+      "type": "A321"
+    },
+    {
+      "name": "A861",
+      "type": "B787"
+    },
+    {
+      "name": "A862",
+      "type": "B787"
+    },
+    {
+      "name": "A863",
+      "type": "B787"
+    },
+    {
+      "name": "A864",
+      "type": "B787"
+    },
+    {
+      "name": "A865",
+      "type": "B787"
+    },
+    {
+      "name": "A866",
+      "type": "B787"
+    },
+    {
+      "name": "A867",
+      "type": "B787"
+    },
+    {
+      "name": "A868",
+      "type": "B787"
+    },
+    {
+      "name": "A869",
+      "type": "B787"
+    },
+    {
+      "name": "A870",
+      "type": "B787"
+    },
+    {
+      "name": "A871",
+      "type": "B787"
+    },
+    {
+      "name": "B210",
+      "type": "ATR"
+    },
+    {
+      "name": "B212",
+      "type": "ATR"
+    },
+    {
+      "name": "B214",
+      "type": "ATR"
+    },
+    {
+      "name": "B218",
+      "type": "ATR"
+    },
+    {
+      "name": "B219",
+      "type": "ATR"
+    },
+    {
+      "name": "B221",
+      "type": "ATR"
+    },
+    {
+      "name": "B223",
+      "type": "ATR"
+    },
+    {
+      "name": "B225",
+      "type": "ATR"
+    },
+    {
+      "name": "B233",
+      "type": "ATR"
+    },
+    {
+      "name": "B236",
+      "type": "ATR"
+    },
+    {
+      "name": "B237",
+      "type": "ATR"
+    },
+    {
+      "name": "B239",
+      "type": "ATR"
+    },
+    {
+      "name": "B240",
+      "type": "ATR"
+    },
+    {
+      "name": "XU-235",
+      "type": "ATR"
+    },
+    {
+      "name": "XU-236",
+      "type": "ATR"
+    },
+    {
+      "name": "XU-237",
+      "type": "ATR"
+    },
+    {
+      "name": "XU-350",
+      "type": "A321"
+    },
+    {
+      "name": "XU-352",
+      "type": "A320"
+    },
+    {
+      "name": "XU-353",
+      "type": "A320"
+    },
+    {
+      "name": "XU-356",
+      "type": "A320"
     }
   ]
 }

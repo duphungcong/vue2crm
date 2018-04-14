@@ -23,10 +23,10 @@
             <td class="body-0">{{ props.item.zoneDivision }}</td>
             <!-- <td class="body-0">{{ props.item.remarks }}</td> -->
             <td class=justify-center layout px-0>
-              <v-btn icon class="mx-0" @click="editItem(props.item)">
+              <v-btn icon class="mx-0" @click="editItem(props.item)" v-if="!props.item.taskName.includes('VN ')">
                 <v-icon color="teal">edit</v-icon>
               </v-btn>
-              <v-btn icon class="mx-0" @click="linkItem(props.item)" :disabled="!props.item.taskName.includes('VN ')">
+              <v-btn icon class="mx-0" @click="linkItem(props.item)" v-if="props.item.taskName.includes('VN ')">
                 <v-icon color="teal">link</v-icon>
               </v-btn>
             </td>
@@ -192,6 +192,8 @@ export default {
           element.zoneDivision.indexOf('300-400') === -1 &&
           element.zoneDivision.indexOf('500-600-700') === -1 &&
           element.zoneDivision.indexOf('AVI') === -1 &&
+          element.zoneDivision.indexOf('AVI') === -1 &&
+          element.zoneDivision.indexOf('STRUCTURE') === -1 &&
           element.zoneDivision.indexOf('CAB') === -1 &&
           element.zoneDivision.indexOf('CLEANING') === -1)
           return
@@ -265,10 +267,10 @@ export default {
           taskType: this.editedItem.taskType,
           zone: this.editedItem.zone
         }
-        if (this.editedItem.taskID !== null && this.editedItem.taskID !== undefined) {
+        if (this.editedItem.taskId !== null && this.editedItem.taskId !== undefined) {
           // console.log('edit')
           let updates = {}
-          updates['/amsA321/' + this.editedItem.taskID] = editedProps
+          updates['/amsA321/' + this.editedItem.taskId] = editedProps
           updates['/workpacks/' + this.checkId + '/' + this.itemIndex] = this.editedItem
           firebase.database().ref().update(updates).then(
             (data) => {
@@ -282,7 +284,7 @@ export default {
           firebase.database().ref('amsA321').push(this.editedItem).then(
             (data) => {
               // console.log(data.key)
-              this.editedItem.taskID = data.key
+              this.editedItem.taskId = data.key
             },
             (error) => {
               console.log('NewCheck - saveEditItem' + error)
@@ -327,10 +329,10 @@ export default {
         }
         let updates = {}
         updates['/eo/' + this.linkedItem.id] = Object.assign({}, editedProps, { name: this.linkedItem.name })
-        updates['/workpacks/' + this.checkId + '/' + this.itemIndex] = Object.assign({}, this.editedItem, editedProps, { taskID: this.linkedItem.id })
+        updates['/workpacks/' + this.checkId + '/' + this.itemIndex] = Object.assign({}, this.editedItem, editedProps, { taskId: this.linkedItem.id })
         firebase.database().ref().update(updates).then(
           (data) => {
-            editedProps.taskID = this.linkedItem.id
+            editedProps.taskId = this.linkedItem.id
             Object.assign(this.workpack[this.itemIndex], editedProps)
           },
           (error) => {
