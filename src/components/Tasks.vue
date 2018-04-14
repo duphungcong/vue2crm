@@ -25,11 +25,17 @@
             </v-flex>
             <v-flex sm1 md1></v-flex>
             <v-flex xs12 sm2 md2>
-              <v-select :items="taskStatus" v-model="selectedStatus" clearable label="Status"></v-select>
+              <v-select :items="taskStatus" v-model="selectedStatus" clearable label="Status" multiple></v-select>
             </v-flex>
             <v-flex sm1 md1></v-flex>
-            <v-flex>
+            <v-flex xs12 sm3 md3>
               <v-text-field append-icon="search" label="Search" single-line hide-details v-model="search"></v-text-field>
+            </v-flex>
+            <v-flex xs12 sm1 md1></v-flex>
+            <v-flex xs12 sm2 md2>
+              <v-btn @click.native="exportTask" class="blue white--text">Export to Excel
+                <v-icon dark right>file_download</v-icon>
+              </v-btn>
             </v-flex>
           </v-layout>
         </v-card-actions>
@@ -185,6 +191,7 @@
 <script>
 
 import firebase from 'firebase'
+import XLSX from 'xlsx'
 
 export default {
   name: 'Tasks',
@@ -252,7 +259,7 @@ export default {
         'out'
       ],
       selectedShift: null,
-      selectedStatus: null
+      selectedStatus: []
     }
   },
   computed: {
@@ -273,10 +280,12 @@ export default {
       }
     },
     selectedShift (newValue, oldValue) {
-      this.filterTask(newValue, this.selectedStatus)
+      console.log(newValue)
+      this.filterTask(newValue, this.selectedStatus, true)
     },
     selectedStatus (newValue, oldValue) {
-      this.filterTask(this.selectedShift, newValue)
+      console.log(newValue)
+      this.filterTask(this.selectedShift, newValue, false)
     }
   },
   methods: {
@@ -308,7 +317,7 @@ export default {
       // console.log(this.tabs)
       this.search = ''
       this.selectedShift = null
-      this.selectedStatus = null
+      this.selectedStatus = []
       const zoneByTab = (tab) => ({
         'tab-1': '100-200-800',
         'tab-2': '300-400',
@@ -489,26 +498,85 @@ export default {
         }
       }
     },
-    filterTask(byShift, byStatus) {
+    filterTask(byShift, byStatus, shiftChange) {
       function filterByShift(element) {
         let shifts = element.shifts
-        let status = false
+        let found = false
         shifts.forEach((item, index, array) => {
           if (item === byShift) {
-            status = true
+            found = true
           }
         })
-        return status
+        return found
       }
-      if (byShift === null && byStatus == null) {
+
+      function filterByStatus(element) {
+        let status = element.status
+        let found = false
+        byStatus.forEach((item, index, array) => {
+          if (status === item) {
+            found = true
+          }
+        })
+        return found
+      }
+
+      if (byShift === null && byStatus.length === 0) {
         this.workpackByTab = this.workpackByTabBeforeFilter
+        return
       }
-      if (byShift !== null && byShift !== undefined) {
-        this.workpackByTab = this.workpackByTabBeforeFilter.filter(filterByShift)
+      console.log(shiftChange)
+      if (shiftChange) {
+        if (byShift !== null && byShift !== undefined) {
+          this.workpackByTab = this.workpackByTabBeforeFilter.filter(filterByShift)
+        } else {
+          this.workpackByTab = this.workpackByTabBeforeFilter
+        }
+        if (byStatus.length > 0) {
+          this.workpackByTab = this.workpackByTab.filter(filterByStatus)
+        }
+      } else {
+        if (byStatus.length > 0) {
+          this.workpackByTab = this.workpackByTabBeforeFilter.filter(filterByStatus)
+        } else {
+          this.workpackByTab = this.workpackByTabBeforeFilter
+        }
+        if (byShift !== null && byShift !== undefined) {
+            this.workpackByTab = this.workpackByTab.filter(filterByShift)
+        }
       }
-      if (byStatus !== null && byStatus !== undefined) {
-        this.workpackByTab = this.workpackByTab.filter(element => element.status === byStatus)
-      }
+    },
+    exportTask() {
+      const zoneByTab = (tab) => ({
+        'tab-1': '100-200-800',
+        'tab-2': '300-400',
+        'tab-3': '500-600-700',
+        'tab-4': 'AVI',
+        'tab-5': 'STRUCTURE',
+        'tab-6': 'CABIN',
+        'tab-7': 'CLEANING',
+        'tab-8': 'N/A',
+        'tab-9': 'REMOVED'
+      })[tab]
+
+      let exportedWorkpack = []
+      this.workpackByTab.forEach((element) => {
+        let item = {
+          WP_ITEM: element.wpItem
+        }
+        exportedWorkpack.push(item)
+      })
+      // console.log(exportedWorkpack)
+      exportedWorkpack.sort((a, b) => {
+        return a.WP_ITEM.localeCompare(b.WP_ITEM)
+      })
+      // console.log(exportedWorkpack)
+      let worksheet = XLSX.utils.json_to_sheet(Object.assign([], exportedWorkpack))
+      // console.log(worksheet)
+      let workbook = XLSX.utils.book_new()
+      XLSX.utils.book_append_sheet(workbook, worksheet, 'ZD')
+      // // console.log(workbook)
+      XLSX.writeFile(workbook, 'BSF-40 - ' + zoneByTab(this.tabs) + '.xlsx')
     }
   },
   mounted() {

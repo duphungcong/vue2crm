@@ -407,7 +407,7 @@ export default {
       let workbook = XLSX.utils.book_new()
       XLSX.utils.book_append_sheet(workbook, worksheet, 'ZD')
       // // console.log(workbook)
-      XLSX.writeFile(workbook, 'bfs26 - ' + this.check.aircraft + '.xlsx')
+      XLSX.writeFile(workbook, 'BFS26 - ' + this.check.aircraft + '.xlsx')
     }
   },
   mounted() {
