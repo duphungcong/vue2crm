@@ -3,13 +3,23 @@
     <v-flex sx12>
       <v-card>
         <v-card-title>
-          <v-select v-model="selectedZone" :items="zoneSelection" label="Select zone" clearable></v-select>
-          <v-spacer></v-spacer>
-          <v-btn @click.native="exportZoneDivision" class="blue">Export to Excel
-            <v-icon right>file_download</v-icon>
-          </v-btn>
+          <v-layout row wrap>
+            <v-flex xs12 sm3 md3>
+              <v-select v-model="selectedZone" :items="zoneSelection" label="Select zone" clearable></v-select>
+            </v-flex>
+            <v-flex xs1 sm1 md1></v-flex>
+            <v-flex xs12 sm3 md3>
+              <v-text-field append-icon="search" label="Search" single-line hide-details v-model="search"></v-text-field>
+            </v-flex>
+            <v-flex xs2 sm2 md2></v-flex>
+            <v-flex xs12 sm3 md3>
+              <v-btn @click.native="exportZoneDivision" class="blue">Export to Excel
+                <v-icon right>file_download</v-icon>
+              </v-btn>
+            </v-flex>
+          </v-layout>
         </v-card-title>
-        <v-data-table :headers="headers" :items="workpack" :pagination.sync="pagination" item-key="wpItem">
+        <v-data-table :headers="headers" :items="workpack" :pagination.sync="pagination" :search="search" item-key="wpItem">
           <template slot="items" slot-scope="props" class="body-0">
             <td class="body-0">{{ props.item.wpItem }}</td>
             <!-- <td class="body-0">{{ props.item.taskName }}</td> -->
@@ -171,7 +181,8 @@ export default {
         'CABIN',
         'CLEANING'
       ],
-      selectedZone: ''
+      selectedZone: '',
+      search: ''
     }
   },
   watch: {
@@ -218,8 +229,8 @@ export default {
       this.$store.dispatch('beginLoading')
       firebase.database().ref('workpacks').child(this.checkId).once('value').then(
         (data) => {
-          this.workpack = data.val()
-          this.workpackBeforeFilter = this.workpack
+          this.workpackBeforeFilter = data.val()
+          this.workpack = this.workpackBeforeFilter
           this.$store.dispatch('endLoading')
         },
         (error) => {
@@ -242,7 +253,8 @@ export default {
       )
     },
     editItem(item) {
-      this.itemIndex = this.workpack.indexOf(item)
+      this.itemIndex = this.workpackBeforeFilter.indexOf(item)
+      console.log(this.itemIndex)
       this.editedItem = Object.assign({}, item)
       this.dialogEditItem = true
     },
@@ -254,7 +266,7 @@ export default {
       }, 300)
     },
     saveEditItem() {
-      if (this.itemIndex > -1 && !this.editedItem.taskName.includes('VN ')) {
+      if (this.itemIndex > -1) {
         let editedProps = {
           amsMH: this.editedItem.amsMH,
           macMH: this.editedItem.macMH,
@@ -274,25 +286,25 @@ export default {
           updates['/workpacks/' + this.checkId + '/' + this.itemIndex] = this.editedItem
           firebase.database().ref().update(updates).then(
             (data) => {
-              Object.assign(this.workpack[this.itemIndex], editedProps)
+              Object.assign(this.workpackBeforeFilter[this.itemIndex], editedProps)
             },
             (error) => {
-              console.log('NewCheck - saveEditItem' + error)
+              console.log(error)
           })
         } else {
           // console.log('new')
-          firebase.database().ref('amsA321').push(this.editedItem).then(
+          firebase.database().ref('amsA321').push(editedProps).then(
             (data) => {
               // console.log(data.key)
               this.editedItem.taskId = data.key
             },
             (error) => {
-              console.log('NewCheck - saveEditItem' + error)
+              console.log(error)
             }
           )
-          firebase.database().ref('workpacks/' + this.checkId + '/' + this.itemIndex).update(this.editedItem).then(
+          firebase.database().ref('workpacks/' + this.checkId + '/' + this.itemIndex).set(this.editedItem).then(
             (data) => {
-              Object.assign(this.workpack[this.itemIndex], this.editedItem)
+              Object.assign(this.workpackBeforeFilter[this.itemIndex], this.editedItem)
             },
             (error) => {
               console.log(error)
@@ -303,7 +315,7 @@ export default {
       this.closeEditItem()
     },
     linkItem(item) {
-      this.itemIndex = this.workpack.indexOf(item)
+      this.itemIndex = this.workpackBeforeFilter.indexOf(item)
       console.log(this.itemIndex)
       this.editedItem = Object.assign({}, item)
       this.linkedItem = Object.assign({}, item)
@@ -333,7 +345,7 @@ export default {
         firebase.database().ref().update(updates).then(
           (data) => {
             editedProps.taskId = this.linkedItem.id
-            Object.assign(this.workpack[this.itemIndex], editedProps)
+            Object.assign(this.workpackBeforeFilter[this.itemIndex], editedProps)
           },
           (error) => {
             console.log(error)

@@ -10,6 +10,7 @@
         <v-text-field
           autofocus
           counter="4"
+          mask="####"
           clearable
           label="Type vaeco ID (4 digits) to active scan"
           v-model="person"></v-text-field>
