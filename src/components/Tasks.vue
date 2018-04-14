@@ -51,12 +51,12 @@
               <td class="text-xs-center">
                 <v-btn icon class="mx-0" @click.native="selectShift(props.item)">
                   <v-tooltip bottom>
-                      <v-icon color="green" slot="activator">sort</v-icon><span>shift</span>
+                      <v-icon color="blue" slot="activator">sort</v-icon><span>shift</span>
                   </v-tooltip>
                 </v-btn>
                 <v-btn icon class="mx-0" @click.native="showLog(props.item)">
                   <v-tooltip bottom>
-                      <v-icon color="green" slot="activator">assignment</v-icon><span>log</span>
+                      <v-icon color="blue" slot="activator">assignment</v-icon><span>log</span>
                   </v-tooltip>
                 </v-btn>
               </td>

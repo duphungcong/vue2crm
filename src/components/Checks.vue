@@ -20,12 +20,12 @@
             <td class="text-xs-right">
               <v-btn icon class="mx-0" @click.native="followCheck(props.item)">
                 <v-tooltip bottom>
-                  <v-icon color="green" slot="activator">touch_app</v-icon><span>follow</span>
+                  <v-icon color="blue" slot="activator">touch_app</v-icon><span>follow</span>
                 </v-tooltip>
               </v-btn>
               <v-btn icon class="mx-0" @click.native="editCheck(props.item)">
                 <v-tooltip bottom>
-                    <v-icon color="green" slot="activator">edit</v-icon><span>edit</span>
+                    <v-icon color="blue" slot="activator">edit</v-icon><span>edit</span>
                 </v-tooltip>
               </v-btn>
               <v-btn icon class="mx-0" @click.native="dialogDelete = true, deletedCheckId = props.item.id">

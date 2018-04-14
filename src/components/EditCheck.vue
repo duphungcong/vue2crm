@@ -13,8 +13,8 @@
             </v-flex>
             <v-flex xs2 sm2 md2></v-flex>
             <v-flex xs12 sm3 md3>
-              <v-btn @click.native="exportZoneDivision" class="blue">Export to Excel
-                <v-icon right>file_download</v-icon>
+              <v-btn @click.native="exportZoneDivision" class="blue white--text">Export to Excel
+                <v-icon dark right>file_download</v-icon>
               </v-btn>
             </v-flex>
           </v-layout>
@@ -34,10 +34,10 @@
             <!-- <td class="body-0">{{ props.item.remarks }}</td> -->
             <td class=justify-center layout px-0>
               <v-btn icon class="mx-0" @click="editItem(props.item)" v-if="!props.item.taskName.includes('VN ')">
-                <v-icon color="teal">edit</v-icon>
+                <v-icon color="blue">edit</v-icon>
               </v-btn>
               <v-btn icon class="mx-0" @click="linkItem(props.item)" v-if="props.item.taskName.includes('VN ')">
-                <v-icon color="teal">link</v-icon>
+                <v-icon color="blue">link</v-icon>
               </v-btn>
             </td>
           </template>
