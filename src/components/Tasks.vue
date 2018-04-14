@@ -483,18 +483,18 @@ export default {
       }
       if (taskStatus === 'inProgress') {
         if (shiftNumber < this.currentShift && shiftNumber === lastShiftNumber) {
-          return 'orange'
+          return 'orange darken-3'
         } else if (shiftNumber > this.currentShift) {
-          return 'grey lighten-3'
+          return 'grey lighten-2'
         } else {
-          return 'yellow'
+          return 'yellow darken-3'
         }
       }
       if (taskStatus === 'notYet') {
         if (shiftNumber <= this.currentShift) {
           return 'red'
         } else {
-          return 'grey lighten-3'
+          return 'grey lighten-2'
         }
       }
     },
@@ -525,7 +525,7 @@ export default {
         this.workpackByTab = this.workpackByTabBeforeFilter
         return
       }
-      console.log(shiftChange)
+      // console.log(shiftChange)
       if (shiftChange) {
         if (byShift !== null && byShift !== undefined) {
           this.workpackByTab = this.workpackByTabBeforeFilter.filter(filterByShift)

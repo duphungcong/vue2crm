@@ -3,7 +3,10 @@
     <v-flex sx12>
       <v-card>
         <v-card-title>
-          <v-layout row wrap>
+          <span class="headline">{{ check.aircraft.name }}-{{ check.name }}</span>
+        </v-card-title>
+        <v-card-actions>
+          <v-layout row wrap px-2>
             <v-flex xs12 sm3 md3>
               <v-select v-model="selectedZone" :items="zoneSelection" label="Select zone" clearable></v-select>
             </v-flex>
@@ -18,7 +21,7 @@
               </v-btn>
             </v-flex>
           </v-layout>
-        </v-card-title>
+        </v-card-actions>
         <v-data-table :headers="headers" :items="workpack" :pagination.sync="pagination" :search="search" item-key="wpItem">
           <template slot="items" slot-scope="props" class="body-0">
             <td class="body-0">{{ props.item.wpItem }}</td>
@@ -282,7 +285,7 @@ export default {
         if (this.editedItem.taskId !== null && this.editedItem.taskId !== undefined) {
           // console.log('edit')
           let updates = {}
-          updates['/amsA321/' + this.editedItem.taskId] = editedProps
+          updates['/ams' + this.check.aircraft.type + '/' + this.editedItem.taskId] = editedProps
           updates['/workpacks/' + this.checkId + '/' + this.itemIndex] = this.editedItem
           firebase.database().ref().update(updates).then(
             (data) => {
@@ -293,7 +296,7 @@ export default {
           })
         } else {
           // console.log('new')
-          firebase.database().ref('amsA321').push(editedProps).then(
+          firebase.database().ref('ams' + this.check.aircraft.type).push(editedProps).then(
             (data) => {
               // console.log(data.key)
               this.editedItem.taskId = data.key
@@ -407,7 +410,7 @@ export default {
       let workbook = XLSX.utils.book_new()
       XLSX.utils.book_append_sheet(workbook, worksheet, 'ZD')
       // // console.log(workbook)
-      XLSX.writeFile(workbook, 'BFS26 - ' + this.check.aircraft + '.xlsx')
+      XLSX.writeFile(workbook, 'BFS26 - ' + this.check.aircraft.name + '.xlsx')
     }
   },
   mounted() {

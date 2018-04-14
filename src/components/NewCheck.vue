@@ -19,7 +19,7 @@
                   class="input-group--focused" required></v-text-field>
               </v-flex>
               <v-flex md6 xs12>
-                <v-select v-bind:items="aircraftList" label="Aircraft" v-model="check.aircraft" item-text="name" item-value="name" class="input-group--focused" required></v-select>
+                <v-select :items="aircraftList" label="Aircraft" v-model="check.aircraft" item-text="name" class="input-group--focused" required autocomplete></v-select>
               </v-flex>
               <v-flex md6 xs12>
                 Start Date<br>
@@ -76,7 +76,7 @@
               <v-card-title><h3>Review and submit</h3></v-card-title>
               <v-card-text>
                 <p>Check: <strong>{{ check.name }}</strong></p>
-                <p>Aircraft: <strong>{{ check.aircraft }}</strong></p>
+                <p>Aircraft: <strong>{{ check.aircraft.name }}</strong></p>
                 <p>Task Cards: <strong>{{ numberTaskCard }}</strong></p>
                 <p>From: <strong>{{ check.startDate }}</strong></p>
                 <p>To: <strong>{{ check.finishDate }}</strong></p>
@@ -192,14 +192,12 @@ export default {
       this.dialogConfirmCancel = false
       this.$router.push('checks')
     },
-    getAircraftList() {
+    loadAircraft() {
       firebase.database().ref('aircraft').once('value').then(
         (data) => {
           const obj = data.val()
           for (let key in obj) {
-            this.aircraftList.push({
-              name: obj[key].name
-            })
+            this.aircraftList.push(obj[key])
           }
         },
         (error) => {
@@ -237,7 +235,7 @@ export default {
       this.$store.dispatch('beginLoading')
       for (let key1 in this.workpack) {
         let taskName = this.workpack[key1].taskName
-        firebase.database().ref('amsA321').orderByChild('taskName').equalTo(taskName).limitToFirst(1).once('value').then(
+        firebase.database().ref('ams' + this.check.aircraft.type).orderByChild('taskName').equalTo(taskName).limitToFirst(1).once('value').then(
           (data) => {
             count++
             const obj = data.val()
@@ -284,7 +282,7 @@ export default {
     }
   },
   mounted() {
-    this.getAircraftList()
+    this.loadAircraft()
     this.title = 'New Check'
   }
 }

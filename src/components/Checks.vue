@@ -12,7 +12,7 @@
         </v-card-title>
         <v-data-table :headers="headers" :items="checks" :search="search" :pagination.sync="pagination">
           <template slot="items" slot-scope="props" class="body-2">
-            <td class="body-2">{{ props.item.aircraft }}</td>
+            <td class="body-2">{{ props.item.aircraft.name }}</td>
             <td class="body-2">{{ props.item.name }}</td>
             <td class="body-2">{{ formatDate(props.item.startDate) }}</td>
             <td class="body-2">{{ formatDate(props.item.finishDate) }}</td>
@@ -105,20 +105,6 @@ export default {
           this.$store.dispatch('endLoading')
         }
       )
-      // Get snapshot to use real-time feature
-      // firebase.database().ref('checks').on('value', (snapshot) => {
-      //   let obj = snapshot.val()
-      //   for (let key in obj) {
-      //       this.checks.push({
-      //         id: key,
-      //         aircraft: obj[key].aircraft,
-      //         name: obj[key].name,
-      //         startDate: obj[key].startDate,
-      //         finishDate: obj[key].finishDate
-      //       })
-      //     }
-      //     this.$store.dispatch('endLoading')
-      // })
     },
     addCheck() {
       this.$router.push('newcheck')

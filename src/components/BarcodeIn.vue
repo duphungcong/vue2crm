@@ -24,14 +24,12 @@
               <v-flex xs1>Not Yet</v-flex>
             </v-layout>
             <v-layout row wrap align-center>
-              <v-flex xs1>
-                <v-checkbox hide-details class="shrink mr-2" v-model="allDone" color="green"></v-checkbox>
-              </v-flex>
-              <v-flex xs1>
-                <v-checkbox hide-details class="shrink mr-2" v-model="allInProgress" color="yellow"></v-checkbox>
-              </v-flex>
-              <v-flex xs1>
-                <v-checkbox hide-details class="shrink mr-2" v-model="allNotYet" color="red"></v-checkbox>
+              <v-flex xs3 sm3 md3>
+                <v-radio-group v-model="allStatus" row>
+                  <v-radio value="done" color="green"></v-radio>
+                  <v-radio value="inProgress" color="yellow darken-3"></v-radio>
+                  <v-radio value="notYet" color="red"></v-radio>
+                </v-radio-group>
               </v-flex>
               <v-flex xs2>
                 <span>TASK ITEM ({{ scan.length }})</span>
@@ -52,14 +50,12 @@
           <li v-for="item in scan" :key="item.wpItem">
             <v-card mx-0 px-0>
               <v-layout row wrap align-center mx-0 px-0>
-                <v-flex xs1>
-                  <v-checkbox hide-details class="shrink mr-2" v-model="item.done" color="green"></v-checkbox>
-                </v-flex>
-                <v-flex xs1>
-                  <v-checkbox hide-details class="shrink mr-2" v-model="item.inProgress" color="yellow"></v-checkbox>
-                </v-flex>
-                <v-flex xs1>
-                  <v-checkbox hide-details class="shrink mr-2" v-model="item.notYet" color="red"></v-checkbox>
+                <v-flex xs3 sm3 md3>
+                  <v-radio-group v-model="item.status" row>
+                    <v-radio value="done" color="green"></v-radio>
+                    <v-radio value="inProgress" color="yellow darken-3"></v-radio>
+                    <v-radio value="notYet" color="red"></v-radio>
+                  </v-radio-group>
                 </v-flex>
                 <v-flex xs2>
                   <span>{{ item.wpItem }}</span>
@@ -93,42 +89,14 @@ export default {
       barcode: '',
       scan: [],
       scannedAlert: false,
-      allDone: false,
-      allInProgress: false,
-      allNotYet: false
+      allStatus: ''
     }
   },
   watch: {
-    allDone (value) {
-      if (value === true) {
-        this.allInProgress = false
-        this.allNotYet = false
+    allStatus (value) {
+      if (value !== null && value !== undefined) {
         for (let key in this.scan) {
-          this.scan[key].done = true
-          this.scan[key].inProgress = false
-          this.scan[key].notYet = false
-        }
-      }
-    },
-    allInProgress (value) {
-      if (value === true) {
-        this.allDone = false
-        this.allNotYet = false
-        for (let key in this.scan) {
-          this.scan[key].done = false
-          this.scan[key].inProgress = true
-          this.scan[key].notYet = false
-        }
-      }
-    },
-    allNotYet (value) {
-      if (value === true) {
-        this.allInProgress = false
-        this.allDone = false
-        for (let key in this.scan) {
-          this.scan[key].done = false
-          this.scan[key].inProgress = false
-          this.scan[key].notYet = true
+          this.scan[key].status = value
         }
       }
     }
@@ -142,17 +110,12 @@ export default {
         return item.wpItem === wpItem
       })
       if (found === undefined) {
-        let now = Date.now(7)
-        let time = new Date(now)
         this.scan.push({
           wpItem: wpItem,
           notes: '',
-          time: time.toLocaleString(),
           updateSuccess: false,
           updateFail: false,
-          done: false,
-          inProgress: false,
-          notYet: false
+          status: this.allStatus
         })
       } else {
         this.scannedAlert = true
@@ -174,37 +137,32 @@ export default {
       return 'VN' + workPackNumber + '-' + itemNumber
     },
     update() {
+      let now = Date.now(7)
+      let time = new Date(now)
+      let timeStr = time.toLocaleString()
       this.scan.forEach(element => {
         firebase.database().ref('workpacks/' + this.checkId).orderByChild('wpItem').equalTo(element.wpItem).limitToFirst(1).once('value').then(
           (data) => {
-            console.log(data.val())
-            let status
-            if (element.notYet === true) {
-              status = 'notYet'
-            }
-            if (element.inProgress === true) {
-              status = 'inProgress'
-            }
-            if (element.done === true) {
-              status = 'done'
-            }
+            // console.log(data.val())
             const obj = data.val()
             if (obj !== null && obj !== undefined) {
               for (let key in obj) {
                 if (element.notes !== null && element.notes !== undefined) {
                   obj[key].notes = element.notes
                 }
-                obj[key].status = status
+                if (element.status !== null && element.status !== undefined) {
+                  obj[key].status = element.status
+                }
                 let log = {
-                  status: status,
+                  status: obj[key].status,
                   person: 'PPC',
-                  time: element.time,
-                  action: 'receive',
+                  time: timeStr,
+                  action: 'received',
                   notes: element.notes
                 }
                 firebase.database().ref('workpacks/' + this.checkId + '/' + key).update(obj[key]).then(
                   (data) => {
-                    console.log('update completed')
+                    // console.log('update completed')
                     element.updateSuccess = true
                   },
                   (error) => {
@@ -214,7 +172,7 @@ export default {
                 )
                 firebase.database().ref('taskLogs/' + this.checkId + '/' + key).push(log).then(
                   (data) => {
-                    console.log('log - receive')
+                    // console.log('log - receive')
                   },
                   (error) => {
                     console.log(error)
