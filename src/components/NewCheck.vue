@@ -54,7 +54,7 @@
             <v-btn @click.native="e1 = 2">Back</v-btn>
             <v-btn color="primary" @click.native="e1 = 4">Next</v-btn>
             <v-card class="lighten-4 elevation-0">
-              <v-data-table :headers="headers" :items="workpack" expand>
+              <v-data-table :headers="headers" :items="workpack">
                 <template slot="items" slot-scope="props" class="body-0">
                   <td class="body-0">{{ props.item.wpItem }}</td>
                   <td class="body-0">{{ props.item.taskName }}</td>
@@ -67,14 +67,14 @@
                   <td class="body-0">{{ props.item.hour }}</td>
                   <td class="body-0">{{ props.item.zoneDivision }}</td>
                   <td class="body-0">{{ props.item.remarks }}</td>
-                  <td class="justify-center layout px-0">
+                  <!-- <td class="justify-center layout px-0">
                     <v-btn icon class="mx-0" @click="editItem(props.item)" v-if="!props.item.taskName.includes('VN ')">
                       <v-icon color="teal">edit</v-icon>
                     </v-btn>
                     <v-btn icon class="mx-0" @click="linkItem(props.item)" v-if="props.item.taskName.includes('VN ')">
                       <v-icon color="teal">link</v-icon>
                     </v-btn>
-                  </td>
+                  </td> -->
                 </template>
               </v-data-table>
             </v-card>
@@ -105,7 +105,7 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
-    <v-dialog v-model="dialogEditItem" max-width="500">
+    <!-- <v-dialog v-model="dialogEditItem" max-width="500">
       <v-card>
         <v-card-title>
           <span class="headline">Edit Item</span>
@@ -180,7 +180,7 @@
           <v-btn color="blue darken-1" flat @click.native="saveLinkItem()">Save</v-btn>
         </v-card-actions>
       </v-card>
-    </v-dialog>
+    </v-dialog> -->
     <loading-progress></loading-progress>
   </v-container>
 </template>
@@ -198,7 +198,7 @@ export default {
     return {
       title: '',
       aircraftList: [],
-      eoList: [],
+      // eoList: [],
       check: {
         name: '',
         aircraft: '',
@@ -211,8 +211,8 @@ export default {
       readingIsCompleted: false,
       scanningIsCompleted: false,
       dialogConfirmCancel: false,
-      dialogEditItem: false,
-      dialogLinkItem: false,
+      // dialogEditItem: false,
+      // dialogLinkItem: false,
       headers: [
         { text: 'WP ITEM', left: true, value: 'wpItem' },
         { text: 'TASK', left: true, value: 'taskName' },
@@ -225,18 +225,18 @@ export default {
         { text: 'hour', left: true, value: 'hour' },
         { text: 'ZONE DIVISION', left: true, value: 'zoneDivision' },
         { text: 'REMARK', left: true, value: 'remarks' }
-      ],
-      itemIndex: -1,
-      defaultItem: {
-        amsMH: 0,
-        macMH: 0,
-        men: 0,
-        hour: 0,
-        zoneDivision: 'N/A',
-        remarks: 'NIL'
-      },
-      editedItem: {},
-      linkedItem: {}
+      ]
+      // itemIndex: -1,
+      // defaultItem: {
+      //   amsMH: 0,
+      //   macMH: 0,
+      //   men: 0,
+      //   hour: 0,
+      //   zoneDivision: 'N/A',
+      //   remarks: 'NIL'
+      // },
+      // editedItem: {},
+      // linkedItem: {}
     }
   },
   computed: {
@@ -305,19 +305,19 @@ export default {
         }
       )
     },
-    getEOList() {
-      firebase.database().ref('eo').once('value').then(
-        (data) => {
-          const obj = data.val()
-          for (let key in obj) {
-            this.eoList.push(Object.assign({}, obj[key], { id: key }))
-          }
-        },
-        (error) => {
-          console.log(error)
-        }
-      )
-    },
+    // getEOList() {
+    //   firebase.database().ref('eo').once('value').then(
+    //     (data) => {
+    //       const obj = data.val()
+    //       for (let key in obj) {
+    //         this.eoList.push(Object.assign({}, obj[key], { id: key }))
+    //       }
+    //     },
+    //     (error) => {
+    //       console.log(error)
+    //     }
+    //   )
+    // },
     onFileChange(e) {
       const files = e.target.files || e.dataTransfer.files
       if (files && files[0]) {
@@ -394,112 +394,112 @@ export default {
           }
         )
       }
-    },
-    editItem(item) {
-      this.itemIndex = this.workpack.indexOf(item)
-      this.editedItem = Object.assign({}, item)
-      this.dialogEditItem = true
-    },
-    closeEditItem() {
-      this.dialogEditItem = false
-      setTimeout(() => {
-        this.editedItem = Object.assign({}, this.defaultItem)
-        this.itemIndex = -1
-      }, 300)
-    },
-    saveEditItem() {
-      if (this.itemIndex > -1 && !this.editedItem.taskName.includes('VN ')) {
-        let editedProps = {
-          amsMH: this.editedItem.amsMH,
-          macMH: this.editedItem.macMH,
-          men: this.editedItem.men,
-          hour: this.editedItem.hour,
-          zoneDivision: this.editedItem.zoneDivision,
-          remarks: this.editedItem.remarks
-        }
-        if (this.editedItem.taskId !== null && this.editedItem.taskId !== undefined) {
-          // console.log('edit')
-          Object.assign(this.workpack[this.itemIndex], editedProps)
-          firebase.database().ref('amsA321').child(this.editedItem.taskId).update(editedProps).then(
-            (data) => {
-              // console.log(data)
-            },
-            (error) => {
-              console.log('NewCheck - saveEditItem' + error)
-          })
-        } else {
-          // console.log('new')
-          firebase.database().ref('amsA321').push(this.editedItem).then(
-            (data) => {
-              // console.log(data.key)
-              this.editedItem.taskId = data.key
-              Object.assign(this.workpack[this.itemIndex], this.editedItem)
-            },
-            (error) => {
-              console.log('NewCheck - saveEditItem' + error)
-            }
-          )
-        }
-      }
-      this.closeEditItem()
-    },
-    linkItem(item) {
-      this.itemIndex = this.workpack.indexOf(item)
-      this.editedItem = Object.assign({}, item)
-      this.linkedItem = Object.assign({}, item)
-      this.dialogLinkItem = true
-    },
-    closeLinkItem() {
-      this.dialogLinkItem = false
-      setTimeout(() => {
-        this.editedItem = Object.assign({}, this.defaultItem)
-        this.linkedItem = this.editedItem
-        this.itemIndex = -1
-      }, 300)
-    },
-    saveLinkItem() {
-      if (this.itemIndex > -1) {
-        let editedProps = {
-          amsMH: this.linkedItem.amsMH,
-          macMH: this.linkedItem.macMH,
-          men: this.linkedItem.men,
-          hour: this.linkedItem.hour,
-          zoneDivision: this.linkedItem.zoneDivision,
-          remarks: this.linkedItem.remarks
-        }
-        firebase.database().ref('eo').child(this.linkedItem.id).update(editedProps).then(
-          (data) => {
-            editedProps.taskId = this.linkedItem.id
-            Object.assign(this.workpack[this.itemIndex], editedProps)
-          },
-          (error) => {
-            console.log(error)
-          }
-        )
-      }
-      this.closeLinkItem()
-    },
-    addEO(e) {
-      let found = this.eoList.find((item) => {
-        return item['name'] === e.target.value
-      })
-      if (found === undefined) {
-        let newEO = { 'name': e.target.value }
-        this.eoList.push(newEO)
-        firebase.database().ref('eo').push(newEO).then(
-          (data) => {
-            this.eoList[this.eoList.length - 1].id = data.key
-          },
-          (error) => {
-            console.log(error)
-          }
-        )
-      }
     }
+    // editItem(item) {
+    //   this.itemIndex = this.workpack.indexOf(item)
+    //   this.editedItem = Object.assign({}, item)
+    //   this.dialogEditItem = true
+    // },
+    // closeEditItem() {
+    //   this.dialogEditItem = false
+    //   setTimeout(() => {
+    //     this.editedItem = Object.assign({}, this.defaultItem)
+    //     this.itemIndex = -1
+    //   }, 300)
+    // },
+    // saveEditItem() {
+    //   if (this.itemIndex > -1 && !this.editedItem.taskName.includes('VN ')) {
+    //     let editedProps = {
+    //       amsMH: this.editedItem.amsMH,
+    //       macMH: this.editedItem.macMH,
+    //       men: this.editedItem.men,
+    //       hour: this.editedItem.hour,
+    //       zoneDivision: this.editedItem.zoneDivision,
+    //       remarks: this.editedItem.remarks
+    //     }
+    //     if (this.editedItem.taskId !== null && this.editedItem.taskId !== undefined) {
+    //       // console.log('edit')
+    //       Object.assign(this.workpack[this.itemIndex], editedProps)
+    //       firebase.database().ref('amsA321').child(this.editedItem.taskId).update(editedProps).then(
+    //         (data) => {
+    //           // console.log(data)
+    //         },
+    //         (error) => {
+    //           console.log('NewCheck - saveEditItem' + error)
+    //       })
+    //     } else {
+    //       // console.log('new')
+    //       firebase.database().ref('amsA321').push(this.editedItem).then(
+    //         (data) => {
+    //           // console.log(data.key)
+    //           this.editedItem.taskId = data.key
+    //           Object.assign(this.workpack[this.itemIndex], this.editedItem)
+    //         },
+    //         (error) => {
+    //           console.log('NewCheck - saveEditItem' + error)
+    //         }
+    //       )
+    //     }
+    //   }
+    //   this.closeEditItem()
+    // },
+    // linkItem(item) {
+    //   this.itemIndex = this.workpack.indexOf(item)
+    //   this.editedItem = Object.assign({}, item)
+    //   this.linkedItem = Object.assign({}, item)
+    //   this.dialogLinkItem = true
+    // },
+    // closeLinkItem() {
+    //   this.dialogLinkItem = false
+    //   setTimeout(() => {
+    //     this.editedItem = Object.assign({}, this.defaultItem)
+    //     this.linkedItem = this.editedItem
+    //     this.itemIndex = -1
+    //   }, 300)
+    // },
+    // saveLinkItem() {
+    //   if (this.itemIndex > -1) {
+    //     let editedProps = {
+    //       amsMH: this.linkedItem.amsMH,
+    //       macMH: this.linkedItem.macMH,
+    //       men: this.linkedItem.men,
+    //       hour: this.linkedItem.hour,
+    //       zoneDivision: this.linkedItem.zoneDivision,
+    //       remarks: this.linkedItem.remarks
+    //     }
+    //     firebase.database().ref('eo').child(this.linkedItem.id).update(editedProps).then(
+    //       (data) => {
+    //         editedProps.taskId = this.linkedItem.id
+    //         Object.assign(this.workpack[this.itemIndex], editedProps)
+    //       },
+    //       (error) => {
+    //         console.log(error)
+    //       }
+    //     )
+    //   }
+    //   this.closeLinkItem()
+    // },
+    // addEO(e) {
+    //   let found = this.eoList.find((item) => {
+    //     return item['name'] === e.target.value
+    //   })
+    //   if (found === undefined) {
+    //     let newEO = { 'name': e.target.value }
+    //     this.eoList.push(newEO)
+    //     firebase.database().ref('eo').push(newEO).then(
+    //       (data) => {
+    //         this.eoList[this.eoList.length - 1].id = data.key
+    //       },
+    //       (error) => {
+    //         console.log(error)
+    //       }
+    //     )
+    //   }
+    // }
   },
   mounted() {
     this.getAircraftList()
-    this.getEOList()
+    // this.getEOList()
     this.title = 'New Check'
   }
 }
