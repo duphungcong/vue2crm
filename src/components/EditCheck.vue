@@ -3,14 +3,14 @@
     <v-flex sx12>
       <v-card>
         <v-card-title>
-          <v-select :items="zoneSelection" label="Select zone"></v-select>
+          <v-select v-model="selectedZone" :items="zoneSelection" label="Select zone" clearable></v-select>
           <v-spacer></v-spacer>
           <v-btn @click.native="exportZoneDivision" class="blue">Export to Excel
             <v-icon right>file_download</v-icon>
           </v-btn>
         </v-card-title>
-        <v-data-table :headers="headers" :items="workpack" :pagination.sync="pagination">
-          <template slot="items" slot-scope="props" class="body-2">
+        <v-data-table :headers="headers" :items="workpack" :pagination.sync="pagination" item-key="wpItem">
+          <template slot="items" slot-scope="props" class="body-0">
             <td class="body-0">{{ props.item.wpItem }}</td>
             <!-- <td class="body-0">{{ props.item.taskName }}</td> -->
             <td class="body-0">{{ props.item.zone }}</td>
@@ -126,11 +126,13 @@ export default {
       checkId: null,
       check: {},
       workpack: [],
+      workpackBeforeFilter: [],
       eoList: [],
       pagination: {
         page: 1,
         totalItems: 0,
-        rowsPerPage: 10
+        rowsPerPage: 10,
+        sortBy: 'zoneDivision'
       },
       headers: [
         { text: 'WP ITEM', left: true, value: 'wpItem' },
@@ -160,6 +162,7 @@ export default {
       dialogEditItem: false,
       dialogLinkItem: false,
       zoneSelection: [
+        'N/A',
         '100-200-800',
         '300-400',
         '500-600-700',
@@ -167,7 +170,8 @@ export default {
         'STRUCTURE',
         'CABIN',
         'CLEANING'
-      ]
+      ],
+      selectedZone: ''
     }
   },
   watch: {
@@ -175,6 +179,26 @@ export default {
       if (newVal === null) {
         this.linkedItem = {}
       }
+    },
+    selectedZone (newVal, oldVal) {
+      if (newVal === null) {
+        this.workpack = this.workpackBeforeFilter
+        return
+      }
+
+      if (newVal === 'N/A') {
+        this.workpack = this.workpackBeforeFilter.filter(element =>
+          element.zoneDivision.indexOf('100-200-800') === -1 &&
+          element.zoneDivision.indexOf('300-400') === -1 &&
+          element.zoneDivision.indexOf('500-600-700') === -1 &&
+          element.zoneDivision.indexOf('AVI') === -1 &&
+          element.zoneDivision.indexOf('CAB') === -1 &&
+          element.zoneDivision.indexOf('CLEANING') === -1)
+          return
+      }
+
+      console.log(newVal)
+      this.workpack = this.workpackBeforeFilter.filter(element => element.zoneDivision.indexOf(newVal) === 0)
     }
   },
   methods: {
@@ -193,6 +217,7 @@ export default {
       firebase.database().ref('workpacks').child(this.checkId).once('value').then(
         (data) => {
           this.workpack = data.val()
+          this.workpackBeforeFilter = this.workpack
           this.$store.dispatch('endLoading')
         },
         (error) => {

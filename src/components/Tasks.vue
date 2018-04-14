@@ -225,7 +225,7 @@ export default {
       paginationTask: {
         page: 1,
         totalItems: 0,
-        rowsPerPage: 10,
+        rowsPerPage: 5,
         sortBy: 'zoneDivision'
       },
       paginationLog: {
@@ -313,7 +313,7 @@ export default {
       )
     },
     showTab() {
-      console.log(this.tabs)
+      // console.log(this.tabs)
       const zoneByTab = (tab) => ({
         'tab-1': '100-200-800',
         'tab-2': '300-400',
@@ -326,11 +326,22 @@ export default {
         'tab-9': 'REMOVED'
       })[tab]
       this.$store.dispatch('beginLoading')
-      // this.workpackByTab = this.workpack.filter(task => task.zoneDivision.includes(zoneByTab(this.tabs)))
-      // this.workpackByTabBeforeFilter = this.workpack.filter(task => task.zoneDivision.indexOf(zoneByTab(this.tabs)) === 0)
-      this.workpackByTab = this.workpack.filter(task => task.zoneDivision.indexOf(zoneByTab(this.tabs)) === 0)
-      this.workpackByTabBeforeFilter = this.workpackByTab
-      this.$store.dispatch('endLoading')
+      if (zoneByTab(this.tabs) === 'N/A') {
+        this.workpackByTab = this.workpack.filter(element =>
+          element.zoneDivision.indexOf('100-200-800') === -1 &&
+          element.zoneDivision.indexOf('300-400') === -1 &&
+          element.zoneDivision.indexOf('500-600-700') === -1 &&
+          element.zoneDivision.indexOf('AVI') === -1 &&
+          element.zoneDivision.indexOf('CAB') === -1 &&
+          element.zoneDivision.indexOf('CLEANING') === -1)
+        this.workpackByTabBeforeFilter = this.workpackByTab
+        this.$store.dispatch('endLoading')
+        return
+      } else {
+        this.workpackByTab = this.workpack.filter(task => task.zoneDivision.indexOf(zoneByTab(this.tabs)) === 0)
+        this.workpackByTabBeforeFilter = this.workpackByTab
+        this.$store.dispatch('endLoading')
+      }
     },
     deleteTask(item) {
       this.itemIndex = this.workpack.indexOf(item)
@@ -487,13 +498,8 @@ export default {
       function filterByShift(element) {
         let shifts = element.shifts
         let status = false
-        // console.log(shifts)
-        // console.log(shifts.length)
         shifts.forEach((item, index, array) => {
-          // console.log(newValue)
-          // console.log(item)
           if (item === byShift) {
-            // console.log('found')
             status = true
           }
         })
