@@ -116,12 +116,10 @@
       menuItem: '',
       followingItems: [
         { icon: 'contacts', text: 'Dashboard', link: 'Dashboard', vertical: 'Dashboard' },
-        // { icon: 'history', text: 'Orders', link: 'Orders', vertical: 'Order' },
-        // { icon: 'content_copy', text: 'Customers', link: 'Customers', vertical: 'Customer' },
-        // { icon: 'settings', text: 'Products', link: 'Products', vertical: 'Product' },
-        // { icon: 'chat_bubble', text: 'About', link: 'About', vertical: 'About' },
         { icon: 'assignment', text: 'Shifts', link: 'Shifts', vertical: 'Shifts' },
         { icon: 'assignment', text: 'Tasks', link: 'Tasks', vertical: 'Tasks' },
+        { icon: 'assignment', text: 'NRCs', link: 'Nrcs', vertical: 'Nrcs' },
+        { icon: 'assignment', text: 'Spares', link: 'Spares', vertical: 'Spares' },
         { icon: 'assignment', text: 'Barcode Receive', link: 'BarcodeIn', vertical: 'BarcodeIn' },
         { icon: 'assignment', text: 'Barcode Take Out', link: 'BarcodeOut', vertical: 'BarcodeOut' }
       ],

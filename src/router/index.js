@@ -12,7 +12,8 @@ import Shift from '@/components/shared/Shift'
 import Tasks from '@/components/Tasks'
 import BarcodeIn from '@/components/BarcodeIn'
 import BarcodeOut from '@/components/BarcodeOut'
-import Time from '@/components/Time'
+import Nrcs from '@/components/Nrcs'
+import Spares from '@/components/Spares'
 
 import Login from '@/components/Login'
 import SignUp from '@/components/SignUp'
@@ -65,13 +66,19 @@ let router = new Router({
       }
     },
     {
-      path: '/time', component: Time, name: 'Time', meta: {
+      path: '/tasks', component: Tasks, name: 'Tasks', meta: {
         requireAuth: true,
         requireFollowing: true
       }
     },
     {
-      path: '/tasks', component: Tasks, name: 'Tasks', meta: {
+      path: '/nrcs', component: Nrcs, name: 'Nrcs', meta: {
+        requireAuth: true,
+        requireFollowing: true
+      }
+    },
+    {
+      path: '/spares', component: Spares, name: 'Spares', meta: {
         requireAuth: true,
         requireFollowing: true
       }

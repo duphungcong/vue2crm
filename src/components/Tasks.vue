@@ -576,7 +576,7 @@ export default {
       let workbook = XLSX.utils.book_new()
       XLSX.utils.book_append_sheet(workbook, worksheet, 'ZD')
       // // console.log(workbook)
-      XLSX.writeFile(workbook, 'BSF-40 - ' + zoneByTab(this.tabs) + '.xlsx')
+      XLSX.writeFile(workbook, 'BSF40 - ' + zoneByTab(this.tabs) + '.xlsx')
     }
   },
   mounted() {
