@@ -280,11 +280,11 @@ export default {
       }
     },
     selectedShift (newValue, oldValue) {
-      console.log(newValue)
+      // console.log(newValue)
       this.filterTask(newValue, this.selectedStatus, true)
     },
     selectedStatus (newValue, oldValue) {
-      console.log(newValue)
+      // console.log(newValue)
       this.filterTask(this.selectedShift, newValue, false)
     }
   },
@@ -349,13 +349,13 @@ export default {
     },
     deleteTask(item) {
       this.itemIndex = this.workpack.indexOf(item)
-      console.log(this.itemIndex)
+      // console.log(this.itemIndex)
       this.editedItem = Object.assign({}, item)
       this.dialogDelete = true
     },
     editTask(item) {
       this.itemIndex = this.workpack.indexOf(item)
-      console.log(this.itemIndex)
+      // console.log(this.itemIndex)
       this.editedItem = Object.assign({}, item)
       this.dialogEdit = true
     },
@@ -381,7 +381,7 @@ export default {
     },
     selectShift(item) {
       this.itemIndex = this.workpack.indexOf(item)
-      console.log(this.itemIndex)
+      // console.log(this.itemIndex)
       this.editedItem = Object.assign({}, item)
       this.dialogSelectShift = true
     },
@@ -392,7 +392,7 @@ export default {
         firebase.database().ref('taskLogs/' + this.checkId + '/' + this.itemIndex).once('value').then(
           (data) => {
             let obj = data.val()
-            console.log(obj)
+            // console.log(obj)
             for (let key in obj) {
               this.taskLogs.push(obj[key])
             }

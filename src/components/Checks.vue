@@ -117,6 +117,7 @@ export default {
       removes['/checks/' + this.deletedCheckId] = null
       removes['/workpacks/' + this.deletedCheckId] = null
       removes['/taskLogs/' + this.deletedCheckId] = null
+      removes['/nrcs/' + this.deletedCheckId] = null
       firebase.database().ref().update(removes).then(
         (data) => {
           this.checks = this.checks.filter(element => element.id !== this.deletedCheckId)
