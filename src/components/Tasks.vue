@@ -72,13 +72,13 @@
                 <v-card-actions>
                   <v-btn icon class="mx-0" @click.native="editTask(props.item)">
                     <v-tooltip bottom>
-                        <v-icon color="green" slot="activator">edit</v-icon><span>edit</span>
+                        <v-icon color="blue" slot="activator">edit</v-icon><span>edit</span>
                     </v-tooltip>
                   </v-btn>
                   <v-menu transition="slide-x-transition">
                     <v-btn icon class="mx-0" slot="activator">
                       <v-tooltip bottom>
-                          <v-icon color="green" slot="activator" medium>trending_flat</v-icon><span>move to</span>
+                          <v-icon color="blue" slot="activator" medium>trending_flat</v-icon><span>move to</span>
                       </v-tooltip>
                     </v-btn>
                     <v-list>
@@ -109,7 +109,7 @@
         <v-card-title>Do you want to delete the task?</v-card-title>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn flat @click.native="closeDeleteTask()">No</v-btn>
+          <v-btn flat color="blue" @click.native="closeDeleteTask()">No</v-btn>
           <v-btn flat color="red" @click.native="saveDeleteTask()">Delete</v-btn>
         </v-card-actions>
       </v-card>

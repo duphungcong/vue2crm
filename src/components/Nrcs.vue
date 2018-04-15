@@ -42,9 +42,20 @@
                 ></v-text-field>
               </v-edit-dialog>
             </td> -->
-            <td class="body-0" @click="props.expanded = !props.expanded">{{ props.item.number }}</td>
-            <td class="body-0" @click="props.expanded = !props.expanded" :class="nrcColor(props.item.priority)">{{ props.item.priority }}</td>
-            <td class="body-0" @click="props.expanded = !props.expanded">{{ props.item.status }}</td>
+            <td class="body-0" @click="props.expanded = !props.expanded"><v-chip :class="statusColor(props.item.status)" label>{{ props.item.number }}</v-chip></td>
+            <td class="body-0" @click="props.expanded = !props.expanded" :class="priorityColor(props.item.priority)">{{ props.item.priority }}</td>
+            <td class="body-0">
+              <v-btn v-if="props.item.spares !== null && props.item.spares !== undefined" icon class="mx-0" @click.native="showSpare(props.item)">
+                <v-tooltip bottom>
+                  <v-icon color="blue" slot="activator">local_grocery_store</v-icon><span>spares</span>
+                </v-tooltip>
+              </v-btn>
+              <v-btn v-if="props.item.tars !== undefined && props.item.tars.length > 0" icon class="mx-0" @click.native="showTAR(props.item)">
+                <v-tooltip bottom>
+                  <v-icon color="blue" slot="activator">help</v-icon><span>TAR</span>
+                </v-tooltip>
+              </v-btn>
+            </td>
             <td class="body-0" @click="props.expanded = !props.expanded">{{ props.item.notes }}</td>
             <td class="body-0" @click="props.expanded = !props.expanded">{{ props.item.content }}</td>
             <td class="body-0" @click="props.expanded = !props.expanded">{{ props.item.ref }}</td>
@@ -53,19 +64,24 @@
           <template slot="expand" slot-scope="props">
               <v-card flat color="blue lighten-5" class="elevation-0">
                 <v-card-actions>
-                  <v-btn icon class="mx-0" @click.native="showLog(props.item)">
-                    <v-tooltip bottom>
-                      <v-icon color="blue" slot="activator">assignment</v-icon><span>log</span>
-                    </v-tooltip>
-                  </v-btn>
                   <v-btn icon class="mx-0" @click="editItem(props.item)">
                     <v-tooltip bottom>
                       <v-icon color="blue" slot="activator">edit</v-icon><span>edit</span>
                     </v-tooltip>
                   </v-btn>
-                  <v-btn icon class="mx-0" @click.native="addSpare(props.item)">
+                  <v-btn icon class="mx-0" @click.native="orderSpare(props.item)">
                     <v-tooltip bottom>
-                      <v-icon color="blue" slot="activator">local_grocery_store</v-icon><span>spares</span>
+                      <v-icon color="blue" slot="activator">add_shopping_cart</v-icon><span>order</span>
+                    </v-tooltip>
+                  </v-btn>
+                  <v-btn icon class="mx-0" @click.native="makeTAR(props.item)">
+                    <v-tooltip bottom>
+                      <v-icon color="blue" slot="activator">help_outline</v-icon><span>TAR</span>
+                    </v-tooltip>
+                  </v-btn>
+                  <v-btn icon class="mx-0" @click.native="showLog(props.item)">
+                    <v-tooltip bottom>
+                      <v-icon color="blue" slot="activator">assignment</v-icon><span>log</span>
                     </v-tooltip>
                   </v-btn>
                 </v-card-actions>
@@ -131,8 +147,8 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="blue darken-1" flat @click.native="dialogEdit = false">Cancel</v-btn>
-          <v-btn color="blue darken-1" flat @click.native="save()">Save</v-btn>
+          <v-btn color="blue" flat @click.native="dialogEdit = false">Cancel</v-btn>
+          <v-btn color="blue" flat @click.native="save()">Save</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -160,8 +176,8 @@ export default {
       headers: [
         { text: 'NRC', left: true, value: 'number' },
         { text: 'PRI', left: true, value: 'priority' },
-        { text: 'STATUS', left: true, value: 'status' },
-        { text: 'NOTE', left: true, value: 'notes' },
+        { text: 'INFO', left: true, value: '' },
+        { text: 'NOTES', left: true, value: 'notes' },
         { text: 'CONTENT', left: true, value: 'content' },
         { text: 'REF', left: true, value: 'ref' },
         { text: 'ZONE', left: true, value: 'zone' }
@@ -223,11 +239,30 @@ export default {
     saveInlineEdit(item) {
       // console.log(item.number)
     },
-    nrcColor(priority) {
+    priorityColor(priority) {
       if (priority === 'AOG') {
         return 'red--text body-1'
       }
-    }
+    },
+    statusColor(status) {
+      if (status === 'inProgress') {
+        return 'yellow darken-3 white--text'
+      }
+      if (status === 'out') {
+        return 'blue-grey white--text'
+      }
+      if (status === 'notYet') {
+        return 'red white--text'
+      }
+      if (status === 'done') {
+        return 'green white--text'
+      }
+    },
+    showLog(item) {},
+    showSpare(item) {},
+    showTAR(item) {},
+    orderSpare(item) {},
+    makeTAR(item) {}
   },
   mounted() {
     this.checkId = this.$store.getters.following

@@ -212,9 +212,10 @@ export default {
         wo: '00000000',
         ref: 'PI',
         zone: 'N/A',
-        priority: 'critical',
+        priority: '',
         content: '',
-        spares: []
+        spares: '',
+        status: 'notYet'
       }
     }
   },
