@@ -60,11 +60,6 @@
                       <v-icon color="blue" slot="activator">sort</v-icon><span>shift</span>
                   </v-tooltip>
                 </v-btn>
-                <v-btn icon class="mx-0" @click.native="showLog(props.item)">
-                  <v-tooltip bottom>
-                      <v-icon color="blue" slot="activator">assignment</v-icon><span>log</span>
-                  </v-tooltip>
-                </v-btn>
               </td>
             </template>
             <template slot="expand" slot-scope="props">
@@ -90,6 +85,11 @@
                   <v-btn icon class="mx-0" @click.native="deleteTask(props.item)" v-if="tabs !== 'tab-9'">
                     <v-tooltip bottom>
                         <v-icon color="red" slot="activator">delete</v-icon><span>delete</span>
+                    </v-tooltip>
+                  </v-btn>
+                  <v-btn icon class="mx-0" @click.native="showLog(props.item)">
+                    <v-tooltip bottom>
+                        <v-icon color="blue" slot="activator">assignment</v-icon><span>log</span>
                     </v-tooltip>
                   </v-btn>
                 </v-card-actions>
@@ -146,7 +146,7 @@
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn flat @click.native="closeEditTask()">Cancel</v-btn>
-          <v-btn color="blue darken-1" flat @click.native="saveEditTask()">Save</v-btn>
+          <v-btn color="blue" flat @click.native="saveEditTask()">Save</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>

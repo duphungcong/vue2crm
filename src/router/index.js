@@ -12,7 +12,7 @@ import Shift from '@/components/shared/Shift'
 import Tasks from '@/components/Tasks'
 import BarcodeIn from '@/components/BarcodeIn'
 import BarcodeOut from '@/components/BarcodeOut'
-import Nrcs from '@/components/Nrcs'
+import NRCs from '@/components/NRCs'
 import Spares from '@/components/Spares'
 
 import Login from '@/components/Login'
@@ -72,7 +72,7 @@ let router = new Router({
       }
     },
     {
-      path: '/nrcs', component: Nrcs, name: 'Nrcs', meta: {
+      path: '/nrcs', component: NRCs, name: 'NRCs', meta: {
         requireAuth: true,
         requireFollowing: true
       }

@@ -105,7 +105,7 @@
         </v-list>
       </v-bottom-sheet>
 
-      <v-dialog v-model="dialogNrc" max-width="600">
+      <v-dialog v-model="dialogAddNRC" max-width="600">
         <v-card>
           <v-card-title>
             <span class="headline">New NRC</span>
@@ -154,7 +154,7 @@
           </v-card-text>
           <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn color="blue darken-1" flat @click.native="dialogNrc = false">Cancel</v-btn>
+            <v-btn color="blue darken-1" flat @click.native="dialogAddNRC = false">Cancel</v-btn>
             <v-btn color="blue darken-1" flat @click.native="save('nrc')">Save</v-btn>
             <v-btn color="blue darken-1" flat @click.native="saveAndExit('nrc')">Save and Exit</v-btn>
           </v-card-actions>
@@ -178,7 +178,7 @@ export default {
         { icon: 'contacts', text: 'Dashboard', link: 'Dashboard', vertical: 'Dashboard' },
         { icon: 'assignment', text: 'Shifts', link: 'Shifts', vertical: 'Shifts' },
         { icon: 'assignment', text: 'Tasks', link: 'Tasks', vertical: 'Tasks' },
-        { icon: 'assignment', text: 'NRCs', link: 'Nrcs', vertical: 'Nrcs' },
+        { icon: 'assignment', text: 'NRCs', link: 'NRCs', vertical: 'NRCs' },
         { icon: 'assignment', text: 'Spares', link: 'Spares', vertical: 'Spares' },
         { icon: 'assignment', text: 'Barcode Receive', link: 'BarcodeIn', vertical: 'BarcodeIn' },
         { icon: 'assignment', text: 'Barcode Take Out', link: 'BarcodeOut', vertical: 'BarcodeOut' }
@@ -194,7 +194,7 @@ export default {
         { img: 'hangouts.png', title: 'Additional tasks', value: 'task' }
       ],
       checkId: '',
-      dialogNrc: false,
+      dialogAddNRC: false,
       nrcList: [],
       nrc: {},
       zoneSelection: [
@@ -307,7 +307,7 @@ export default {
       if (this.checkId !== null && item === 'nrc') {
         this.loadNrc()
         this.nrc = Object.assign({}, this.defaultNrc)
-        this.dialogNrc = true
+        this.dialogAddNRC = true
       }
     },
     save(item) {
@@ -327,7 +327,7 @@ export default {
     saveAndExit(item) {
       if (item === 'nrc') {
         this.save(item)
-        this.dialogNrc = false
+        this.dialogAddNRC = false
       }
     },
     loadNrc() {

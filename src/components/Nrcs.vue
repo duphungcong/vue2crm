@@ -13,7 +13,7 @@
             </v-flex>
             <v-flex xs2 sm2 md2></v-flex>
             <v-flex xs12 sm3 md3>
-              <v-btn @click.native="exportNRCList" class="blue white--text">Export to Excel
+              <v-btn @click.native="exportNrcList" class="blue white--text">Export to Excel
                 <v-icon dark right>file_download</v-icon>
               </v-btn>
             </v-flex>
@@ -21,38 +21,18 @@
         </v-card-actions>
         <v-data-table :headers="headers" :items="nrcList" :pagination.sync="pagination" :search="search" item-key="number">
           <template slot="items" slot-scope="props" class="body-0">
-            <!-- <td class="body-0">
-              <v-edit-dialog
-                :return-value.sync="props.item.wo"
-                large
-                lazy
-                persistent
-                :save="saveInlineEdit(props.item)"
-              >
-                <div>{{ props.item.wo }}</div>
-                <div slot="input" class="mt-3">NRC {{ props.item.number }}</div>
-                <v-text-field
-                  slot="input"
-                  label="WO number"
-                  v-model="props.item.wo"
-                  single-line
-                  autofocus
-                  counter="8"
-                  mask="########"
-                ></v-text-field>
-              </v-edit-dialog>
-            </td> -->
-            <td class="body-0" @click="props.expanded = !props.expanded"><v-chip :class="statusColor(props.item.status)" label>{{ props.item.number }}</v-chip></td>
+            <!-- <td class="body-0" @click="props.expanded = !props.expanded"><v-chip :class="statusColor(props.item.status)" label>{{ props.item.number }}</v-chip></td> -->
+            <td class="body-0" @click="props.expanded = !props.expanded">{{ props.item.number }}</td>
             <td class="body-0" @click="props.expanded = !props.expanded" :class="priorityColor(props.item.priority)">{{ props.item.priority }}</td>
             <td class="body-0">
-              <v-btn v-if="props.item.spares !== null && props.item.spares !== undefined" icon class="mx-0" @click.native="showSpare(props.item)">
+              <v-btn v-if="props.item.spares !== undefined && props.item.spares !== ''" icon class="mx-0" @click.native="showSpare(props.item)">
                 <v-tooltip bottom>
-                  <v-icon color="blue" slot="activator">local_grocery_store</v-icon><span>spares</span>
+                  <v-icon color="grey darken-3" slot="activator">local_grocery_store</v-icon><span>spares</span>
                 </v-tooltip>
               </v-btn>
               <v-btn v-if="props.item.tars !== undefined && props.item.tars.length > 0" icon class="mx-0" @click.native="showTAR(props.item)">
                 <v-tooltip bottom>
-                  <v-icon color="blue" slot="activator">help</v-icon><span>TAR</span>
+                  <v-icon color="grey" slot="activator">help</v-icon><span>TAR</span>
                 </v-tooltip>
               </v-btn>
             </td>
@@ -74,9 +54,9 @@
                       <v-icon color="blue" slot="activator">add_shopping_cart</v-icon><span>order</span>
                     </v-tooltip>
                   </v-btn>
-                  <v-btn icon class="mx-0" @click.native="makeTAR(props.item)">
+                  <v-btn icon class="mx-0" @click.native="makeTar(props.item)">
                     <v-tooltip bottom>
-                      <v-icon color="blue" slot="activator">help_outline</v-icon><span>TAR</span>
+                      <v-icon color="blue" slot="activator">help_outline</v-icon><span>tar</span>
                     </v-tooltip>
                   </v-btn>
                   <v-btn icon class="mx-0" @click.native="showLog(props.item)">
@@ -93,7 +73,7 @@
         </v-data-table>
       </v-card>
     </v-flex>
-    <v-dialog v-model="dialogEdit" max-width="600">
+    <v-dialog v-model="dialogEditNrc" max-width="600">
       <v-card>
         <v-card-title>
           <span class="headline">Edit NRC</span>
@@ -102,6 +82,14 @@
           <v-layout row wrap align-baseline>
             <v-flex xs3>
               <v-subheader>NRC {{ editedItem.number }}</v-subheader>
+            </v-flex>
+          </v-layout>
+          <v-layout row wrap align-baseline>
+            <v-flex xs3>
+              <v-subheader>Status</v-subheader>
+            </v-flex>
+            <v-flex xs9>
+              <v-select :items="statusSelection" v-model="editedItem.status"></v-select>
             </v-flex>
           </v-layout>
           <v-layout row wrap align-baseline>
@@ -147,7 +135,7 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="blue" flat @click.native="dialogEdit = false">Cancel</v-btn>
+          <v-btn color="blue" flat @click.native="dialogEditNrc = false">Cancel</v-btn>
           <v-btn color="blue" flat @click.native="save()">Save</v-btn>
         </v-card-actions>
       </v-card>
@@ -161,7 +149,7 @@
 import firebase from 'firebase'
 
 export default {
-  name: 'Nrcs',
+  name: 'NRCs',
   data () {
     return {
       checkId: null,
@@ -198,8 +186,15 @@ export default {
         'critical',
         'normal'
       ],
+      statusSelection: [
+        'notYet',
+        'inProgress',
+        'done',
+        'out',
+        'ready'
+      ],
       editedItem: {},
-      dialogEdit: false,
+      dialogEditNrc: false,
       selectedZone: '',
       search: ''
     }
@@ -222,13 +217,13 @@ export default {
       this.itemIndex = this.nrcList.indexOf(item)
       console.log(this.itemIndex)
       this.editedItem = Object.assign({}, item)
-      this.dialogEdit = true
+      this.dialogEditNrc = true
     },
     save() {
       if (this.itemIndex > -1) {
         firebase.database().ref('nrcs/' + this.checkId + '/' + this.itemIndex).update(this.editedItem).then(
           (data) => {
-            this.dialogEdit = false
+            this.dialogEditNrc = false
           },
           (error) => {
             console.log(error)
@@ -251,9 +246,9 @@ export default {
       if (status === 'out') {
         return 'blue-grey white--text'
       }
-      if (status === 'notYet') {
-        return 'red white--text'
-      }
+      // if (status === 'notYet') {
+      //   return 'red white--text'
+      // }
       if (status === 'done') {
         return 'green white--text'
       }
@@ -262,7 +257,7 @@ export default {
     showSpare(item) {},
     showTAR(item) {},
     orderSpare(item) {},
-    makeTAR(item) {}
+    makeTar(item) {}
   },
   mounted() {
     this.checkId = this.$store.getters.following
