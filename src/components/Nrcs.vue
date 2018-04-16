@@ -27,12 +27,12 @@
             <td class="body-0">
               <v-btn v-if="props.item.spares !== undefined && props.item.spares !== ''" icon class="mx-0" @click.native="showSpare(props.item)">
                 <v-tooltip bottom>
-                  <v-icon color="grey darken-3" slot="activator">local_grocery_store</v-icon><span>spares</span>
+                  <v-icon color="grey darken-2" slot="activator">local_grocery_store</v-icon><span>spares</span>
                 </v-tooltip>
               </v-btn>
               <v-btn v-if="props.item.tars !== undefined && props.item.tars.length > 0" icon class="mx-0" @click.native="showTAR(props.item)">
                 <v-tooltip bottom>
-                  <v-icon color="grey" slot="activator">help</v-icon><span>TAR</span>
+                  <v-icon color="grey darken-2" slot="activator">help</v-icon><span>TAR</span>
                 </v-tooltip>
               </v-btn>
             </td>
@@ -44,7 +44,7 @@
           <template slot="expand" slot-scope="props">
               <v-card flat color="blue lighten-5" class="elevation-0">
                 <v-card-actions>
-                  <v-btn icon class="mx-0" @click="editItem(props.item)">
+                  <v-btn icon class="mx-0" @click="editNRC(props.item)">
                     <v-tooltip bottom>
                       <v-icon color="blue" slot="activator">edit</v-icon><span>edit</span>
                     </v-tooltip>
@@ -54,7 +54,7 @@
                       <v-icon color="blue" slot="activator">add_shopping_cart</v-icon><span>order</span>
                     </v-tooltip>
                   </v-btn>
-                  <v-btn icon class="mx-0" @click.native="makeTar(props.item)">
+                  <v-btn icon class="mx-0" @click.native="makeTAR(props.item)">
                     <v-tooltip bottom>
                       <v-icon color="blue" slot="activator">help_outline</v-icon><span>tar</span>
                     </v-tooltip>
@@ -73,7 +73,7 @@
         </v-data-table>
       </v-card>
     </v-flex>
-    <v-dialog v-model="dialogEditNrc" max-width="600">
+    <v-dialog v-model="dialogEditNRC" max-width="600">
       <v-card>
         <v-card-title>
           <span class="headline">Edit NRC</span>
@@ -81,7 +81,7 @@
         <v-card-text>
           <v-layout row wrap align-baseline>
             <v-flex xs3>
-              <v-subheader>NRC {{ editedItem.number }}</v-subheader>
+              <v-subheader>NRC {{ editedNRC.number }}</v-subheader>
             </v-flex>
           </v-layout>
           <v-layout row wrap align-baseline>
@@ -89,7 +89,7 @@
               <v-subheader>Status</v-subheader>
             </v-flex>
             <v-flex xs9>
-              <v-select :items="statusSelection" v-model="editedItem.status"></v-select>
+              <v-select :items="statusSelection" v-model="editedNRC.status"></v-select>
             </v-flex>
           </v-layout>
           <v-layout row wrap align-baseline>
@@ -97,7 +97,7 @@
               <v-subheader>WO</v-subheader>
             </v-flex>
             <v-flex xs9>
-              <v-text-field mask="########" counter="8" v-model="editedItem.wo"></v-text-field>
+              <v-text-field mask="########" counter="8" v-model="editedNRC.wo"></v-text-field>
             </v-flex>
           </v-layout>
           <v-layout row wrap align-baseline>
@@ -105,7 +105,7 @@
               <v-subheader>Reference</v-subheader>
             </v-flex>
             <v-flex xs9>
-              <v-text-field v-model="editedItem.ref"></v-text-field>
+              <v-text-field v-model="editedNRC.ref"></v-text-field>
             </v-flex>
           </v-layout>
           <v-layout row wrap align-baseline>
@@ -113,7 +113,7 @@
               <v-subheader>Zone</v-subheader>
             </v-flex>
             <v-flex xs9>
-              <v-select :items="zoneSelection" v-model="editedItem.zone"></v-select>
+              <v-select :items="zoneSelection" v-model="editedNRC.zone"></v-select>
             </v-flex>
           </v-layout>
           <v-layout row wrap align-baseline>
@@ -121,7 +121,7 @@
               <v-subheader>Priority</v-subheader>
             </v-flex>
             <v-flex xs9>
-              <v-select :items="prioritySelection" v-model="editedItem.priority"></v-select>
+              <v-select :items="prioritySelection" v-model="editedNRC.priority"></v-select>
             </v-flex>
           </v-layout>
           <v-layout row wrap align-baseline>
@@ -129,14 +129,81 @@
               <v-subheader>Content</v-subheader>
             </v-flex>
             <v-flex xs9>
-              <v-text-field v-model="editedItem.content" required multi-line rows="2"></v-text-field>
+              <v-text-field v-model="editedNRC.content" required multi-line rows="2"></v-text-field>
             </v-flex>
           </v-layout>
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="blue" flat @click.native="dialogEditNrc = false">Cancel</v-btn>
-          <v-btn color="blue" flat @click.native="save()">Save</v-btn>
+          <v-btn color="blue" flat @click.native="dialogEditNRC = false">Cancel</v-btn>
+          <v-btn color="blue" flat @click.native="saveEditedNRC()">Save</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <v-dialog v-model="dialogOrderSpare" max-width="600">
+      <v-card>
+        <v-card-title>
+          <span class="headline">Order Spare</span>
+        </v-card-title>
+        <v-card-text>
+          <v-layout row wrap align-baseline>
+            <v-flex xs3>
+              <v-subheader>NRC {{ editedNRC.number }}</v-subheader>
+            </v-flex>
+          </v-layout>
+          <v-layout row wrap align-baseline>
+            <v-flex xs3>
+              <v-subheader>RQF</v-subheader>
+            </v-flex>
+            <v-flex xs9>
+              <v-text-field mask="HM  ########" counter="12" v-model="newOrder.number"></v-text-field>
+            </v-flex>
+          </v-layout>
+          <v-layout row wrap align-baseline>
+            <v-flex xs3>
+              <v-subheader>P/N</v-subheader>
+            </v-flex>
+            <v-flex xs9>
+              <v-text-field v-model="newOrder.pn"></v-text-field>
+            </v-flex>
+          </v-layout>
+          <v-layout row wrap align-baseline>
+            <v-flex xs3>
+              <v-subheader>Description</v-subheader>
+            </v-flex>
+            <v-flex xs9>
+              <v-text-field v-model="newOrder.description"></v-text-field>
+            </v-flex>
+          </v-layout>
+          <v-layout row wrap align-baseline>
+            <v-flex xs3>
+              <v-subheader>Quantity</v-subheader>
+            </v-flex>
+            <v-flex xs9>
+              <v-text-field v-model="newOrder.quntity" type="number"></v-text-field>
+            </v-flex>
+          </v-layout>
+          <v-layout row wrap align-baseline>
+            <v-flex xs3>
+              <v-subheader>Priority</v-subheader>
+            </v-flex>
+            <v-flex xs9>
+              <v-select :items="prioritySelection" v-model="newOrder.priority"></v-select>
+            </v-flex>
+          </v-layout>
+          <v-layout row wrap align-baseline>
+            <v-flex xs3>
+              <v-subheader>Note</v-subheader>
+            </v-flex>
+            <v-flex xs9>
+              <v-text-field v-model="newOrder.note" required multi-line rows="2"></v-text-field>
+            </v-flex>
+          </v-layout>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="blue" flat @click.native="dialogOrderSpare = false">Cancel</v-btn>
+          <v-btn color="blue" flat @click.native="saveOrderSpare()">Save</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -191,16 +258,19 @@ export default {
         'inProgress',
         'done',
         'out',
-        'ready'
+        'ready',
+        'cancel'
       ],
-      editedItem: {},
-      dialogEditNrc: false,
+      editedNRC: {},
+      newOrder: {},
+      dialogEditNRC: false,
+      dialogOrderSpare: false,
       selectedZone: '',
       search: ''
     }
   },
   methods: {
-    loadNrc() {
+    loadNRC() {
       this.$store.dispatch('beginLoading')
       firebase.database().ref('nrcs/' + this.checkId).on('value',
         (data) => {
@@ -213,27 +283,70 @@ export default {
         }
       )
     },
-    editItem(item) {
+    editNRC(item) {
       this.itemIndex = this.nrcList.indexOf(item)
       console.log(this.itemIndex)
-      this.editedItem = Object.assign({}, item)
-      this.dialogEditNrc = true
+      this.editedNRC = Object.assign({}, item)
+      this.dialogEditNRC = true
     },
-    save() {
+    saveEditedNRC() {
       if (this.itemIndex > -1) {
-        firebase.database().ref('nrcs/' + this.checkId + '/' + this.itemIndex).update(this.editedItem).then(
+        firebase.database().ref('nrcs/' + this.checkId + '/' + this.itemIndex).update(this.editedNRC).then(
           (data) => {
-            this.dialogEditNrc = false
+            // this.dialogEditNRC = false
           },
           (error) => {
             console.log(error)
           }
         )
       }
+      this.closeEditNRC()
     },
-    saveInlineEdit(item) {
-      // console.log(item.number)
+    closeEditNRC() {
+      this.dialogEditNRC = false
+      setTimeout(() => {
+        this.editedNRC = {}
+        this.itemIndex = -1
+      }, 300)
     },
+    showLog(item) {},
+    showSpare(item) {},
+    showTAR(item) {},
+    orderSpare(item) {
+      this.itemIndex = this.nrcList.indexOf(item)
+      console.log(this.itemIndex)
+      this.editedNRC = Object.assign({}, item)
+      this.newOrder.priority = this.editedNRC.priority
+      this.dialogOrderSpare = true
+    },
+    saveOrderSpare() {
+      if (this.itemIndex > -1) {
+        console.log(this.itemIndex)
+        this.editedNRC.spares = 'order'
+        let newSpareKey = firebase.database().ref('spares/' + this.checkId + '/' + this.itemIndex).push().key
+        let updates = {}
+        updates['/nrcs/' + this.checkId + '/' + this.itemIndex] = this.editedNRC
+        updates['/spares/' + this.checkId + '/' + this.itemIndex + '/' + newSpareKey] = this.newOrder
+        firebase.database().ref().update(updates).then(
+          (data) => {
+            // console.log(data.val())
+          },
+          (error) => {
+            console.log(error)
+          }
+        )
+      }
+      this.closeOrderSpare()
+    },
+    closeOrderSpare() {
+      this.dialogOrderSpare = false
+      setTimeout(() => {
+        this.newOrder = {}
+        this.editedNRC = {}
+        this.itemIndex = -1
+      }, 300)
+    },
+    makeTAR(item) {},
     priorityColor(priority) {
       if (priority === 'AOG') {
         return 'red--text body-1'
@@ -252,16 +365,11 @@ export default {
       if (status === 'done') {
         return 'green white--text'
       }
-    },
-    showLog(item) {},
-    showSpare(item) {},
-    showTAR(item) {},
-    orderSpare(item) {},
-    makeTar(item) {}
+    }
   },
   mounted() {
     this.checkId = this.$store.getters.following
-    this.loadNrc()
+    this.loadNRC()
   }
 }
 </script>

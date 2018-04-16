@@ -305,7 +305,7 @@ export default {
       this.checkId = this.$store.getters.following
       this.bottomSheet = false
       if (this.checkId !== null && item === 'nrc') {
-        this.loadNrc()
+        this.loadNRC()
         this.nrc = Object.assign({}, this.defaultNrc)
         this.dialogAddNRC = true
       }
@@ -330,7 +330,7 @@ export default {
         this.dialogAddNRC = false
       }
     },
-    loadNrc() {
+    loadNRC() {
       // console.log(this.checkId)
       firebase.database().ref('nrcs/' + this.checkId).on('value',
         (data) => {
