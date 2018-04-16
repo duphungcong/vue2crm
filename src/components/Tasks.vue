@@ -563,6 +563,7 @@ export default {
       this.workpackByTab.forEach((element) => {
         let item = {
           WP_ITEM: element.wpItem
+          // TITLE: element.taskTitle
         }
         exportedWorkpack.push(item)
       })
