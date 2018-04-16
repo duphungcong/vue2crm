@@ -21,8 +21,8 @@
         </v-card-actions>
         <v-data-table :headers="headerNRC" :items="nrcList" :pagination.sync="paginationNRC" :search="search" item-key="number">
           <template slot="items" slot-scope="props" class="body-0">
-            <!-- <td class="body-0" @click="props.expanded = !props.expanded"><v-chip :class="statusColor(props.item.status)" label>{{ props.item.number }}</v-chip></td> -->
-            <td class="body-0" @click="props.expanded = !props.expanded">{{ props.item.number }}</td>
+            <td class="body-0" @click="props.expanded = !props.expanded"><v-chip :class="statusColor(props.item.status)" label>{{ props.item.number }}</v-chip></td>
+            <!-- <td class="body-0" @click="props.expanded = !props.expanded">{{ props.item.number }}</td> -->
             <td class="body-0" @click="props.expanded = !props.expanded" :class="priorityColor(props.item.priority)">{{ props.item.priority }}</td>
             <td class="body-0">
               <v-btn v-if="props.item.spares !== undefined && props.item.spares !== ''" icon class="mx-0" @click.native="showSpare(props.item)">
@@ -221,7 +221,8 @@
             <td class="boyd-0">{{ props.item.number }}</td>
             <td class="boyd-0">{{ props.item.description }}</td>
             <td class="boyd-0">{{ props.item.pn }}</td>
-            <td class="boyd-0">{{ props.item.priority }}</td>
+            <td class="boyd-0" :class="priorityColor(props.item.priority)">{{ props.item.priority }}</td>
+            <td class="boyd-0">{{ props.item.status }}</td>
             <td class="boyd-0">{{ props.item.note || 'NIL'}}</td>
           </template>
         </v-data-table>
@@ -266,9 +267,10 @@ export default {
       ],
       headerSpare: [
         { text: 'RQF', left: true, value: 'rqf' },
-        { text: 'DES', left: true, value: 'description' },
+        { text: 'DESCRIPTION', left: true, value: 'description' },
         { text: 'P/N', left: true, value: 'pn' },
         { text: 'PRI', left: true, value: 'priority' },
+        { text: 'STATUS', left: true, value: 'status' },
         { text: 'NOTE', left: true, value: 'note' }
       ],
       itemIndex: -1,
@@ -429,11 +431,17 @@ export default {
       if (status === 'out') {
         return 'blue-grey white--text'
       }
-      // if (status === 'notYet') {
-      //   return 'red white--text'
-      // }
+      if (status === 'notYet') {
+        return 'grey lighten-2'
+      }
+      if (status === 'ready') {
+        return 'blue white--text'
+      }
       if (status === 'done') {
         return 'green white--text'
+      }
+      if (status === 'cancel') {
+        return 'line-bg white--text'
       }
     }
   },
@@ -443,4 +451,15 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+  .line-bg {
+    background: repeating-linear-gradient(
+      45deg,
+      #2e2f36,
+      #c3c5c9 2px
+);
+  }
+</style>
+
 

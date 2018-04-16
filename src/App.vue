@@ -105,58 +105,142 @@
         </v-list>
       </v-bottom-sheet>
 
-      <v-dialog v-model="dialogAddNRC" max-width="600">
+      <v-dialog v-model="dialogAddNRC" persistent max-width="600">
         <v-card>
           <v-card-title>
             <span class="headline">New NRC</span>
           </v-card-title>
           <v-card-text>
-             <v-layout row wrap align-baseline>
-               <v-flex xs3>
-                  <v-subheader>NRC</v-subheader>
-                </v-flex>
-               <v-flex xs9>
-                <v-text-field type="number" v-model="nrc.number" required readonly></v-text-field>
-              </v-flex>
-             </v-layout>
             <v-layout row wrap align-baseline>
-              <v-flex xs3>
-                <v-subheader>WO</v-subheader>
-              </v-flex>
-              <v-flex xs9>
-                <v-text-field mask="########" counter="8" prefix="VN" v-model="nrc.wo"></v-text-field>
+              <v-flex xs12>
+                NRC {{ newNRC.number }}
               </v-flex>
             </v-layout>
             <v-layout row wrap align-baseline>
-              <v-flex xs3>
-                <v-subheader>Reference</v-subheader>
+              <v-flex xs6>
+                <v-text-field label="W/O" mask="########" counter="8" v-model="newNRC.wo"></v-text-field>
               </v-flex>
-              <v-flex xs9>
-                <v-text-field v-model="nrc.ref"></v-text-field>
-              </v-flex>
-            </v-layout>
-            <v-layout row wrap align-baseline>
-              <v-flex xs3>
-                <v-subheader>Zone</v-subheader>
-              </v-flex>
-              <v-flex xs9>
-                <v-select :items="zoneSelection" v-model="nrc.zone"></v-select>
+              <v-flex xs1></v-flex>
+              <v-flex xs5>
+                <v-text-field label="Reference" v-model="newNRC.ref"></v-text-field>
               </v-flex>
             </v-layout>
             <v-layout row wrap align-baseline>
-              <v-flex xs3>
-                <v-subheader>Content</v-subheader>
+              <v-flex xs6>
+                <v-select label="Zone" :items="zoneSelection" v-model="newNRC.zone"></v-select>
               </v-flex>
-              <v-flex xs9>
-                <v-text-field v-model="nrc.content" required multi-line rows="2"></v-text-field>
+              <v-flex xs1></v-flex>
+              <v-flex xs5>
+                <v-select label="Status" :items="nrcStatusSelection" v-model="newNRC.status"></v-select>
+              </v-flex>
+            </v-layout>
+            <v-layout row wrap align-baseline>
+              <v-flex xs12>
+                <v-select label="Priority" :items="prioritySelection" v-model="newNRC.priority"></v-select>
+              </v-flex>
+              <v-flex xs12>
+                <v-text-field label="Content" v-model="newNRC.content" required multi-line rows="2"></v-text-field>
               </v-flex>
             </v-layout>
           </v-card-text>
           <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn color="blue darken-1" flat @click.native="dialogAddNRC = false">Cancel</v-btn>
-            <v-btn color="blue darken-1" flat @click.native="save('nrc')">Save</v-btn>
-            <v-btn color="blue darken-1" flat @click.native="saveAndExit('nrc')">Save and Exit</v-btn>
+            <v-btn color="blue" flat @click.native="close('nrc')">Cancel</v-btn>
+            <v-btn color="blue" flat @click.native="save('nrc')">Save</v-btn>
+            <v-btn color="blue" flat @click.native="saveAndExit('nrc')">Save and Exit</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+
+      <v-dialog v-model="dialogOrder" persistent max-width="600">
+        <v-card>
+          <v-card-title>
+            <span class="headline">Order Spare</span>
+          </v-card-title>
+          <v-card-text>
+            <v-layout row wrap align-baseline>
+              <v-flex xs12>
+                <v-select label="NRC" :items="nrcList" v-model="orderNRC" item-text="number" autocomplete></v-select>
+              </v-flex>
+            </v-layout>
+            <v-layout row wrap align-baseline>
+              <v-flex xs6>
+                <v-text-field label="RQF" mask="AA  ########" counter="12" v-model="newOrder.number"></v-text-field>
+              </v-flex>
+              <v-flex xs1></v-flex>
+              <v-flex xs5>
+                <v-text-field label="P/N" v-model="newOrder.pn"></v-text-field>
+              </v-flex>
+            </v-layout>
+            <v-layout row wrap align-baseline>
+              <v-flex xs6>
+                <v-text-field label="Description" v-model="newOrder.description"></v-text-field>
+              </v-flex>
+              <v-flex xs1></v-flex>
+              <v-flex xs5>
+                <v-text-field label="Qty" v-model="newOrder.quantity" type="number"></v-text-field>
+              </v-flex>
+            </v-layout>
+            <v-layout row wrap align-baseline>
+              <v-flex xs6>
+                <v-select label="Priority" :items="prioritySelection" v-model="newOrder.priority" autocomplete></v-select>
+              </v-flex>
+              <v-flex xs1></v-flex>
+              <v-flex xs5>
+                <v-select label="Status" :items="spareStatusSelection" v-model="newOrder.status" autocomplete></v-select>
+              </v-flex>
+            </v-layout>
+            <v-layout row wrap align-baseline>
+              <v-flex xs6>
+                <v-menu
+                  lazy
+                  :close-on-content-click="true"
+                  transition="scale-transition"
+                  offset-y
+                  full-width
+                  :nudge-right="40"
+                  min-width="290px"
+                >
+                  <v-text-field
+                    slot="activator"
+                    label="Req date"
+                    v-model="newOrder.reqDate"
+                    prepend-icon="event"
+                    readonly
+                  ></v-text-field>
+                  <v-date-picker v-model="newOrder.reqDate"></v-date-picker>
+                </v-menu>
+              </v-flex>
+              <v-flex xs6>
+                <v-menu
+                  lazy
+                  :close-on-content-click="true"
+                  transition="scale-transition"
+                  offset-y
+                  full-width
+                  :nudge-right="40"
+                  min-width="290px"
+                >
+                  <v-text-field
+                    slot="activator"
+                    label="Due date"
+                    v-model="newOrder.dueDate"
+                    prepend-icon="event"
+                    readonly
+                  ></v-text-field>
+                  <v-date-picker v-model="newOrder.dueDate"></v-date-picker>
+                </v-menu>
+              </v-flex>
+            </v-layout>
+            <v-flex xs12>
+              <v-text-field label="Note" v-model="newOrder.note" required multi-line rows="2"></v-text-field>
+            </v-flex>
+          </v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn color="blue" flat @click.native="close('order')">Cancel</v-btn>
+            <v-btn color="blue" flat @click.native="save('order')">Save</v-btn>
+            <v-btn color="blue" flat @click.native="saveAndExit('order')">Save and Exit</v-btn>
           </v-card-actions>
         </v-card>
       </v-dialog>
@@ -189,14 +273,17 @@ export default {
       ],
       bottomSheet: false,
       bottomSheetTitles: [
-        { img: 'keep.png', title: 'NRC', value: 'nrc' },
-        { img: 'inbox.png', title: 'Spare order', value: 'spare' },
-        { img: 'hangouts.png', title: 'Additional tasks', value: 'task' }
+        { img: 'keep.png', title: 'New NRC', value: 'nrc' },
+        { img: 'inbox.png', title: 'New Order', value: 'order' },
+        { img: 'hangouts.png', title: 'Add Task', value: 'task' }
       ],
       checkId: '',
       dialogAddNRC: false,
+      dialogOrder: false,
       nrcList: [],
-      nrc: {},
+      newNRC: {},
+      newOrder: {},
+      orderNRC: {},
       zoneSelection: [
         'N/A',
         '100-200-800',
@@ -207,7 +294,25 @@ export default {
         'CABIN',
         'CLEANING'
       ],
-      defaultNrc: {
+      prioritySelection: [
+        'AOG',
+        'critical',
+        'normal'
+      ],
+      nrcStatusSelection: [
+        'notYet',
+        'inProgress',
+        'done',
+        'out',
+        'ready',
+        'cancel'
+      ],
+      spareStatusSelection: [
+        'notYet',
+        'avail',
+        'issued'
+      ],
+      defaultNRC: {
         number: 0,
         wo: '00000000',
         ref: 'PI',
@@ -306,22 +411,59 @@ export default {
       this.bottomSheet = false
       if (this.checkId !== null && item === 'nrc') {
         this.loadNRC()
-        this.nrc = Object.assign({}, this.defaultNrc)
+        this.newNRC = Object.assign({}, this.defaultNRC)
         this.dialogAddNRC = true
+      }
+      if (this.checkId !== null && item === 'order') {
+        this.loadNRC()
+        this.newOrder.status = 'notYet'
+        this.dialogOrder = true
+      }
+    },
+    close(item) {
+      if (item === 'nrc') {
+        this.newNRC = {}
+        this.dialogAddNRC = false
+      }
+      if (item === 'order') {
+        this.newOrder = {}
+        this.dialogOrder = false
       }
     },
     save(item) {
       if (item === 'nrc') {
-        firebase.database().ref('nrcs/' + this.checkId + '/' + this.nrcList.length).set(this.nrc).then(
+        firebase.database().ref('nrcs/' + this.checkId + '/' + this.nrcList.length).set(this.newNRC).then(
           (data) => {
             // console.log(this.nrcList)
-            this.defaultNrc.number = this.nrcList.length + 1
-            this.nrc = Object.assign({}, this.defaultNrc)
+            this.defaultNRC.number = this.nrcList.length + 1
+            this.newNRC = Object.assign({}, this.defaultNRC)
           },
           (error) => {
             console.log(error)
           }
         )
+      }
+      if (item === 'order') {
+        let nrcIndex = this.nrcList.indexOf(this.orderNRC)
+        console.log(nrcIndex)
+        if (nrcIndex > -1) {
+          let newSpareKey = firebase.database().ref('spares/' + this.checkId + '/' + nrcIndex).push().key
+          let updates = {}
+          if (this.orderNRC.spares === undefined || this.orderNRC.spares === '') {
+            this.orderNRC.spares = 'order'
+            updates['/nrcs/' + this.checkId + '/' + nrcIndex] = this.orderNRC
+          }
+          updates['/spares/' + this.checkId + '/' + nrcIndex + '/' + newSpareKey] = this.newOrder
+          firebase.database().ref().update(updates).then(
+            (data) => {
+              this.newOrder = {}
+              this.newOrder.status = 'notYet'
+            },
+            (error) => {
+              console.log(error)
+            }
+          )
+        }
       }
     },
     saveAndExit(item) {
@@ -329,13 +471,17 @@ export default {
         this.save(item)
         this.dialogAddNRC = false
       }
+      if (item === 'order') {
+        this.save(item)
+        this.dialogOrder = false
+      }
     },
     loadNRC() {
       // console.log(this.checkId)
       firebase.database().ref('nrcs/' + this.checkId).on('value',
         (data) => {
           this.nrcList = data.val() || []
-          this.defaultNrc.number = this.nrcList.length + 1
+          this.defaultNRC.number = this.nrcList.length + 1
           // console.log(this.nrcList)
         },
         (error) => {
