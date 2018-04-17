@@ -92,8 +92,9 @@
       <v-card>
         <v-card-title>Do you want to cancel your progress?</v-card-title>
         <v-card-actions>
-          <v-btn color="blue" flat="flat" @click.native="dialogConfirmCancel = false">No</v-btn>
-          <v-btn flat="flat" @click.native="cancelCheck()">Yes</v-btn>
+          <v-spacer></v-spacer>
+          <v-btn color="blue" flat @click.native="dialogConfirmCancel = false">No</v-btn>
+          <v-btn color="red" flat @click.native="cancelCheck()">Yes</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -146,11 +147,10 @@ export default {
       return this.workpack.length
     },
     inputCheckInfoCompleted () {
-      // return this.check.name.length !== 0
-      //         && this.check.aircraft.length !== 0
-      //         && this.check.startDate.length !== 0
-      //         && this.check.finishDate.length !== 0
-      return true
+      return this.check.name.length !== 0
+              && this.check.aircraft.length !== 0
+              && this.check.startDate.length !== 0
+              && this.check.finishDate.length !== 0
     }
   },
   watch: {
