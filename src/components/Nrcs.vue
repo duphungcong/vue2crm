@@ -13,7 +13,7 @@
             </v-flex>
             <v-flex xs2 sm2 md2></v-flex>
             <v-flex xs12 sm3 md3>
-              <v-btn @click.native="exportNrcList" class="blue white--text">Export to Excel
+              <v-btn @click.native="exportNRCList" class="blue white--text">Export to Excel
                 <v-icon dark right>file_download</v-icon>
               </v-btn>
             </v-flex>
@@ -213,7 +213,7 @@
       <v-card class="elevation-0">
         <v-data-table
           :items="spares"
-          item-key="number"
+          item-key="pn"
           :headers="headerSpare"
           :pagination.sync="paginationSpare"
           :loading="spareLoading"
