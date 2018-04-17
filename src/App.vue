@@ -89,7 +89,6 @@
       </v-btn>
     
       <v-bottom-sheet v-model="bottomSheet" inset="">
-        <!-- <v-btn slot="activator" color="purple" dark>Click me</v-btn> -->
         <v-list>
           <v-list-tile
             v-for="item in bottomSheetTitles"
@@ -107,8 +106,8 @@
 
       <v-dialog v-model="dialogAddNRC" persistent max-width="600">
         <v-card>
-          <v-card-title>
-            <span class="headline">New NRC</span>
+          <v-card-title class="blue darken-1">
+            <h4 class="white--text">New NRC</h4>
           </v-card-title>
           <v-card-text>
             <v-layout row wrap align-baseline>
@@ -154,8 +153,8 @@
 
       <v-dialog v-model="dialogOrder" persistent max-width="600">
         <v-card>
-          <v-card-title>
-            <span class="headline">Order Spare</span>
+          <v-card-title class="blue darken-1">
+            <h4 class="white--text">Order Spare</h4>
           </v-card-title>
           <v-card-text>
             <v-layout row wrap align-baseline>
@@ -244,6 +243,20 @@
           </v-card-actions>
         </v-card>
       </v-dialog>
+      <v-snackbar
+        :timeout="timeout"
+        :color="snackbarColor"
+        :top="y === 'top'"
+        :bottom="y === 'bottom'"
+        :right="x === 'right'"
+        :left="x === 'left'"
+        :multi-line="mode === 'multi-line'"
+        :vertical="mode === 'vertical'"
+        v-model="snackbar"
+        >
+        {{ snackbarMsg }}
+        <v-btn flat @click.native="snackbar = false">Close</v-btn>
+      </v-snackbar>
     </template>
   </v-app>
 </template>
@@ -321,7 +334,14 @@ export default {
         content: '',
         spares: '',
         status: 'notYet'
-      }
+      },
+      snackbarMsg: '',
+      snackbarColor: 'blue',
+      snackbar: false,
+      y: 'top',
+      x: null,
+      mode: '',
+      timeout: 2000
     }
   },
   props: {
@@ -417,6 +437,7 @@ export default {
       if (this.checkId !== null && item === 'order') {
         this.loadNRC()
         this.newOrder.status = 'notYet'
+        this.newOrder.estDate = 'NIL'
         this.dialogOrder = true
       }
     },
@@ -435,11 +456,17 @@ export default {
         firebase.database().ref('nrcs/' + this.checkId + '/' + this.nrcList.length).set(this.newNRC).then(
           (data) => {
             // console.log(this.nrcList)
+            this.snackbarMsg = 'Create Success'
+            this.snackbarColor = 'success'
+            this.snackbar = true
             this.defaultNRC.number = this.nrcList.length + 1
             this.newNRC = Object.assign({}, this.defaultNRC)
           },
           (error) => {
             console.log(error)
+            this.snackbarMsg = 'Create Fail'
+            this.snackbarColor = 'error'
+            this.snackbar = true
           }
         )
       }
@@ -456,11 +483,18 @@ export default {
           updates['/spares/' + this.checkId + '/' + nrcIndex + '/' + newSpareKey] = this.newOrder
           firebase.database().ref().update(updates).then(
             (data) => {
+              this.snackbarMsg = 'Create Success'
+              this.snackbarColor = 'success'
+              this.snackbar = true
               this.newOrder = {}
               this.newOrder.status = 'notYet'
+              this.newOrder.estDate = 'NIL'
             },
             (error) => {
               console.log(error)
+              this.snackbarMsg = 'Create Fail'
+              this.snackbarColor = 'error'
+              this.snackbar = true
             }
           )
         }

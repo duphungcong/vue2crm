@@ -75,8 +75,8 @@
     </v-flex>
     <v-dialog v-model="dialogEditNRC" persistent max-width="600">
       <v-card>
-        <v-card-title>
-          <span class="headline">Edit NRC</span>
+        <v-card-title class="blue darken-1">
+          <h4 class="white--text">Edit NRC</h4>
         </v-card-title>
         <v-card-text>
           <v-layout row wrap align-baseline>
@@ -120,9 +120,9 @@
     </v-dialog>
     <v-dialog v-model="dialogOrder" persistent max-width="600">
       <v-card>
-        <v-card-title>
-          <span class="headline">Order Spare</span>
-        </v-card-title>
+        <v-card-title class="blue darken-1">
+            <h4 class="white--text">Order Spare</h4>
+          </v-card-title>
         <v-card-text>
           <v-layout row wrap align-baseline>
             <v-flex xs12>
@@ -209,25 +209,51 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
-    <v-dialog v-model="dialogSpare" max-width="900">
+    <v-dialog v-model="dialogSpare" max-width="1200">
       <v-card class="elevation-0">
         <v-data-table
           :items="spares"
+          item-key="number"
           :headers="headerSpare"
           :pagination.sync="paginationSpare"
           :loading="spareLoading"
           class="elevation-1">
           <template slot="items" slot-scope="props">
-            <td class="boyd-0">{{ props.item.number }}</td>
-            <td class="boyd-0">{{ props.item.description }}</td>
-            <td class="boyd-0">{{ props.item.pn }}</td>
-            <td class="boyd-0" :class="priorityColor(props.item.priority)">{{ props.item.priority }}</td>
-            <td class="boyd-0">{{ props.item.status }}</td>
-            <td class="boyd-0">{{ props.item.note || 'NIL'}}</td>
+            <tr @click="props.expanded = !props.expanded">
+              <td class="boyd-0">{{ props.item.number }}</td>
+              <td class="boyd-0">{{ props.item.description }}</td>
+              <td class="boyd-0">{{ props.item.pn }}</td>
+              <td class="boyd-0" :class="priorityColor(props.item.priority)">{{ props.item.priority }}</td>
+              <td class="boyd-0">{{ props.item.status }}</td>
+              <td class="boyd-0">{{ props.item.estDate }}</td>
+              <td class="boyd-0">{{ props.item.note || 'NIL'}}</td>
+            </tr>
+          </template>
+          <template slot="expand" slot-scope="props">
+              <v-card flat color="blue lighten-5" class="elevation-0">
+                <v-card-text>
+                  <p>Req Date: <strong>{{ props.item.reqDate }}</strong></p>
+                  <p>Due Date: <strong>{{ props.item.dueDate }}</strong></p>
+                </v-card-text>
+              </v-card>
           </template>
         </v-data-table>
       </v-card>
     </v-dialog>
+    <v-snackbar
+      :timeout="timeout"
+      :color="snackbarColor"
+      :top="y === 'top'"
+      :bottom="y === 'bottom'"
+      :right="x === 'right'"
+      :left="x === 'left'"
+      :multi-line="mode === 'multi-line'"
+      :vertical="mode === 'vertical'"
+      v-model="snackbar"
+      >
+      {{ snackbarMsg }}
+      <v-btn flat @click.native="snackbar = false">Close</v-btn>
+    </v-snackbar>
     <loading-progress></loading-progress>
   </v-container>
 </template>
@@ -271,6 +297,7 @@ export default {
         { text: 'P/N', left: true, value: 'pn' },
         { text: 'PRI', left: true, value: 'priority' },
         { text: 'STATUS', left: true, value: 'status' },
+        { text: 'EST DATE', left: true, value: 'estDate' },
         { text: 'NOTE', left: true, value: 'note' }
       ],
       itemIndex: -1,
@@ -310,7 +337,14 @@ export default {
       dialogOrder: false,
       dialogSpare: false,
       selectedZone: '',
-      search: ''
+      search: '',
+      snackbarMsg: '',
+      snackbarColor: 'blue',
+      snackbar: false,
+      y: 'top',
+      x: null,
+      mode: '',
+      timeout: 2000
     }
   },
   watch: {
@@ -345,9 +379,15 @@ export default {
         firebase.database().ref('nrcs/' + this.checkId + '/' + this.itemIndex).update(this.editedNRC).then(
           (data) => {
             // this.dialogEditNRC = false
+            this.snackbarMsg = 'Edit Success'
+            this.snackbarColor = 'success'
+            this.snackbar = true
           },
           (error) => {
             console.log(error)
+            this.snackbarMsg = 'Edit Fail'
+            this.snackbarColor = 'error'
+            this.snackbar = true
           }
         )
       }
@@ -389,6 +429,7 @@ export default {
       this.editedNRC = Object.assign({}, item)
       this.newOrder.priority = this.editedNRC.priority
       this.newOrder.status = 'notYet'
+      this.newOrder.estDate = 'NIL'
       this.dialogOrder = true
     },
     saveOrderSpare() {
@@ -402,9 +443,15 @@ export default {
         firebase.database().ref().update(updates).then(
           (data) => {
             // console.log(data.val())
+            this.snackbarMsg = 'Order Success'
+            this.snackbarColor = 'success'
+            this.snackbar = true
           },
           (error) => {
             console.log(error)
+            this.snackbarMsg = 'Order Fail'
+            this.snackbarColor = 'error'
+            this.snackbar = true
           }
         )
       }

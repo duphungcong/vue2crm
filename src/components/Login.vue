@@ -5,7 +5,7 @@
         <h1> &nbsp;</h1>
         <v-card>
             <v-card-title  class="blue darken-1">
-              <h4 style="color:white">Log In</h4>
+              <h4 class="white--text">Log In</h4>
             </v-card-title>
             <v-card-text>
                 <form @submit.prevent="onLogin">
