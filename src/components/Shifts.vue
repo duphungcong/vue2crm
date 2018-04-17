@@ -17,20 +17,6 @@
           @change="updateStatus($event, shift)"></shift>
       </v-flex>
     </v-layout>
-    <v-snackbar
-      :timeout="timeout"
-      color="info"
-      :top="y === 'top'"
-      :bottom="y === 'bottom'"
-      :right="x === 'right'"
-      :left="x === 'left'"
-      :multi-line="mode === 'multi-line'"
-      :vertical="mode === 'vertical'"
-      v-model="snackbar"
-    >
-      {{ msg }}
-      <v-btn flat  @click.native="snackbar = false">Close</v-btn>
-    </v-snackbar>
   </v-container>
 </template>
 
@@ -44,13 +30,7 @@ export default {
   data () {
     return {
       checkId: null,
-      check: {},
-      msg: '',
-      snackbar: false,
-      y: 'top',
-      x: null,
-      mode: '',
-      timeout: 3000
+      check: {}
     }
   },
   computed: {
@@ -84,15 +64,14 @@ export default {
       return date.toDateString()
     },
     update() {
+      const rootComponent = this.appUtil.getRootComponent(this)
       firebase.database().ref('checks/' + this.checkId + '/shifts').set(this.check.shifts).then(
         (data) => {
-          this.msg = 'Shifts updated!'
-          this.snackbar = true
+          rootComponent.openSnackbar('Success', 'success')
         },
         (error) => {
-          console.log(error)
-          this.msg = error
-          this.snackbar = true
+          // console.log(error)
+          rootComponent.openSnackbar(error, 'error')
         }
       )
     }

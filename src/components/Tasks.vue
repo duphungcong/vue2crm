@@ -366,15 +366,18 @@ export default {
       this.editedItem = Object.assign({}, item)
       this.editedItem.zoneDivision = zone + ' from ' + this.editedItem.zoneDivision
       if (this.itemIndex > -1) {
+        const rootComponent = this.appUtil.getRootComponent(this)
         firebase.database().ref('/workpacks/' + this.checkId + '/' + this.itemIndex).update(this.editedItem).then(
           (data) => {
             // console.log(data)
+            rootComponent.openSnackbar('Success', 'success')
             Object.assign(this.workpack[this.itemIndex], this.editedItem)
             this.editedItem = {}
             this.showTab()
           },
           (error) => {
-            console.log(error)
+            // console.log(error)
+            rootComponent.openSnackbar(error, 'error')
             this.editedItem = {}
           }
         )
@@ -431,13 +434,16 @@ export default {
     saveDeleteTask() {
       this.editedItem.zoneDivision = 'REMOVED ' + this.editedItem.zoneDivision
       if (this.itemIndex > -1) {
+        const rootComponent = this.appUtil.getRootComponent(this)
         firebase.database().ref('/workpacks/' + this.checkId + '/' + this.itemIndex).update(this.editedItem).then(
           (data) => {
+            rootComponent.openSnackbar('Deleted', 'error')
             Object.assign(this.workpack[this.itemIndex], this.editedItem)
             this.showTab()
           },
           (error) => {
-            console.log(error)
+            // console.log(error)
+            rootComponent.openSnackbar(error, 'error')
           }
         )
       }
@@ -445,13 +451,16 @@ export default {
     },
     saveEditTask() {
       if (this.itemIndex > -1) {
+        const rootComponent = this.appUtil.getRootComponent(this)
         firebase.database().ref('/workpacks/' + this.checkId + '/' + this.itemIndex).update(this.editedItem).then(
           (data) => {
+            rootComponent.openSnackbar('Success', 'success')
             Object.assign(this.workpack[this.itemIndex], this.editedItem)
             this.showTab()
           },
           (error) => {
-            console.log(error)
+            // console.log(error)
+            rootComponent.openSnackbar(error, 'error')
             this.closeEditTask()
           }
         )

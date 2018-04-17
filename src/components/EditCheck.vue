@@ -120,7 +120,7 @@
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn color="blue darken-1" flat @click.native="closeLinkItem()">Cancel</v-btn>
-          <v-btn color="blue darken-1" flat @click.native="saveLinkItem()">Save</v-btn>
+          <v-btn color="blue darken-1" flat @click.native="saveLinkItem()" :disabled="linkedItem.name === undefined">Save</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -257,7 +257,7 @@ export default {
     },
     editItem(item) {
       this.itemIndex = this.workpackBeforeFilter.indexOf(item)
-      console.log(this.itemIndex)
+      // console.log(this.itemIndex)
       this.editedItem = Object.assign({}, item)
       this.dialogEditItem = true
     },
@@ -270,6 +270,7 @@ export default {
     },
     saveEditItem() {
       if (this.itemIndex > -1) {
+        const rootComponent = this.appUtil.getRootComponent(this)
         let editedProps = {
           amsMH: this.editedItem.amsMH,
           macMH: this.editedItem.macMH,
@@ -289,10 +290,12 @@ export default {
           updates['/workpacks/' + this.checkId + '/' + this.itemIndex] = this.editedItem
           firebase.database().ref().update(updates).then(
             (data) => {
+              rootComponent.openSnackbar('Success', 'success')
               Object.assign(this.workpackBeforeFilter[this.itemIndex], editedProps)
             },
             (error) => {
-              console.log(error)
+              // console.log(error)
+              rootComponent.openSnackbar(error, 'error')
           })
         } else {
           // console.log('new')
@@ -302,15 +305,18 @@ export default {
               this.editedItem.taskId = data.key
             },
             (error) => {
-              console.log(error)
+              // console.log(error)
+              rootComponent.openSnackbar(error, 'error')
             }
           )
           firebase.database().ref('workpacks/' + this.checkId + '/' + this.itemIndex).set(this.editedItem).then(
             (data) => {
+              rootComponent.openSnackbar('Success', 'success')
               Object.assign(this.workpackBeforeFilter[this.itemIndex], this.editedItem)
             },
             (error) => {
-              console.log(error)
+              // console.log(error)
+              rootComponent.openSnackbar(error, 'error')
             }
           )
         }
@@ -333,7 +339,8 @@ export default {
       }, 300)
     },
     saveLinkItem() {
-      if (this.itemIndex > -1) {
+      if (this.itemIndex > -1 && this.linkedItem.name !== undefined) {
+        const rootComponent = this.appUtil.getRootComponent(this)
         let editedProps = {
           amsMH: this.linkedItem.amsMH,
           macMH: this.linkedItem.macMH,
@@ -347,11 +354,13 @@ export default {
         updates['/workpacks/' + this.checkId + '/' + this.itemIndex] = Object.assign({}, this.editedItem, editedProps, { taskId: this.linkedItem.id })
         firebase.database().ref().update(updates).then(
           (data) => {
+            rootComponent.openSnackbar('Success', 'success')
             editedProps.taskId = this.linkedItem.id
             Object.assign(this.workpackBeforeFilter[this.itemIndex], editedProps)
           },
           (error) => {
-            console.log(error)
+            // console.log(error)
+            rootComponent.openSnackbar(error, 'error')
           }
         )
       }

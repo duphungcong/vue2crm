@@ -44,12 +44,11 @@
     <loading-progress></loading-progress>
     <v-dialog v-model="dialogDelete" persistent max-width="290">
       <v-card>
-        <v-card-title class="headline">Delete this check?</v-card-title>
-        <v-card-text>You can not roll back</v-card-text>
+        <v-card-title>Do you want to delete the check?</v-card-title>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="green darken-1" flat @click.native="dialogDelete = false, deletedCheckId = ''">No</v-btn>
-          <v-btn color="red darken-1" flat @click.native="dialogDelete =  false, deleteCheck(deletedCheckId)">Delete</v-btn>
+          <v-btn color="blue" flat @click.native="dialogDelete = false, deletedCheckId = ''">No</v-btn>
+          <v-btn color="red" flat @click.native="dialogDelete =  false, deleteCheck(deletedCheckId)">Delete</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>

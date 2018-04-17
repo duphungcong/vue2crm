@@ -5,6 +5,7 @@ import Vuetify from 'vuetify'
 import App from './App'
 import router from './router'
 import store from './store'
+import appUtil from './utils/app'
 import firebase from 'firebase'
 
 import VueProgressBar from 'vue-progressbar'
@@ -41,6 +42,7 @@ Vue.component('loading-progress', LoadingProgress)
 Vue.use(VueBarcodeScanner, barcodeOptions)
 
 window.Store = store
+Vue.prototype.appUtil = appUtil
 
 // Initialize Firebase
 let config = {

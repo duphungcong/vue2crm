@@ -240,20 +240,6 @@
         </v-data-table>
       </v-card>
     </v-dialog>
-    <v-snackbar
-      :timeout="timeout"
-      :color="snackbarColor"
-      :top="y === 'top'"
-      :bottom="y === 'bottom'"
-      :right="x === 'right'"
-      :left="x === 'left'"
-      :multi-line="mode === 'multi-line'"
-      :vertical="mode === 'vertical'"
-      v-model="snackbar"
-      >
-      {{ snackbarMsg }}
-      <v-btn flat @click.native="snackbar = false">Close</v-btn>
-    </v-snackbar>
     <loading-progress></loading-progress>
   </v-container>
 </template>
@@ -337,14 +323,7 @@ export default {
       dialogOrder: false,
       dialogSpare: false,
       selectedZone: '',
-      search: '',
-      snackbarMsg: '',
-      snackbarColor: 'blue',
-      snackbar: false,
-      y: 'top',
-      x: null,
-      mode: '',
-      timeout: 2000
+      search: ''
     }
   },
   watch: {
@@ -376,18 +355,15 @@ export default {
     },
     saveEditedNRC() {
       if (this.itemIndex > -1) {
+        const rootComponent = this.appUtil.getRootComponent(this)
         firebase.database().ref('nrcs/' + this.checkId + '/' + this.itemIndex).update(this.editedNRC).then(
           (data) => {
             // this.dialogEditNRC = false
-            this.snackbarMsg = 'Edit Success'
-            this.snackbarColor = 'success'
-            this.snackbar = true
+            rootComponent.openSnackbar('Success', 'success')
           },
           (error) => {
-            console.log(error)
-            this.snackbarMsg = 'Edit Fail'
-            this.snackbarColor = 'error'
-            this.snackbar = true
+            // console.log(error)
+            rootComponent.openSnackbar(error, 'error')
           }
         )
       }
@@ -434,6 +410,7 @@ export default {
     },
     saveOrderSpare() {
       if (this.itemIndex > -1) {
+        const rootComponent = this.appUtil.getRootComponent(this)
         console.log(this.itemIndex)
         this.editedNRC.spares = 'order'
         let newSpareKey = firebase.database().ref('spares/' + this.checkId + '/' + this.itemIndex).push().key
@@ -443,15 +420,11 @@ export default {
         firebase.database().ref().update(updates).then(
           (data) => {
             // console.log(data.val())
-            this.snackbarMsg = 'Order Success'
-            this.snackbarColor = 'success'
-            this.snackbar = true
+            rootComponent.openSnackbar('Success', 'success')
           },
           (error) => {
-            console.log(error)
-            this.snackbarMsg = 'Order Fail'
-            this.snackbarColor = 'error'
-            this.snackbar = true
+            // console.log(error)
+            rootComponent.openSnackbar(error, 'error')
           }
         )
       }

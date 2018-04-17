@@ -269,6 +269,7 @@ export default {
   name: 'App',
   data () {
     return {
+      isRootComponent: true,
       drawer: null,
       menuItem: '',
       followingItems: [
@@ -336,12 +337,12 @@ export default {
         status: 'notYet'
       },
       snackbarMsg: '',
-      snackbarColor: 'blue',
+      snackbarColor: 'info',
       snackbar: false,
       y: 'top',
       x: null,
       mode: '',
-      timeout: 2000
+      timeout: 1000
     }
   },
   props: {
@@ -419,6 +420,11 @@ export default {
     clickMenu (item) {
       this.menuItem = item.text
       this.$router.push({ name: item.link })
+    },
+    openSnackbar(message, status) {
+      this.snackbarMsg = message
+      this.snackbarColor = status
+      this.snackbar = true
     },
     onLogOut () {
       this.$store.dispatch('logOut')
