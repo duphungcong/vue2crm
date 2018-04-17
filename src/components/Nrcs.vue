@@ -287,34 +287,10 @@ export default {
         { text: 'NOTE', left: true, value: 'note' }
       ],
       itemIndex: -1,
-      zoneSelection: [
-        'N/A',
-        '100-200-800',
-        '300-400',
-        '500-600-700',
-        'AVIONIC',
-        'STRUCTURE',
-        'CABIN',
-        'CLEANING'
-      ],
-      prioritySelection: [
-        'AOG',
-        'critical',
-        'normal'
-      ],
-      nrcStatusSelection: [
-        'notYet',
-        'inProgress',
-        'done',
-        'out',
-        'ready',
-        'cancel'
-      ],
-      spareStatusSelection: [
-        'notYet',
-        'avail',
-        'issued'
-      ],
+      zoneSelection: this.constUtil.zoneSelection,
+      prioritySelection: this.constUtil.prioritySelection,
+      nrcStatusSelection: this.constUtil.nrcStatusSelection,
+      spareStatusSelection: this.constUtil.spareStatusSelection,
       editedNRC: {},
       newOrder: {},
       spares: [],

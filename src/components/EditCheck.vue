@@ -79,8 +79,8 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="blue darken-1" flat @click.native="closeEditItem()">Cancel</v-btn>
-          <v-btn color="blue darken-1" flat @click.native="saveEditItem()">Save</v-btn>
+          <v-btn color="blue" flat @click.native="closeEditItem()">Cancel</v-btn>
+          <v-btn color="blue" flat @click.native="saveEditItem()">Save</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -119,8 +119,8 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="blue darken-1" flat @click.native="closeLinkItem()">Cancel</v-btn>
-          <v-btn color="blue darken-1" flat @click.native="saveLinkItem()" :disabled="linkedItem.name === undefined">Save</v-btn>
+          <v-btn color="blue" flat @click.native="closeLinkItem()">Cancel</v-btn>
+          <v-btn color="blue" flat @click.native="saveLinkItem()" :disabled="linkedItem.name === undefined">Save</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -174,16 +174,7 @@ export default {
       linkedItem: {},
       dialogEditItem: false,
       dialogLinkItem: false,
-      zoneSelection: [
-        'N/A',
-        '100-200-800',
-        '300-400',
-        '500-600-700',
-        'AVIONIC',
-        'STRUCTURE',
-        'CABIN',
-        'CLEANING'
-      ],
+      zoneSelection: this.constUtil.zoneSelection,
       selectedZone: '',
       search: ''
     }

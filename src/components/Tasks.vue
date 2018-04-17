@@ -242,23 +242,10 @@ export default {
       dialogEdit: false,
       dialogSelectShift: false,
       dialogLog: false,
-      zoneSelection: [
-        '100-200-800',
-        '300-400',
-        '500-600-700',
-        'AVIONIC',
-        'STRUCTURE',
-        'CABIN',
-        'CLEANING'
-      ],
+      zoneSelection: this.constUtil.zoneSelection,
       taskLogs: [],
       logLoading: false,
-      taskStatus: [
-        'done',
-        'inProgress',
-        'notYet',
-        'out'
-      ],
+      taskStatus: this.constUtil.taskStatus,
       selectedShift: null,
       selectedStatus: []
     }
