@@ -19,6 +19,7 @@
     </v-layout>
     <v-snackbar
       :timeout="timeout"
+      color="info"
       :top="y === 'top'"
       :bottom="y === 'bottom'"
       :right="x === 'right'"
@@ -28,7 +29,7 @@
       v-model="snackbar"
     >
       {{ msg }}
-      <v-btn flat color="pink" @click.native="snackbar = false">Close</v-btn>
+      <v-btn flat  @click.native="snackbar = false">Close</v-btn>
     </v-snackbar>
   </v-container>
 </template>
@@ -49,7 +50,7 @@ export default {
       y: 'top',
       x: null,
       mode: '',
-      timeout: 6000
+      timeout: 3000
     }
   },
   computed: {

@@ -34,6 +34,20 @@
           </v-card-text>
         </v-card>
       </v-flex>
+      <v-snackbar
+      :timeout="timeout"
+      color="error"
+      :top="y === 'top'"
+      :bottom="y === 'bottom'"
+      :right="x === 'right'"
+      :left="x === 'left'"
+      :multi-line="mode === 'multi-line'"
+      :vertical="mode === 'vertical'"
+      v-model="snackbar"
+      >
+      {{ msg }}
+      <v-btn flat @click.native="snackbar = false">Close</v-btn>
+    </v-snackbar>
     </v-layout>
   </v-container>
 </template>
@@ -43,7 +57,13 @@ export default {
   data () {
     return {
       email: '',
-      password: ''
+      password: '',
+      msg: '',
+      snackbar: false,
+      y: 'top',
+      x: null,
+      mode: '',
+      timeout: 3000
     }
   },
   computed: {
@@ -52,6 +72,12 @@ export default {
     },
     loading () {
       return this.$store.getters.loading
+    }
+  },
+  watch: {
+    error (value) {
+      this.msg = value.message
+      this.snackbar = true
     }
   },
   methods: {
