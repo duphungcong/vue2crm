@@ -209,43 +209,6 @@ export default {
     }
   },
   methods: {
-    loadCheck() {
-      firebase.database().ref('checks').child(this.checkId).once('value').then(
-        (data) => {
-          this.check = data.val()
-        },
-        (error) => {
-          console.log(error)
-        }
-      )
-    },
-    loadWorkPack() {
-      this.$store.dispatch('beginLoading')
-      firebase.database().ref('workpacks').child(this.checkId).once('value').then(
-        (data) => {
-          this.workpackBeforeFilter = data.val()
-          this.workpack = this.workpackBeforeFilter
-          this.$store.dispatch('endLoading')
-        },
-        (error) => {
-          console.log(error)
-          this.$store.dispatch('endLoading')
-        }
-      )
-    },
-    getEOList() {
-      firebase.database().ref('eo').once('value').then(
-        (data) => {
-          const obj = data.val()
-          for (let key in obj) {
-            this.eoList.push(Object.assign({}, obj[key], { id: key }))
-          }
-        },
-        (error) => {
-          console.log(error)
-        }
-      )
-    },
     editItem(item) {
       this.itemIndex = this.workpackBeforeFilter.indexOf(item)
       // console.log(this.itemIndex)
@@ -357,6 +320,45 @@ export default {
       }
       this.closeLinkItem()
     },
+    loadCheck() {
+      firebase.database().ref('checks').child(this.checkId).once('value').then(
+        (data) => {
+          this.check = data.val()
+        },
+        (error) => {
+          console.log(error)
+        }
+      )
+    },
+    loadWorkPack() {
+      this.$store.dispatch('beginLoading')
+      firebase.database().ref('workpacks').child(this.checkId).once('value').then(
+        (data) => {
+          this.workpackBeforeFilter = data.val()
+          this.workpack = this.workpackBeforeFilter
+          this.$store.dispatch('endLoading')
+        },
+        (error) => {
+          console.log(error)
+          this.$store.dispatch('endLoading')
+        }
+      )
+    },
+    loadEO() {
+      firebase.database().ref('eo').on('value',
+        (data) => {
+          this.eoList = []
+          const obj = data.val()
+          for (let key in obj) {
+            obj[key].id = key
+            this.eoList.push(obj[key])
+          }
+        },
+        (error) => {
+          console.log(error)
+        }
+      )
+    },
     addEO(e) {
       let found = this.eoList.find((item) => {
         return item['name'] === e.target.value
@@ -371,11 +373,9 @@ export default {
           zoneDivision: 'N/A',
           remarks: 'NIL'
         }
-        this.eoList.push(newEO)
+        // this.eoList.push(newEO)
         firebase.database().ref('eo').push(newEO).then(
-          (data) => {
-            this.eoList[this.eoList.length - 1].id = data.key
-          },
+          (data) => {},
           (error) => {
             console.log(error)
           }
@@ -417,7 +417,7 @@ export default {
     this.checkId = this.$route.params.id
     this.loadCheck()
     this.loadWorkPack()
-    this.getEOList()
+    this.loadEO()
   }
 }
 </script>
