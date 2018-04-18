@@ -1,5 +1,5 @@
 <template>
-  <v-container fluid grid-list-md>
+  <v-container fluid grid-list-sm>
     <v-flex sx12>
       <v-card>
         <v-card-actions>
