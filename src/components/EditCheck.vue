@@ -186,26 +186,7 @@ export default {
       }
     },
     selectedZone (newVal, oldVal) {
-      if (newVal === null) {
-        this.workpack = this.workpackBeforeFilter
-        return
-      }
-
-      if (newVal === 'N/A') {
-        this.workpack = this.workpackBeforeFilter.filter(element =>
-          element.zoneDivision.indexOf('100-200-800') === -1 &&
-          element.zoneDivision.indexOf('300-400') === -1 &&
-          element.zoneDivision.indexOf('500-600-700') === -1 &&
-          element.zoneDivision.indexOf('AVI') === -1 &&
-          element.zoneDivision.indexOf('AVI') === -1 &&
-          element.zoneDivision.indexOf('STRUCTURE') === -1 &&
-          element.zoneDivision.indexOf('CAB') === -1 &&
-          element.zoneDivision.indexOf('CLEANING') === -1)
-          return
-      }
-
-      console.log(newVal)
-      this.workpack = this.workpackBeforeFilter.filter(element => element.zoneDivision.indexOf(newVal) === 0)
+      this.filterByZone(newVal)
     }
   },
   methods: {
@@ -245,7 +226,6 @@ export default {
           firebase.database().ref().update(updates).then(
             (data) => {
               rootComponent.openSnackbar('Success', 'success')
-              Object.assign(this.workpackBeforeFilter[this.itemIndex], editedProps)
             },
             (error) => {
               // console.log(error)
@@ -253,20 +233,14 @@ export default {
           })
         } else {
           // console.log('new')
-          firebase.database().ref('ams' + this.check.aircraft.type).push(editedProps).then(
-            (data) => {
-              // console.log(data.key)
-              this.editedItem.taskId = data.key
-            },
-            (error) => {
-              // console.log(error)
-              rootComponent.openSnackbar(error, 'error')
-            }
-          )
-          firebase.database().ref('workpacks/' + this.checkId + '/' + this.itemIndex).set(this.editedItem).then(
+          let newAmsTaskKey = firebase.database().ref('ams' + this.check.aircraft.type).push().key
+          this.editedItem.taskId = newAmsTaskKey
+          let updates = {}
+          updates['/ams' + this.check.aircraft.type + '/' + newAmsTaskKey] = editedProps
+          updates['/workpacks/' + this.checkId + '/' + this.itemIndex] = this.editedItem
+          firebase.database().ref().update(updates).then(
             (data) => {
               rootComponent.openSnackbar('Success', 'success')
-              Object.assign(this.workpackBeforeFilter[this.itemIndex], this.editedItem)
             },
             (error) => {
               // console.log(error)
@@ -309,8 +283,6 @@ export default {
         firebase.database().ref().update(updates).then(
           (data) => {
             rootComponent.openSnackbar('Success', 'success')
-            editedProps.taskId = this.linkedItem.id
-            Object.assign(this.workpackBeforeFilter[this.itemIndex], editedProps)
           },
           (error) => {
             // console.log(error)
@@ -319,6 +291,28 @@ export default {
         )
       }
       this.closeLinkItem()
+    },
+    filterByZone(zone) {
+      if (zone === null) {
+        this.workpack = this.workpackBeforeFilter
+        return
+      }
+
+      if (zone === 'N/A') {
+        this.workpack = this.workpackBeforeFilter.filter(element =>
+          element.zoneDivision.indexOf('100-200-800') === -1 &&
+          element.zoneDivision.indexOf('300-400') === -1 &&
+          element.zoneDivision.indexOf('500-600-700') === -1 &&
+          element.zoneDivision.indexOf('AVI') === -1 &&
+          element.zoneDivision.indexOf('AVI') === -1 &&
+          element.zoneDivision.indexOf('STRUCTURE') === -1 &&
+          element.zoneDivision.indexOf('CAB') === -1 &&
+          element.zoneDivision.indexOf('CLEANING') === -1)
+          return
+      }
+
+      console.log(zone)
+      this.workpack = this.workpackBeforeFilter.filter(element => element.zoneDivision.indexOf(zone) === 0)
     },
     loadCheck() {
       firebase.database().ref('checks').child(this.checkId).once('value').then(
@@ -332,10 +326,11 @@ export default {
     },
     loadWorkPack() {
       this.$store.dispatch('beginLoading')
-      firebase.database().ref('workpacks').child(this.checkId).once('value').then(
+      firebase.database().ref('workpacks/' + this.checkId).on('value',
         (data) => {
           this.workpackBeforeFilter = data.val()
           this.workpack = this.workpackBeforeFilter
+          this.filterByZone(this.selectedZone)
           this.$store.dispatch('endLoading')
         },
         (error) => {
@@ -373,7 +368,6 @@ export default {
           zoneDivision: 'N/A',
           remarks: 'NIL'
         }
-        // this.eoList.push(newEO)
         firebase.database().ref('eo').push(newEO).then(
           (data) => {},
           (error) => {
