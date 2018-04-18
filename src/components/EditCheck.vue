@@ -186,7 +186,7 @@ export default {
       }
     },
     selectedZone (newVal, oldVal) {
-      this.filterByZone(newVal)
+      this.filterTask(newVal)
     }
   },
   methods: {
@@ -292,7 +292,7 @@ export default {
       }
       this.closeLinkItem()
     },
-    filterByZone(zone) {
+    filterTask(zone) {
       if (zone === null) {
         this.workpack = this.workpackBeforeFilter
         return
@@ -330,7 +330,7 @@ export default {
         (data) => {
           this.workpackBeforeFilter = data.val()
           this.workpack = this.workpackBeforeFilter
-          this.filterByZone(this.selectedZone)
+          this.filterTask(this.selectedZone)
           this.$store.dispatch('endLoading')
         },
         (error) => {

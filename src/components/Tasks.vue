@@ -202,6 +202,7 @@ export default {
       check: {
         shifts: []
       },
+      firstLoad: true,
       workpack: [],
       workpackByTab: [],
       workpackByTabBeforeFilter: [],
@@ -261,6 +262,9 @@ export default {
   watch: {
     tabs (newValue, oldValue) {
       this.showTab()
+      this.search = ''
+      this.selectedShift = null
+      this.selectedStatus = []
     },
     dialogLog (newValue, oldValue) {
       if (newValue === false) {
@@ -277,65 +281,6 @@ export default {
     }
   },
   methods: {
-    loadCheck() {
-      firebase.database().ref('checks').child(this.checkId).once('value').then(
-        (data) => {
-          this.check = data.val()
-        },
-        (error) => {
-          console.log(error)
-        }
-      )
-    },
-    loadWorkpack() {
-      this.$store.dispatch('beginLoading')
-      firebase.database().ref('workpacks').child(this.checkId).once('value').then(
-        (data) => {
-          this.workpack = data.val()
-          this.showTab()
-          this.$store.dispatch('endLoading')
-        },
-        (error) => {
-          console.log(error)
-          this.$store.dispatch('endLoading')
-        }
-      )
-    },
-    showTab() {
-      // console.log(this.tabs)
-      this.search = ''
-      this.selectedShift = null
-      this.selectedStatus = []
-      const zoneByTab = (tab) => ({
-        'tab-1': '100-200-800',
-        'tab-2': '300-400',
-        'tab-3': '500-600-700',
-        'tab-4': 'AVI',
-        'tab-5': 'STRUCTURE',
-        'tab-6': 'CABIN',
-        'tab-7': 'CLEANING',
-        'tab-8': 'N/A',
-        'tab-9': 'REMOVED'
-      })[tab]
-      this.$store.dispatch('beginLoading')
-      if (zoneByTab(this.tabs) === 'N/A') {
-        this.workpackByTab = this.workpack.filter(element =>
-          element.zoneDivision.indexOf('100-200-800') === -1 &&
-          element.zoneDivision.indexOf('300-400') === -1 &&
-          element.zoneDivision.indexOf('500-600-700') === -1 &&
-          element.zoneDivision.indexOf('AVI') === -1 &&
-          element.zoneDivision.indexOf('STRUCTURE') === -1 &&
-          element.zoneDivision.indexOf('CAB') === -1 &&
-          element.zoneDivision.indexOf('CLEANING') === -1)
-        this.workpackByTabBeforeFilter = this.workpackByTab
-        this.$store.dispatch('endLoading')
-        return
-      } else {
-        this.workpackByTab = this.workpack.filter(task => task.zoneDivision.indexOf(zoneByTab(this.tabs)) === 0)
-        this.workpackByTabBeforeFilter = this.workpackByTab
-        this.$store.dispatch('endLoading')
-      }
-    },
     deleteTask(item) {
       this.itemIndex = this.workpack.indexOf(item)
       // console.log(this.itemIndex)
@@ -357,11 +302,8 @@ export default {
         const rootComponent = this.appUtil.getRootComponent(this)
         firebase.database().ref('/workpacks/' + this.checkId + '/' + this.itemIndex).update(this.editedItem).then(
           (data) => {
-            // console.log(data)
             rootComponent.openSnackbar('Success', 'success')
-            Object.assign(this.workpack[this.itemIndex], this.editedItem)
             this.editedItem = {}
-            this.showTab()
           },
           (error) => {
             // console.log(error)
@@ -426,8 +368,6 @@ export default {
         firebase.database().ref('/workpacks/' + this.checkId + '/' + this.itemIndex).update(this.editedItem).then(
           (data) => {
             rootComponent.openSnackbar('Deleted', 'error')
-            Object.assign(this.workpack[this.itemIndex], this.editedItem)
-            this.showTab()
           },
           (error) => {
             // console.log(error)
@@ -443,8 +383,6 @@ export default {
         firebase.database().ref('/workpacks/' + this.checkId + '/' + this.itemIndex).update(this.editedItem).then(
           (data) => {
             rootComponent.openSnackbar('Success', 'success')
-            Object.assign(this.workpack[this.itemIndex], this.editedItem)
-            this.showTab()
           },
           (error) => {
             // console.log(error)
@@ -461,9 +399,7 @@ export default {
       })
       if (this.itemIndex > -1) {
         firebase.database().ref('/workpacks/' + this.checkId + '/' + this.itemIndex).update(this.editedItem).then(
-          (data) => {
-            Object.assign(this.workpack[this.itemIndex], this.editedItem)
-          },
+          (data) => {},
           (error) => {
             console.log(error)
           }
@@ -542,6 +478,64 @@ export default {
         if (byShift !== null && byShift !== undefined) {
             this.workpackByTab = this.workpackByTab.filter(filterByShift)
         }
+      }
+    },
+    loadCheck() {
+      firebase.database().ref('checks').child(this.checkId).once('value').then(
+        (data) => {
+          this.check = data.val()
+        },
+        (error) => {
+          console.log(error)
+        }
+      )
+    },
+    loadWorkpack() {
+      this.$store.dispatch('beginLoading')
+      firebase.database().ref('workpacks/' + this.checkId).on('value',
+        (data) => {
+          this.workpack = data.val()
+          this.showTab()
+          // console.log(this.firstLoad)
+          if (!this.firstLoad) {
+            this.filterTask(this.selectedShift, this.selectedStatus, true)
+          }
+          this.firstLoad = false
+          this.$store.dispatch('endLoading')
+        },
+        (error) => {
+          console.log(error)
+          this.$store.dispatch('endLoading')
+        }
+      )
+    },
+    showTab() {
+      const zoneByTab = (tab) => ({
+        'tab-1': '100-200-800',
+        'tab-2': '300-400',
+        'tab-3': '500-600-700',
+        'tab-4': 'AVI',
+        'tab-5': 'STRUCTURE',
+        'tab-6': 'CABIN',
+        'tab-7': 'CLEANING',
+        'tab-8': 'N/A',
+        'tab-9': 'REMOVED'
+      })[tab]
+      if (zoneByTab(this.tabs) === 'N/A') {
+        this.workpackByTab = this.workpack.filter(element =>
+          element.zoneDivision.indexOf('100-200-800') === -1 &&
+          element.zoneDivision.indexOf('300-400') === -1 &&
+          element.zoneDivision.indexOf('500-600-700') === -1 &&
+          element.zoneDivision.indexOf('AVI') === -1 &&
+          element.zoneDivision.indexOf('STRUCTURE') === -1 &&
+          element.zoneDivision.indexOf('CAB') === -1 &&
+          element.zoneDivision.indexOf('CLEANING') === -1)
+        this.workpackByTabBeforeFilter = this.workpackByTab
+        return
+      } else {
+        this.workpackByTab = this.workpack.filter(task => task.zoneDivision.indexOf(zoneByTab(this.tabs)) === 0)
+        this.workpackByTabBeforeFilter = this.workpackByTab
+        this.$store.dispatch('endLoading')
       }
     },
     exportTask() {
