@@ -96,8 +96,8 @@
             @click="add(item.value)">
             <v-list-tile-title class="text-xs-right pr-2">{{ item.title }}</v-list-tile-title>
             <v-list-tile-avatar>
-              <v-avatar size="32px" tile>
-                <img :src="`https://vuetifyjs.com/static/doc-images/bottom-sheets/${item.img}`" :alt="item.title">
+              <v-avatar size="32">
+                <v-icon color="blue">{{ item.icon }}</v-icon>
               </v-avatar>
             </v-list-tile-avatar>
           </v-list-tile>
@@ -333,9 +333,9 @@ export default {
       ],
       bottomSheet: false,
       bottomSheetTitles: [
-        { img: 'keep.png', title: 'New NRC', value: 'nrc' },
-        { img: 'inbox.png', title: 'New Order', value: 'order' },
-        { img: 'hangouts.png', title: 'Add Task', value: 'task' }
+        { icon: 'content_copy', title: 'New NRC', value: 'nrc' },
+        { icon: 'add_shopping_cart', title: 'New Order', value: 'order' },
+        { icon: 'content_paste', title: 'Add Task', value: 'task' }
       ],
       checkId: '',
       dialogAddNRC: false,
@@ -477,12 +477,10 @@ export default {
       // this.checkId = this.$store.getters.following
       this.bottomSheet = false
       if (this.checkId !== null && item === 'nrc') {
-        // this.loadNRC()
         this.newNRC = Object.assign({}, this.defaultNRC)
         this.dialogAddNRC = true
       }
       if (this.checkId !== null && item === 'order') {
-        // this.loadNRC()
         this.newOrder.status = 'notYet'
         this.newOrder.estDate = 'NIL'
         this.dialogOrder = true

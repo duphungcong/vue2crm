@@ -334,7 +334,6 @@ export default {
         const rootComponent = this.appUtil.getRootComponent(this)
         firebase.database().ref('nrcs/' + this.checkId + '/' + this.itemIndex).update(this.editedNRC).then(
           (data) => {
-            // this.dialogEditNRC = false
             rootComponent.openSnackbar('Success', 'success')
           },
           (error) => {
@@ -395,7 +394,6 @@ export default {
         updates['/spares/' + this.checkId + '/' + this.itemIndex + '/' + newSpareKey] = this.newOrder
         firebase.database().ref().update(updates).then(
           (data) => {
-            // console.log(data.val())
             rootComponent.openSnackbar('Success', 'success')
           },
           (error) => {
