@@ -25,7 +25,7 @@
                       <v-text-field name="password" v-model="password" label="password" value="Input text" type="password" class="input-group--focused"></v-text-field>
                     </v-flex>
                   </v-layout>
-                  <v-btn type="submit" :disabled="loading" :loading="loading">login</v-btn>
+                  <v-btn class="blue white--text" type="submit" :disabled="loading" :loading="loading">login</v-btn>
                 </form>
                 <br>
                 <v-layout row>
@@ -45,7 +45,7 @@
       :vertical="mode === 'vertical'"
       v-model="snackbar"
       >
-      {{ msg }}
+      {{ snackbarMsg }}
       <v-btn flat @click.native="snackbar = false">Close</v-btn>
     </v-snackbar>
     </v-layout>
@@ -58,12 +58,12 @@ export default {
     return {
       email: '',
       password: '',
-      msg: '',
+      snackbarMsg: '',
       snackbar: false,
       y: 'top',
       x: null,
       mode: '',
-      timeout: 3000
+      timeout: 2000
     }
   },
   computed: {
@@ -76,8 +76,10 @@ export default {
   },
   watch: {
     error (value) {
-      this.msg = value.message
-      this.snackbar = true
+      if (value !== null && value !== undefined) {
+        this.snackbarMsg = value.message
+        this.snackbar = true
+      }
     }
   },
   methods: {
