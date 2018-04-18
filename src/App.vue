@@ -257,7 +257,7 @@
             </v-layout>
             <v-layout row wrap align-baseline>
               <v-flex xs12>
-                <v-text-field label="WP Item (Ex: VN 00273556-12)" mask="VN ########-###" v-model="newTask.wpItem" @change="validateExist(newTask.wpItem)" autofocus></v-text-field>
+                <v-text-field label="WP Item (Ex: VN 00273556-12)" mask="VN ########-###" v-model="newTask.wpItem" @change="validateExist(newTask.wpItem)"></v-text-field>
               </v-flex>
               <v-flex xs12>
                 <v-alert type="error" v-model="existedAlert" transition="scale-transition">
@@ -353,7 +353,7 @@ export default {
       spareStatusSelection: this.constUtil.spareStatusSelection,
       defaultNRC: {
         number: 0,
-        wo: '00000000',
+        wo: '',
         ref: 'PI',
         zone: 'N/A',
         priority: '',
