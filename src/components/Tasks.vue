@@ -324,6 +324,7 @@ export default {
           element.zoneDivision.indexOf('300-400') === -1 &&
           element.zoneDivision.indexOf('500-600-700') === -1 &&
           element.zoneDivision.indexOf('AVI') === -1 &&
+          element.zoneDivision.indexOf('STRUCTURE') === -1 &&
           element.zoneDivision.indexOf('CAB') === -1 &&
           element.zoneDivision.indexOf('CLEANING') === -1)
         this.workpackByTabBeforeFilter = this.workpackByTab

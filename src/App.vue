@@ -252,6 +252,11 @@
           <v-card-text>
             <v-layout row wrap align-baseline>
               <v-flex xs12>
+                Task Number: {{ newTaskKey }}
+              </v-flex>
+            </v-layout>
+            <v-layout row wrap align-baseline>
+              <v-flex xs12>
                 <v-text-field label="WP Item (Ex: VN 00273556-12)" mask="VN ########-###" v-model="newTask.wpItem" @change="validateExist(newTask.wpItem)" autofocus></v-text-field>
               </v-flex>
               <v-flex xs12>
@@ -340,6 +345,7 @@ export default {
       newNRC: {},
       newOrder: {},
       newTask: {},
+      newTaskKey: null,
       orderNRC: {},
       zoneSelection: this.constUtil.zoneSelection,
       prioritySelection: this.constUtil.prioritySelection,
@@ -359,7 +365,10 @@ export default {
         wpItem: '',
         taskName: '',
         taskTitle: '',
-        zoneDivision: 'N/A'
+        zoneDivision: 'N/A',
+        shifts: [],
+        status: 'notYet',
+        notes: 'ADDITIONAL TASK'
       },
       snackbarMsg: '',
       snackbarColor: 'info',
@@ -368,7 +377,8 @@ export default {
       x: null,
       mode: '',
       timeout: 1000,
-      existedAlert: false
+      existedAlert: false,
+      currentShift: ''
     }
   },
   props: {
@@ -419,7 +429,12 @@ export default {
       return this.$store.getters.following !== null
     },
     following () {
-      return this.$store.getters.following
+      let following = this.$store.getters.following
+      if (following !== null) {
+        this.checkId = following
+        this.loadInitData()
+      }
+      return following
     }
   },
   watch: {
@@ -459,22 +474,22 @@ export default {
       this.$store.dispatch('stopFollowing')
     },
     add(item) {
-      this.checkId = this.$store.getters.following
+      // this.checkId = this.$store.getters.following
       this.bottomSheet = false
       if (this.checkId !== null && item === 'nrc') {
-        this.loadNRC()
+        // this.loadNRC()
         this.newNRC = Object.assign({}, this.defaultNRC)
         this.dialogAddNRC = true
       }
       if (this.checkId !== null && item === 'order') {
-        this.loadNRC()
+        // this.loadNRC()
         this.newOrder.status = 'notYet'
         this.newOrder.estDate = 'NIL'
         this.dialogOrder = true
       }
       if (this.checkId !== null && item === 'task') {
         this.newTask = Object.assign({}, this.defaultTask)
-        console.log(this.newTask)
+        // console.log(this.newTask)
         this.dialogAddTask = true
       }
     },
@@ -533,45 +548,44 @@ export default {
           )
         }
       }
-      if (item === 'task') {
-        console.log(this.newTask)
-        firebase.database().ref('workpacks/' + this.checkId).push(this.newTask).then(
+      if (item === 'task' && this.newTaskKey !== null) {
+        let wpItem = this.newTask.wpItem.substring(0, 10) + '-' + this.newTask.wpItem.substring(10)
+        let saveTask = Object.assign({}, this.newTask, { wpItem: wpItem })
+        // console.log(saveTask)
+        firebase.database().ref('workpacks/' + this.checkId + '/' + this.newTaskKey).set(saveTask).then(
           (data) => {
             this.openSnackbar('Success', 'success')
+            this.newTask = Object.assign({}, this.defaultTask)
+            this.existedAlert = false
           },
           (error) => {
             this.openSnackbar(error, 'error')
           }
         )
-        this.openSnackbar('Success', 'success')
       }
     },
     saveAndExit(item) {
       if (item === 'nrc') {
         this.save(item)
-        this.dialogAddNRC = false
+        this.close('nrc')
       }
       if (item === 'order') {
         this.save(item)
-        this.dialogOrder = false
+        this.close('order')
       }
       if (item === 'task') {
         this.save(item)
-        this.dialogAddTask = false
+        this.close('task')
       }
     },
     validateExist(wpItem) {
       this.existedAlert = false
       wpItem = wpItem.substring(0, 10) + '-' + wpItem.substring(10)
-      console.log(wpItem)
       firebase.database().ref('workpacks/' + this.checkId).orderByChild('wpItem').equalTo(wpItem).limitToFirst(1).once('value').then(
         (data) => {
           const obj = data.val()
           if (obj !== null && obj !== undefined) {
             this.existedAlert = true
-            // setTimeout(() => {
-            //   this.existedAlert = false
-            // }, 3000)
           }
         },
         (error) => {
@@ -586,6 +600,36 @@ export default {
           this.nrcList = data.val() || []
           this.defaultNRC.number = this.nrcList.length + 1
           // console.log(this.nrcList)
+        },
+        (error) => {
+          console.log(error)
+        }
+      )
+    },
+    loadInitData() {
+      this.loadNRC()
+
+      firebase.database().ref('workpacks/' + this.checkId).orderByKey().limitToLast(1).on('child_added',
+          (data) => {
+            this.newTaskKey = Number.parseInt(data.key) + 1
+            // console.log(this.newTaskKey)
+          },
+          (error) => {
+            console.log(error)
+            this.newTaskKey = null
+          }
+        )
+
+      firebase.database().ref('checks/' + this.checkId + '/startDate').on('value',
+        (data) => {
+          let startDate = data.val()
+          let today = Date.now(7)
+          let start = new Date(startDate)
+          let diff = new Date(today - start)
+          this.currentShift = diff.getUTCDate()
+          // console.log(this.currentShift)
+          this.defaultTask.shifts = [ this.currentShift ]
+          // console.log(this.defaultTask)
         },
         (error) => {
           console.log(error)
