@@ -117,7 +117,7 @@
             </v-layout>
             <v-layout row wrap align-baseline>
               <v-flex xs6>
-                <v-text-field label="W/O" mask="########" counter="8" v-model="newNRC.wo"></v-text-field>
+                <v-text-field label="W/O (Ex: 23204567)" mask="########" v-model="newNRC.wo"></v-text-field>
               </v-flex>
               <v-flex xs1></v-flex>
               <v-flex xs5>
@@ -164,7 +164,7 @@
             </v-layout>
             <v-layout row wrap align-baseline>
               <v-flex xs6>
-                <v-text-field label="RQF" mask="AA  ########" counter="12" v-model="newOrder.number"></v-text-field>
+                <v-text-field label="RQF (Ex: HM  01145678)" mask="AA  ########" v-model="newOrder.number"></v-text-field>
               </v-flex>
               <v-flex xs1></v-flex>
               <v-flex xs5>
@@ -243,6 +243,47 @@
           </v-card-actions>
         </v-card>
       </v-dialog>
+
+      <v-dialog v-model="dialogAddTask" persistent max-width="600">
+        <v-card>
+          <v-card-title class="blue darken-1">
+            <h4 class="white--text">New Task</h4>
+          </v-card-title>
+          <v-card-text>
+            <v-layout row wrap align-baseline>
+              <v-flex xs12>
+                <v-text-field label="WP Item (Ex: VN 00273556-12)" mask="VN ########-###" v-model="newTask.wpItem" @change="validateExist(newTask.wpItem)" autofocus></v-text-field>
+              </v-flex>
+              <v-flex xs12>
+                <v-alert type="error" v-model="existedAlert" transition="scale-transition">
+                  This task is already existed!
+                </v-alert>
+              </v-flex>
+            </v-layout>
+            <v-layout row wrap align-baseline>
+              <v-flex xs6>
+                <v-text-field label="Task AMS / WO" v-model="newTask.taskName"></v-text-field>
+              </v-flex>
+              <v-flex xs1></v-flex>
+              <v-flex xs5>
+                <v-select label="Zone" :items="zoneSelection" v-model="newTask.zoneDivision"></v-select>
+              </v-flex>
+            </v-layout>
+            <v-layout row wrap align-baseline>
+              <v-flex xs12>
+                <v-text-field label="Title" v-model="newTask.taskTitle" multi-line rows="2"></v-text-field>
+              </v-flex>
+            </v-layout>
+          </v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn color="blue" flat @click.native="close('task')">Cancel</v-btn>
+            <v-btn color="blue" flat @click.native="save('task')">Save</v-btn>
+            <v-btn color="blue" flat @click.native="saveAndExit('task')">Save and Exit</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+
       <v-snackbar
         :timeout="timeout"
         :color="snackbarColor"
@@ -294,9 +335,11 @@ export default {
       checkId: '',
       dialogAddNRC: false,
       dialogOrder: false,
+      dialogAddTask: false,
       nrcList: [],
       newNRC: {},
       newOrder: {},
+      newTask: {},
       orderNRC: {},
       zoneSelection: this.constUtil.zoneSelection,
       prioritySelection: this.constUtil.prioritySelection,
@@ -312,13 +355,20 @@ export default {
         spares: '',
         status: 'notYet'
       },
+      defaultTask: {
+        wpItem: '',
+        taskName: '',
+        taskTitle: '',
+        zoneDivision: 'N/A'
+      },
       snackbarMsg: '',
       snackbarColor: 'info',
       snackbar: false,
       y: 'top',
       x: null,
       mode: '',
-      timeout: 1000
+      timeout: 1000,
+      existedAlert: false
     }
   },
   props: {
@@ -422,6 +472,11 @@ export default {
         this.newOrder.estDate = 'NIL'
         this.dialogOrder = true
       }
+      if (this.checkId !== null && item === 'task') {
+        this.newTask = Object.assign({}, this.defaultTask)
+        console.log(this.newTask)
+        this.dialogAddTask = true
+      }
     },
     close(item) {
       if (item === 'nrc') {
@@ -432,29 +487,30 @@ export default {
         this.newOrder = {}
         this.dialogOrder = false
       }
+      if (item === 'task') {
+        this.newTask = {}
+        this.dialogAddTask = false
+        this.existedAlert = false
+      }
     },
     save(item) {
       if (item === 'nrc') {
         firebase.database().ref('nrcs/' + this.checkId + '/' + this.nrcList.length).set(this.newNRC).then(
           (data) => {
             // console.log(this.nrcList)
-            this.snackbarMsg = 'Create Success'
-            this.snackbarColor = 'success'
-            this.snackbar = true
+            this.openSnackbar('Success', 'success')
             this.defaultNRC.number = this.nrcList.length + 1
             this.newNRC = Object.assign({}, this.defaultNRC)
           },
           (error) => {
-            console.log(error)
-            this.snackbarMsg = 'Create Fail'
-            this.snackbarColor = 'error'
-            this.snackbar = true
+            // console.log(error)
+            this.openSnackbar(error, 'error')
           }
         )
       }
       if (item === 'order') {
         let nrcIndex = this.nrcList.indexOf(this.orderNRC)
-        console.log(nrcIndex)
+        // console.log(nrcIndex)
         if (nrcIndex > -1) {
           let newSpareKey = firebase.database().ref('spares/' + this.checkId + '/' + nrcIndex).push().key
           let updates = {}
@@ -465,21 +521,29 @@ export default {
           updates['/spares/' + this.checkId + '/' + nrcIndex + '/' + newSpareKey] = this.newOrder
           firebase.database().ref().update(updates).then(
             (data) => {
-              this.snackbarMsg = 'Create Success'
-              this.snackbarColor = 'success'
-              this.snackbar = true
+              this.openSnackbar('Success', 'success')
               this.newOrder = {}
               this.newOrder.status = 'notYet'
               this.newOrder.estDate = 'NIL'
             },
             (error) => {
-              console.log(error)
-              this.snackbarMsg = 'Create Fail'
-              this.snackbarColor = 'error'
-              this.snackbar = true
+              // console.log(error)
+              this.openSnackbar(error, 'error')
             }
           )
         }
+      }
+      if (item === 'task') {
+        console.log(this.newTask)
+        firebase.database().ref('workpacks/' + this.checkId).push(this.newTask).then(
+          (data) => {
+            this.openSnackbar('Success', 'success')
+          },
+          (error) => {
+            this.openSnackbar(error, 'error')
+          }
+        )
+        this.openSnackbar('Success', 'success')
       }
     },
     saveAndExit(item) {
@@ -491,6 +555,29 @@ export default {
         this.save(item)
         this.dialogOrder = false
       }
+      if (item === 'task') {
+        this.save(item)
+        this.dialogAddTask = false
+      }
+    },
+    validateExist(wpItem) {
+      this.existedAlert = false
+      wpItem = wpItem.substring(0, 10) + '-' + wpItem.substring(10)
+      console.log(wpItem)
+      firebase.database().ref('workpacks/' + this.checkId).orderByChild('wpItem').equalTo(wpItem).limitToFirst(1).once('value').then(
+        (data) => {
+          const obj = data.val()
+          if (obj !== null && obj !== undefined) {
+            this.existedAlert = true
+            // setTimeout(() => {
+            //   this.existedAlert = false
+            // }, 3000)
+          }
+        },
+        (error) => {
+          console.log(error)
+        }
+      )
     },
     loadNRC() {
       // console.log(this.checkId)
