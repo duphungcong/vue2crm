@@ -63,7 +63,7 @@ export default {
       y: 'top',
       x: null,
       mode: '',
-      timeout: 2000
+      timeout: 3000
     }
   },
   computed: {
