@@ -22,12 +22,12 @@
         <v-data-table :headers="headerNRC" :items="nrcList" :pagination.sync="paginationNRC" :search="search" item-key="number">
           <template slot="items" slot-scope="props" class="body-0">
             <td class="body-0" @click="props.expanded = !props.expanded"><v-chip :class="statusColor(props.item.status)" label>{{ props.item.number }}</v-chip></td>
-            <!-- <td class="body-0" @click="props.expanded = !props.expanded">{{ props.item.number }}</td> -->
             <td class="body-0" @click="props.expanded = !props.expanded" :class="priorityColor(props.item.priority)">{{ props.item.priority }}</td>
             <td class="body-0">
               <v-btn v-if="props.item.spares !== undefined && props.item.spares !== ''" icon class="mx-0" @click.native="showSpare(props.item)">
                 <v-tooltip bottom>
-                  <v-icon color="grey darken-2" slot="activator">local_grocery_store</v-icon><span>spares</span>
+                  <v-icon color="blue" slot="activator" v-if="props.item.spares === 'ready'">local_grocery_store</v-icon>
+                  <v-icon color="grey darken-2" slot="activator" v-else>local_grocery_store</v-icon><span>spares</span>
                 </v-tooltip>
               </v-btn>
               <v-btn v-if="props.item.tars !== undefined && props.item.tars.length > 0" icon class="mx-0" @click.native="showTAR(props.item)">
@@ -108,6 +108,9 @@
             </v-flex>
             <v-flex xs12>
               <v-text-field label="Content" v-model="editedNRC.content" required multi-line rows="2"></v-text-field>
+            </v-flex>
+            <v-flex xs12>
+              <v-text-field label="Notes" v-model="editedNRC.notes" required multi-line rows="2"></v-text-field>
             </v-flex>
           </v-layout>
         </v-card-text>
@@ -199,7 +202,7 @@
             </v-flex>
           </v-layout>
           <v-flex xs12>
-            <v-text-field label="Note" v-model="newOrder.note" required multi-line rows="2"></v-text-field>
+            <v-text-field label="Note" v-model="newOrder.notes" required multi-line rows="2"></v-text-field>
           </v-flex>
         </v-card-text>
         <v-card-actions>
@@ -211,6 +214,9 @@
     </v-dialog>
     <v-dialog v-model="dialogSpare" max-width="1200">
       <v-card class="elevation-0">
+        <v-card-actions>
+          <v-switch label="All Ready" v-model="allSparesReady" color="info"></v-switch>
+        </v-card-actions>
         <v-data-table
           :items="spares"
           item-key="pn"
@@ -226,7 +232,7 @@
               <td class="boyd-0" :class="priorityColor(props.item.priority)">{{ props.item.priority }}</td>
               <td class="boyd-0">{{ props.item.status }}</td>
               <td class="boyd-0">{{ props.item.estDate }}</td>
-              <td class="boyd-0">{{ props.item.note || 'NIL'}}</td>
+              <td class="boyd-0">{{ props.item.notes || 'NIL'}}</td>
             </tr>
           </template>
           <template slot="expand" slot-scope="props">
@@ -284,7 +290,7 @@ export default {
         { text: 'PRI', left: true, value: 'priority' },
         { text: 'STATUS', left: true, value: 'status' },
         { text: 'EST DATE', left: true, value: 'estDate' },
-        { text: 'NOTE', left: true, value: 'note' }
+        { text: 'NOTES', left: true, value: 'notes' }
       ],
       itemIndex: -1,
       zoneSelection: this.constUtil.zoneSelection,
@@ -299,13 +305,27 @@ export default {
       dialogOrder: false,
       dialogSpare: false,
       selectedZone: '',
-      search: ''
+      search: '',
+      allSparesReady: false
     }
   },
   watch: {
     dialogSpare (newValue, oldValue) {
       if (newValue === false) {
-        this.spares = []
+        this.closeDialogSpare()
+      }
+    },
+    allSparesReady (newValue, oldValue) {
+      if (newValue) {
+        this.editedNRC.spares = 'ready'
+      } else {
+        this.editedNRC.spares = 'order'
+      }
+      if (this.itemIndex > -1) {
+        firebase.database().ref('nrcs/' + this.checkId + '/' + this.itemIndex).update(this.editedNRC).then(
+          (data) => {},
+          (error) => { console.log(error) }
+        )
       }
     }
   },
@@ -351,9 +371,22 @@ export default {
         this.itemIndex = -1
       }, 300)
     },
+    closeDialogSpare() {
+      this.spares = []
+      setTimeout(() => {
+        this.editedNRC = {}
+        this.itemIndex = -1
+      }, 300)
+    },
     showLog(item) {},
     showSpare(item) {
       this.itemIndex = this.nrcList.indexOf(item)
+      this.editedNRC = Object.assign({}, item)
+      if (this.editedNRC.spares === 'ready') {
+        this.allSparesReady = true
+      } else {
+        this.allSparesReady = false
+      }
       if (this.itemIndex > -1) {
         this.spareLoading = true
         firebase.database().ref('spares/' + this.checkId + '/' + this.itemIndex).once('value').then(

@@ -232,7 +232,7 @@
               </v-flex>
             </v-layout>
             <v-flex xs12>
-              <v-text-field label="Note" v-model="newOrder.note" required multi-line rows="2"></v-text-field>
+              <v-text-field label="Note" v-model="newOrder.notes" required multi-line rows="2"></v-text-field>
             </v-flex>
           </v-card-text>
           <v-card-actions>
