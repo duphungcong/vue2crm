@@ -36,11 +36,15 @@
             <td class="body-0">{{ props.item.zoneDivision }}</td>
             <!-- <td class="body-0">{{ props.item.remarks }}</td> -->
             <td class=justify-center layout px-0>
-              <v-btn icon class="mx-0" @click="editItem(props.item)" v-if="!props.item.taskName.includes('VN ')">
-                <v-icon color="blue">edit</v-icon>
+              <v-btn icon class="mx-0" @click="editItem(props.item)">
+                <v-tooltip bottom>
+                  <v-icon color="blue" slot="activator">edit</v-icon><span>edit</span>
+                </v-tooltip>
               </v-btn>
               <v-btn icon class="mx-0" @click="linkItem(props.item)" v-if="props.item.taskName.includes('VN ')">
-                <v-icon color="blue">link</v-icon>
+                <v-tooltip bottom>
+                  <v-icon color="blue" slot="activator">link</v-icon><span>link EO</span>
+                </v-tooltip>
               </v-btn>
             </td>
           </template>
@@ -233,20 +237,32 @@ export default {
           })
         } else {
           // console.log('new')
-          let newAmsTaskKey = firebase.database().ref('ams' + this.check.aircraft.type).push().key
-          this.editedItem.taskId = newAmsTaskKey
-          let updates = {}
-          updates['/ams' + this.check.aircraft.type + '/' + newAmsTaskKey] = editedProps
-          updates['/workpacks/' + this.checkId + '/' + this.itemIndex] = this.editedItem
-          firebase.database().ref().update(updates).then(
-            (data) => {
-              rootComponent.openSnackbar('Success', 'success')
-            },
-            (error) => {
-              // console.log(error)
-              rootComponent.openSnackbar(error, 'error')
-            }
-          )
+          if (!this.editedItem.taskName.includes('VN ')) {
+            let newAmsTaskKey = firebase.database().ref('ams' + this.check.aircraft.type).push().key
+            this.editedItem.taskId = newAmsTaskKey
+            let updates = {}
+            updates['/ams' + this.check.aircraft.type + '/' + newAmsTaskKey] = editedProps
+            updates['/workpacks/' + this.checkId + '/' + this.itemIndex] = this.editedItem
+            firebase.database().ref().update(updates).then(
+              (data) => {
+                rootComponent.openSnackbar('Success', 'success')
+              },
+              (error) => {
+                // console.log(error)
+                rootComponent.openSnackbar(error, 'error')
+              }
+            )
+          } else {
+            // console.log('edit wo. no link')
+            firebase.database().ref('/workpacks/' + this.checkId + '/' + this.itemIndex).update(this.editedItem).then(
+              (data) => {
+                rootComponent.openSnackbar('Success', 'success')
+              },
+              (error) => {
+                rootComponent.openSnackbar(error, 'error')
+              }
+            )
+          }
         }
       }
       this.closeEditItem()
@@ -311,7 +327,7 @@ export default {
           return
       }
 
-      console.log(zone)
+      // console.log(zone)
       this.workpack = this.workpackBeforeFilter.filter(element => element.zoneDivision.indexOf(zone) === 0)
     },
     loadCheck() {
