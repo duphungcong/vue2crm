@@ -241,7 +241,7 @@ methods: {
     }
   },
   clear() {
-    this.scanTask.forEach(element => {
+    this.scanList.forEach(element => {
       element.updateSuccess = false
       element.updateFail = false
     })
