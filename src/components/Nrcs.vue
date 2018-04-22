@@ -24,7 +24,7 @@
             <td class="body-0" @click="props.expanded = !props.expanded"><v-chip :class="statusColor(props.item.status)" label>{{ props.item.number }}</v-chip></td>
             <td class="body-0" @click="props.expanded = !props.expanded" :class="priorityColor(props.item.priority)">{{ props.item.priority }}</td>
             <td class="body-0">
-              <v-btn v-if="props.item.spares !== undefined && props.item.spares !== ''" icon class="mx-0" @click.native="showSpare(props.item)">
+              <v-btn v-if="props.item.spares !== undefined && props.item.spares !== ''" icon class="mx-0" @click.native="showNRCSpares(props.item)">
                 <v-tooltip bottom>
                   <v-icon color="blue" slot="activator" v-if="props.item.spares === 'ready'">local_grocery_store</v-icon>
                   <v-icon color="grey darken-2" slot="activator" v-else>local_grocery_store</v-icon><span>spares</span>
@@ -121,7 +121,7 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
-    <v-dialog v-model="dialogOrder" persistent max-width="600">
+    <v-dialog v-model="dialogOrderSpare" persistent max-width="600">
       <v-card>
         <v-card-title class="blue darken-1">
             <h4 class="white--text">Order Spare</h4>
@@ -212,28 +212,43 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
-    <v-dialog v-model="dialogSpare" max-width="1200">
+    <v-dialog v-model="dialogNRCSpares" max-width="1200">
       <v-card class="elevation-0">
         <v-card-actions>
           <v-switch label="All Ready" v-model="allSparesReady" color="info"></v-switch>
+          <v-spacer></v-spacer>
+          <v-btn color="blue" flat @click.native="closeNRCSpares()">Close</v-btn>
+          <v-btn color="blue" flat @click.native="saveNRCSpares()">Save</v-btn>
         </v-card-actions>
         <v-data-table
-          :items="spares"
+          :items="sparesList"
           item-key="pn"
           :headers="headerSpare"
           :pagination.sync="paginationSpare"
           :loading="spareLoading"
           class="elevation-1">
           <template slot="items" slot-scope="props">
-            <tr @click="props.expanded = !props.expanded">
-              <td class="boyd-0">{{ props.item.number }}</td>
-              <td class="boyd-0">{{ props.item.description }}</td>
-              <td class="boyd-0">{{ props.item.pn }}</td>
-              <td class="boyd-0" :class="priorityColor(props.item.priority)">{{ props.item.priority }}</td>
-              <td class="boyd-0">{{ props.item.status }}</td>
-              <td class="boyd-0">{{ props.item.estDate }}</td>
-              <td class="boyd-0">{{ props.item.notes || 'NIL'}}</td>
-            </tr>
+            <td class="boyd-0" @click="props.expanded = !props.expanded">{{ props.item.number }}</td>
+            <td class="boyd-0" @click="props.expanded = !props.expanded">{{ props.item.description }}</td>
+            <td class="boyd-0" @click="props.expanded = !props.expanded">{{ props.item.pn }}</td>
+            <td class="boyd-0" @click="props.expanded = !props.expanded" :class="priorityColor(props.item.priority)">{{ props.item.priority }}</td>
+            <td class="boyd-0" @click="props.expanded = !props.expanded">{{ props.item.status }}</td>
+            <td class="boyd-0" @click="props.expanded = !props.expanded">{{ props.item.estDate }}</td>
+            <td class="boyd-0" @click="props.expanded = !props.expanded">{{ props.item.notes || 'NIL'}}</td>
+            <td class="body-0">
+              <v-menu bottom right>
+                <v-btn icon class="mx-0" @click.native="selectStatus(props.item)" slot="activator">
+                  <v-tooltip bottom>
+                    <v-icon color="blue" slot="activator">edit</v-icon><span>edit</span>
+                  </v-tooltip>
+                </v-btn>
+                <v-list>
+                  <v-list-tile v-for="status in spareStatusSelection" :key="status" @click="props.item.status = status">
+                    <v-list-tile-title v-text="status"></v-list-tile-title>
+                  </v-list-tile>
+                </v-list>
+              </v-menu>
+            </td>
           </template>
           <template slot="expand" slot-scope="props">
               <v-card flat color="blue lighten-5" class="elevation-0">
@@ -290,7 +305,8 @@ export default {
         { text: 'PRI', left: true, value: 'priority' },
         { text: 'STATUS', left: true, value: 'status' },
         { text: 'EST DATE', left: true, value: 'estDate' },
-        { text: 'NOTES', left: true, value: 'notes' }
+        { text: 'NOTES', left: true, value: 'notes' },
+        { text: '', sortable: false, value: '' }
       ],
       itemIndex: -1,
       zoneSelection: this.constUtil.zoneSelection,
@@ -299,33 +315,20 @@ export default {
       spareStatusSelection: this.constUtil.spareStatusSelection,
       editedNRC: {},
       newOrder: {},
-      spares: [],
+      sparesList: [],
       spareLoading: false,
       dialogEditNRC: false,
-      dialogOrder: false,
-      dialogSpare: false,
+      dialogOrderSpare: false,
+      dialogNRCSpares: false,
       selectedZone: '',
       search: '',
       allSparesReady: false
     }
   },
   watch: {
-    dialogSpare (newValue, oldValue) {
+    dialogNRCSpares (newValue, oldValue) {
       if (newValue === false) {
-        this.closeDialogSpare()
-      }
-    },
-    allSparesReady (newValue, oldValue) {
-      if (newValue) {
-        this.editedNRC.spares = 'ready'
-      } else {
-        this.editedNRC.spares = 'order'
-      }
-      if (this.itemIndex > -1) {
-        firebase.database().ref('nrcs/' + this.checkId + '/' + this.itemIndex).update(this.editedNRC).then(
-          (data) => {},
-          (error) => { console.log(error) }
-        )
+        this.closeNRCSpares()
       }
     }
   },
@@ -349,6 +352,13 @@ export default {
       this.editedNRC = Object.assign({}, item)
       this.dialogEditNRC = true
     },
+    closeEditNRC() {
+      this.dialogEditNRC = false
+      setTimeout(() => {
+        this.editedNRC = {}
+        this.itemIndex = -1
+      }, 300)
+    },
     saveEditedNRC() {
       if (this.itemIndex > -1) {
         const rootComponent = this.appUtil.getRootComponent(this)
@@ -364,22 +374,7 @@ export default {
       }
       this.closeEditNRC()
     },
-    closeEditNRC() {
-      this.dialogEditNRC = false
-      setTimeout(() => {
-        this.editedNRC = {}
-        this.itemIndex = -1
-      }, 300)
-    },
-    closeDialogSpare() {
-      this.spares = []
-      setTimeout(() => {
-        this.editedNRC = {}
-        this.itemIndex = -1
-      }, 300)
-    },
-    showLog(item) {},
-    showSpare(item) {
+    showNRCSpares(item) {
       this.itemIndex = this.nrcList.indexOf(item)
       this.editedNRC = Object.assign({}, item)
       if (this.editedNRC.spares === 'ready') {
@@ -392,9 +387,10 @@ export default {
         firebase.database().ref('spares/' + this.checkId + '/' + this.itemIndex).once('value').then(
           (data) => {
             let obj = data.val()
-            // console.log(obj)
-            for (let key in obj) {
-              this.spares.push(obj[key])
+            if (obj !== null && obj !== undefined) {
+              for (let key in obj) {
+                this.sparesList.push(Object.assign({}, obj[key], { id: key }))
+              }
             }
             this.spareLoading = false
           },
@@ -404,8 +400,48 @@ export default {
           }
         )
       }
-      this.dialogSpare = true
+      this.dialogNRCSpares = true
     },
+    closeNRCSpares() {
+      this.dialogNRCSpares = false
+      this.sparesList = []
+      setTimeout(() => {
+        this.editedNRC = {}
+        this.itemIndex = -1
+      }, 300)
+    },
+    saveNRCSpares() {
+      if (this.itemIndex > -1 && this.sparesList.length > 0) {
+        const rootComponent = this.appUtil.getRootComponent(this)
+        if (this.allSparesReady) {
+          this.editedNRC.spares = 'ready'
+        } else {
+          this.editedNRC.spares = 'order'
+        }
+
+        let sparesListObj = this.sparesList.reduce((obj, item) => {
+          obj[item.id] = item
+          obj[item.id].id = null
+          return obj
+        }, {})
+        // console.log(sparesListObj)
+
+        let updates = {}
+        updates['/nrcs/' + this.checkId + '/' + this.itemIndex] = this.editedNRC
+        updates['/spares/' + this.checkId + '/' + this.itemIndex] = sparesListObj
+        firebase.database().ref().update(updates).then(
+          (data) => {
+            rootComponent.openSnackbar('Success', 'success')
+          },
+          (error) => {
+            // console.log(error)
+            rootComponent.openSnackbar(error, 'error')
+          }
+        )
+      }
+      // this.closeNRCSpares()
+    },
+    showLog(item) {},
     showTAR(item) {},
     orderSpare(item) {
       this.itemIndex = this.nrcList.indexOf(item)
@@ -414,7 +450,15 @@ export default {
       this.newOrder.priority = this.editedNRC.priority
       this.newOrder.status = 'notYet'
       this.newOrder.estDate = 'NIL'
-      this.dialogOrder = true
+      this.dialogOrderSpare = true
+    },
+    closeOrderSpare() {
+      this.dialogOrderSpare = false
+      setTimeout(() => {
+        this.newOrder = {}
+        this.editedNRC = {}
+        this.itemIndex = -1
+      }, 300)
     },
     saveOrderSpare() {
       if (this.itemIndex > -1) {
@@ -436,14 +480,6 @@ export default {
         )
       }
       this.closeOrderSpare()
-    },
-    closeOrderSpare() {
-      this.dialogOrder = false
-      setTimeout(() => {
-        this.newOrder = {}
-        this.editedNRC = {}
-        this.itemIndex = -1
-      }, 300)
     },
     makeTAR(item) {},
     priorityColor(priority) {
