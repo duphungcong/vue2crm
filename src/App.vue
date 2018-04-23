@@ -537,7 +537,7 @@ export default {
               this.openSnackbar('Success', 'success')
               this.newOrder = {}
               this.newOrder.status = 'notYet'
-              this.newOrder.estDate = 'NIL'
+              this.newOrder.estDate = ''
             },
             (error) => {
               // console.log(error)

@@ -124,8 +124,8 @@
     <v-dialog v-model="dialogOrderSpare" persistent max-width="600">
       <v-card>
         <v-card-title class="blue darken-1">
-            <h4 class="white--text">Order Spare</h4>
-          </v-card-title>
+          <h4 class="white--text">Order Spare</h4>
+        </v-card-title>
         <v-card-text>
           <v-layout row wrap align-baseline>
             <v-flex xs12>
@@ -214,6 +214,9 @@
     </v-dialog>
     <v-dialog v-model="dialogNRCSpares" max-width="1200">
       <v-card class="elevation-0">
+        <v-card-title class="blue darken-1">
+          <h4 class="white--text">Spares List</h4>
+        </v-card-title>
         <v-card-actions>
           <v-switch label="All Ready" v-model="allSparesReady" color="info"></v-switch>
           <v-spacer></v-spacer>
@@ -232,14 +235,14 @@
             <td class="boyd-0" @click="props.expanded = !props.expanded">{{ props.item.description }}</td>
             <td class="boyd-0" @click="props.expanded = !props.expanded">{{ props.item.pn }}</td>
             <td class="boyd-0" @click="props.expanded = !props.expanded" :class="priorityColor(props.item.priority)">{{ props.item.priority }}</td>
-            <td class="boyd-0" @click="props.expanded = !props.expanded">{{ props.item.status }}</td>
-            <td class="boyd-0" @click="props.expanded = !props.expanded">{{ props.item.estDate }}</td>
+            <td class="boyd-0" @click="props.expanded = !props.expanded"><v-icon color="blue">{{ statusToIcon(props.item.status) }}</v-icon></td>
+            <td class="boyd-0" @click="props.expanded = !props.expanded">{{ props.item.estDate || 'NIL' }}</td>
             <td class="boyd-0" @click="props.expanded = !props.expanded">{{ props.item.notes || 'NIL'}}</td>
             <td class="body-0">
               <v-menu bottom right>
                 <v-btn icon class="mx-0" @click.native="selectStatus(props.item)" slot="activator">
                   <v-tooltip bottom>
-                    <v-icon color="blue" slot="activator">edit</v-icon><span>edit</span>
+                    <v-icon color="blue" slot="activator">edit</v-icon><span>status</span>
                   </v-tooltip>
                 </v-btn>
                 <v-list>
@@ -247,6 +250,20 @@
                     <v-list-tile-title v-text="status"></v-list-tile-title>
                   </v-list-tile>
                 </v-list>
+              </v-menu>
+              <v-menu
+                lazy
+                :close-on-content-click="true"
+                transition="scale-transition"
+                offset-y
+                :nudge-right="40"
+                min-width="290px">
+                <v-btn icon class="mx-0" slot="activator">
+                  <v-tooltip bottom>
+                    <v-icon color="blue" slot="activator">today</v-icon><span>est date</span>
+                  </v-tooltip>
+                </v-btn>
+                <v-date-picker v-model="props.item.estDate"></v-date-picker>
               </v-menu>
             </td>
           </template>
@@ -306,7 +323,7 @@ export default {
         { text: 'STATUS', left: true, value: 'status' },
         { text: 'EST DATE', left: true, value: 'estDate' },
         { text: 'NOTES', left: true, value: 'notes' },
-        { text: '', sortable: false, value: '' }
+        { text: 'ACTIONS', sortable: false, value: '' }
       ],
       itemIndex: -1,
       zoneSelection: this.constUtil.zoneSelection,
@@ -439,7 +456,7 @@ export default {
           }
         )
       }
-      // this.closeNRCSpares()
+      this.closeNRCSpares()
     },
     showLog(item) {},
     showTAR(item) {},
@@ -449,7 +466,7 @@ export default {
       this.editedNRC = Object.assign({}, item)
       this.newOrder.priority = this.editedNRC.priority
       this.newOrder.status = 'notYet'
-      this.newOrder.estDate = 'NIL'
+      this.newOrder.estDate = ''
       this.dialogOrderSpare = true
     },
     closeOrderSpare() {
@@ -506,6 +523,14 @@ export default {
       if (status === 'cancel') {
         return 'line-bg white--text'
       }
+    },
+    statusToIcon(itemStatus) {
+      const iconByStatus = (status) => ({
+        'avail': 'check_circle',
+        'notYet': 'directions_bike',
+        'issued': 'build'
+      })[status]
+      return iconByStatus(itemStatus)
     }
   },
   mounted() {

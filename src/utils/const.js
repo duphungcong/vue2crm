@@ -30,7 +30,7 @@ export default {
   ],
   spareStatusSelection: [
     'notYet',
-    'AVAIL',
-    'ISSUED'
+    'avail',
+    'issued'
   ]
 }

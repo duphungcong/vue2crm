@@ -72,7 +72,7 @@
                 <v-menu transition="slide-x-transition">
                   <v-btn icon class="mx-0" slot="activator">
                     <v-tooltip bottom>
-                        <v-icon color="blue" slot="activator" medium>trending_flat</v-icon><span>move to</span>
+                        <v-icon color="blue" slot="activator" medium>forward</v-icon><span>move to</span>
                     </v-tooltip>
                   </v-btn>
                   <v-list>

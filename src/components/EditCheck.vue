@@ -54,8 +54,8 @@
     <loading-progress></loading-progress>
     <v-dialog v-model="dialogEditItem" max-width="500">
       <v-card>
-        <v-card-title>
-          <span class="headline">Edit Item</span>
+        <v-card-title class="blue darken-1">
+          <h4 class="white--text">Edit Item</h4>
         </v-card-title>
         <v-card-text>
           <v-container grid-list-md>
@@ -90,7 +90,9 @@
     </v-dialog>
     <v-dialog v-model="dialogLinkItem" max-width="500">
       <v-card>
-        <v-card-title><span class="headline">Link to EO</span></v-card-title>
+        <v-card-title class="blue darken-1">
+          <h4 class="white--text">Link to EO</h4>
+        </v-card-title>
         <v-card-text>
           <v-container grid-list-md>
             <v-layout wrap>
