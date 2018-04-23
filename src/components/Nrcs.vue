@@ -292,6 +292,7 @@ export default {
     return {
       checkId: null,
       nrcList: [],
+      nrcListBeforeFilter: [],
       paginationNRC: {
         page: 1,
         totalItems: 0,
@@ -337,7 +338,7 @@ export default {
       dialogEditNRC: false,
       dialogOrderSpare: false,
       dialogNRCSpares: false,
-      selectedZone: '',
+      selectedZone: null,
       search: '',
       allSparesReady: false
     }
@@ -347,6 +348,9 @@ export default {
       if (newValue === false) {
         this.closeNRCSpares()
       }
+    },
+    selectedZone (newValue, oldValue) {
+      this.filterNRC(newValue)
     }
   },
   methods: {
@@ -355,6 +359,7 @@ export default {
       firebase.database().ref('nrcs/' + this.checkId).on('value',
         (data) => {
           this.nrcList = data.val() || []
+          this.nrcListBeforeFilter = this.nrcList
           this.$store.dispatch('endLoading')
         },
         (error) => {
@@ -502,6 +507,17 @@ export default {
     priorityColor(priority) {
       if (priority === 'AOG') {
         return 'red--text body-1'
+      }
+    },
+    filterNRC(byZone) {
+      function filterByZone(element) {
+        return element.zone.indexOf(byZone) === 0
+      }
+
+      if (byZone === null) {
+        this.nrcList = this.nrcListBeforeFilter
+      } else {
+        this.nrcList = this.nrcListBeforeFilter.filter(filterByZone)
       }
     },
     statusColor(status) {
