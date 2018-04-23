@@ -13,7 +13,7 @@
             </v-flex>
             <v-flex xs2 sm2 md2></v-flex>
             <v-flex xs12 sm3 md3>
-              <v-btn @click.native="exportNRCList" class="blue white--text">Export to Excel
+              <v-btn @click.native="exportNRCList()" class="blue white--text">Export to Excel
                 <v-icon dark right>file_download</v-icon>
               </v-btn>
             </v-flex>
@@ -30,7 +30,7 @@
                   <v-icon color="grey darken-2" slot="activator" v-else>local_grocery_store</v-icon><span>spares</span>
                 </v-tooltip>
               </v-btn>
-              <v-btn v-if="props.item.tars !== undefined && props.item.tars.length > 0" icon class="mx-0" @click.native="showTAR(props.item)">
+              <v-btn v-if="props.item.tars !== undefined && props.item.tars.length !== ''" icon class="mx-0" @click.native="showTAR(props.item)">
                 <v-tooltip bottom>
                   <v-icon color="grey darken-2" slot="activator">help</v-icon><span>TAR</span>
                 </v-tooltip>
@@ -285,6 +285,7 @@
 <script>
 
 import firebase from 'firebase'
+import XLSX from 'xlsx'
 
 export default {
   name: 'NRCs',
@@ -547,6 +548,24 @@ export default {
         'issued': 'build'
       })[status]
       return iconByStatus(itemStatus)
+    },
+    exportNRCList() {
+      let exporter = []
+      this.nrcList.forEach((element) => {
+        let item = {
+          nrc: element.number,
+          description: element.content,
+          reference: element.ref
+        }
+        exporter.push(item)
+      })
+      // console.log(exportedWorkpack)
+      let worksheet = XLSX.utils.json_to_sheet(Object.assign([], exporter))
+      // console.log(worksheet)
+      let workbook = XLSX.utils.book_new()
+      XLSX.utils.book_append_sheet(workbook, worksheet, 'NRC')
+      // // console.log(workbook)
+      XLSX.writeFile(workbook, 'NRC.xlsx')
     }
   },
   mounted() {
