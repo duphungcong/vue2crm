@@ -550,17 +550,17 @@ export default {
       return iconByStatus(itemStatus)
     },
     exportNRCList() {
-      let exporter = []
+      let exportedNRCList = []
       this.nrcList.forEach((element) => {
         let item = {
           nrc: element.number,
           description: element.content,
           reference: element.ref
         }
-        exporter.push(item)
+        exportedNRCList.push(item)
       })
       // console.log(exportedWorkpack)
-      let worksheet = XLSX.utils.json_to_sheet(Object.assign([], exporter))
+      let worksheet = XLSX.utils.json_to_sheet(Object.assign([], exportedNRCList))
       // console.log(worksheet)
       let workbook = XLSX.utils.book_new()
       XLSX.utils.book_append_sheet(workbook, worksheet, 'NRC')
