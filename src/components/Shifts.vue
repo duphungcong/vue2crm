@@ -1,7 +1,7 @@
 <template>
   <v-container fluid grid-list-sm>
     <v-layout row wrap>
-      <v-flex lg12 md12 sm12 xs12>
+      <v-flex xs12>
          <v-card>
             <v-card-actions>
               <v-btn @click.native="reset">Reset</v-btn>
@@ -9,14 +9,31 @@
             </v-card-actions>
           </v-card>
       </v-flex>
-      <v-flex lg1 md1 sm1 xs1 v-for="shift in check.shifts" :key="shift.number">
-        <shift
-          :date="dateOfShift(shift.number)"
-          :current="isCurrentShift(shift.number)"
-          :shift="shift"
-          @change="updateStatus($event, shift)"></shift>
+      <v-flex xs12>
+        <v-card>
+          <v-card-actions>
+            <v-layout row wrap align-baseline>
+              <v-flex xs4>
+                <v-select :items="check.shifts" label="Select shift" item-text="number" item-value="number" v-model="selectedShiftNumber"></v-select>
+              </v-flex>
+              <v-flex xs1></v-flex>
+              <v-flex xs2>
+                <v-text-field label="Number of shifts" :value="check.shifts.length" type="number"></v-text-field>
+              </v-flex>
+              
+              <!-- <v-flex xs1>
+                <shift v-if="selectedShiftNumber !== null"
+                  :date="dateOfShift(selectedShiftNumber)"
+                  :current="isCurrentShift(selectedShiftNumber)"
+                  :shift="selectedShift"
+                  @change="updateStatus($event, selectedShift)"></shift>
+              </v-flex> -->
+               
+            </v-layout>
+          </v-card-actions>
+        </v-card>
       </v-flex>
-    </v-layout>
+    </v-layout> 
   </v-container>
 </template>
 
@@ -30,7 +47,9 @@ export default {
   data () {
     return {
       checkId: null,
-      check: {}
+      check: {},
+      selectedShift: {},
+      selectedShiftNumber: null
     }
   },
   computed: {
@@ -41,9 +60,18 @@ export default {
       return diff.getUTCDate()
     }
   },
+  watch: {
+    selectedShiftNumber(newValue, oldValue) {
+      this.check.shifts.forEach((element) => {
+        if (element.number === newValue) {
+          this.selectedShift = element
+        }
+      })
+    }
+  },
   methods: {
     loadCheck() {
-      firebase.database().ref('checks').child(this.checkId).once('value').then(
+      firebase.database().ref('checks').child(this.checkId).on('value',
         (data) => {
           this.check = data.val()
         },

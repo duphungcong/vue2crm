@@ -1,26 +1,20 @@
 <template>
-  <v-container grid-list-sm mx-0 px-0>
+  <v-container fluid grid-list-sm ma-0>
+    <v-layout row wrap>
       <v-card>
-        <v-card-actions>
-          <v-layout row wrap pr-2>
-            <v-flex lg12 md12 xs12>
-              <v-tooltip bottom>
-                <v-btn flat outline block class="elevation-1" :class="{ currentShift: current }" slot="activator" >Shift {{ shift.number }}</v-btn>
-                <span>{{ date }}</span>
-              </v-tooltip>
-            </v-flex>
-            <v-flex lg12 md12 xs12>
-              <v-btn block class="elevation-1" @click.native="changeElect" :class="{ green: shift.elect }">ELECT</v-btn>
-            </v-flex>
-            <v-flex lg12 md12 xs12>
-              <v-btn block :disabled="!shift.elect" class="elevation-1" @click.native="changeAir" :class="{ blue: shift.air }" >AIR</v-btn>
-            </v-flex>
-            <v-flex lg12 md12 xs12>
-              <v-btn block :disabled="!shift.elect" class="elevation-1" @click.native="changeHyd" :class="{ orange: shift.hyd }">HYD</v-btn>
-            </v-flex>
-          </v-layout>
-        </v-card-actions>
+        <v-layout row wrap pa-1>
+          <v-flex>
+            <v-tooltip bottom>
+              <v-btn flat outline block class="elevation-1" :class="{ currentShift: current }" slot="activator" >Shift {{ shift.number }}</v-btn>
+              <span>{{ date }}</span>
+            </v-tooltip>
+            <v-btn block class="elevation-1" @click.native="changeElect" :class="{ green: shift.elect }">ELECT</v-btn>
+            <v-btn block :disabled="!shift.elect" class="elevation-1" @click.native="changeAir" :class="{ blue: shift.air }" >AIR</v-btn>
+            <v-btn block :disabled="!shift.elect" class="elevation-1" @click.native="changeHyd" :class="{ orange: shift.hyd }">HYD</v-btn>
+          </v-flex>
+        </v-layout> 
       </v-card>
+    </v-layout>
   </v-container>
 </template>
 
