@@ -32,7 +32,7 @@
                 </v-radio-group>
               </v-flex>
               <v-flex xs2>
-                <span>TASK ITEM ({{ scan.length }})</span>
+                <span>TASK ITEM ({{ scanList.length }})</span>
               </v-flex>
               <v-flex xs6>
                 <span>NOTES</span>
@@ -118,7 +118,7 @@ export default {
         this.scanList.push({
           number: scanItem.number,
           isNRC: scanItem.isNRC,
-          person: this.person,
+          status: this.allStatus,
           time: time.toLocaleString(),
           notes: '',
           updateSuccess: false,
