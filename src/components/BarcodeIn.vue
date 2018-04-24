@@ -47,7 +47,7 @@
       </v-flex>
       <v-flex xs12>
         <ul>
-          <li v-for="item in scan" :key="item.wpItem">
+          <li v-for="item in scanList" :key="item.number">
             <v-card mx-0 px-0>
               <v-layout row wrap align-center mx-0 px-0>
                 <v-flex xs3 sm3 md3>
@@ -58,7 +58,7 @@
                   </v-radio-group>
                 </v-flex>
                 <v-flex xs2>
-                  <span>{{ item.wpItem }}</span>
+                  <span v-if="item.isNRC">NRC </span><span>{{ item.number }}</span>
                 </v-flex>
                 <v-flex xs6>
                   <v-text-field label="Remarks" v-model="item.notes"></v-text-field>
@@ -88,6 +88,7 @@ export default {
       checkId: '',
       barcode: '',
       scan: [],
+      scanList: [],
       scannedAlert: false,
       allStatus: ''
     }
@@ -95,8 +96,8 @@ export default {
   watch: {
     allStatus (value) {
       if (value !== null && value !== undefined) {
-        for (let key in this.scan) {
-          this.scan[key].status = value
+        for (let key in this.scanList) {
+          this.scanList[key].status = value
         }
       }
     }
@@ -105,17 +106,23 @@ export default {
     onBarcodeScanned(barcode) {
       // console.log(barcode)
       this.scannedAlert = false
-      let wpItem = this.formatBarcode(this.barcode)
-      let found = this.scan.find((item) => {
-        return item.wpItem === wpItem
+      let scanItem = this.formatBarcode(this.barcode)
+      // console.log(scanItem)
+      let found = this.scanList.find((item) => {
+        return item.number === scanItem.number
       })
       if (found === undefined) {
-        this.scan.push({
-          wpItem: wpItem,
+        let now = Date.now(7)
+        let time = new Date(now)
+        // console.log(time)
+        this.scanList.push({
+          number: scanItem.number,
+          isNRC: scanItem.isNRC,
+          person: this.person,
+          time: time.toLocaleString(),
           notes: '',
           updateSuccess: false,
-          updateFail: false,
-          status: this.allStatus
+          updateFail: false
         })
       } else {
         this.scannedAlert = true
@@ -130,68 +137,121 @@ export default {
       // console.log(barcode)
     },
     formatBarcode(barcode) {
-      let workPackNumber = barcode.substr(8, 8)
-      let itemNumber = parseInt(barcode.substr(16, 4), 10)
-      // console.log(workPackNumber)
-      // console.log(itemNumber)
-      return 'VN' + workPackNumber + '-' + itemNumber
+      let isNRC = barcode.substr(0, 3) === 'nrc'
+      if (isNRC) {
+        let nrcNumber = parseInt(barcode.substr(3, 7), 10)
+        // console.log(nrcNumber)
+        return {
+          number: nrcNumber,
+          isNRC: isNRC
+        }
+      } else {
+        let workPackNumber = barcode.substr(8, 8)
+        let itemNumber = parseInt(barcode.substr(16, 4), 10)
+        return {
+          number: 'VN' + workPackNumber + '-' + itemNumber,
+          isNRC: isNRC
+        }
+      }
     },
     update() {
-      let now = Date.now(7)
-      let time = new Date(now)
-      let timeStr = time.toLocaleString()
-      this.scan.forEach(element => {
-        firebase.database().ref('workpacks/' + this.checkId).orderByChild('wpItem').equalTo(element.wpItem).limitToFirst(1).once('value').then(
-          (data) => {
-            // console.log(data.val())
-            const obj = data.val()
-            if (obj !== null && obj !== undefined) {
-              for (let key in obj) {
-                if (element.notes !== null && element.notes !== undefined) {
-                  obj[key].notes = element.notes
-                }
-                if (element.status !== null && element.status !== undefined) {
+      this.scanList.forEach(element => {
+        if (element.isNRC) {
+          firebase.database().ref('nrcs/' + this.checkId).orderByChild('number').equalTo(element.number).limitToFirst(1).once('value').then(
+            (data) => {
+              // console.log(data.val())
+              const obj = data.val()
+              if (obj !== null && obj !== undefined) {
+                for (let key in obj) {
+                  if (element.notes !== null && element.notes !== undefined) {
+                    obj[key].notes = element.notes
+                  }
                   obj[key].status = element.status
-                }
-                let log = {
-                  status: obj[key].status,
-                  person: 'PPC',
-                  time: timeStr,
-                  action: 'received',
-                  notes: element.notes
-                }
-                firebase.database().ref('workpacks/' + this.checkId + '/' + key).update(obj[key]).then(
-                  (data) => {
-                    // console.log('update completed')
-                    element.updateSuccess = true
-                  },
-                  (error) => {
-                    console.log(error)
-                    element.updateFail = true
+                  let log = {
+                    status: element.status,
+                    person: 'ppc',
+                    time: element.time,
+                    action: 'received',
+                    notes: element.notes
                   }
-                )
-                firebase.database().ref('taskLogs/' + this.checkId + '/' + key).push(log).then(
-                  (data) => {
-                    // console.log('log - receive')
-                  },
-                  (error) => {
-                    console.log(error)
-                  }
-                )
+                  firebase.database().ref('nrcs/' + this.checkId + '/' + key).update(obj[key]).then(
+                    (data) => {
+                      // console.log('update completed')
+                      element.updateSuccess = true
+                    },
+                    (error) => {
+                      console.log(error)
+                      element.updateFail = true
+                    }
+                  )
+                  firebase.database().ref('nrcLogs/' + this.checkId + '/' + key).push(log).then(
+                    (data) => {
+                      // console.log('log - take out')
+                    },
+                    (error) => {
+                      console.log(error)
+                    }
+                  )
+                }
+                return
               }
-              return
+              element.updateFail = true
+            },
+            (error) => {
+              element.updateFail = true
+              console.log(error)
+            })
+        } else {
+          firebase.database().ref('workpacks/' + this.checkId).orderByChild('wpItem').equalTo(element.number).limitToFirst(1).once('value').then(
+            (data) => {
+              // console.log(data.val())
+              const obj = data.val()
+              if (obj !== null && obj !== undefined) {
+                for (let key in obj) {
+                  if (element.notes !== null && element.notes !== undefined) {
+                    obj[key].notes = element.notes
+                  }
+                  obj[key].status = element.status
+                  let log = {
+                    status: element.status,
+                    person: element.person,
+                    time: element.time,
+                    action: 'received',
+                    notes: element.notes
+                  }
+                  firebase.database().ref('workpacks/' + this.checkId + '/' + key).update(obj[key]).then(
+                    (data) => {
+                      // console.log('update completed')
+                      element.updateSuccess = true
+                    },
+                    (error) => {
+                      console.log(error)
+                      element.updateFail = true
+                    }
+                  )
+                  firebase.database().ref('taskLogs/' + this.checkId + '/' + key).push(log).then(
+                    (data) => {
+                      // console.log('log - take out')
+                    },
+                    (error) => {
+                      console.log(error)
+                    }
+                  )
+                }
+                return
+              }
+              element.updateFail = true
+            },
+            (error) => {
+              element.updateFail = true
+              console.log(error)
             }
-            element.updateFail = true
-          },
-          (error) => {
-            element.updateFail = true
-            console.log(error)
-          }
-        )
+          )
+        }
       })
     },
     clear() {
-      this.scan.forEach(element => {
+      this.scanList.forEach(element => {
         element.updateSuccess = false
         element.updateFail = false
       })
