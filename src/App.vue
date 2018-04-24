@@ -80,7 +80,7 @@
         v-if="userIsFollowingCheck"
         fab
         bottom
-        right
+        left
         color="red"
         dark
         fixed
@@ -94,12 +94,12 @@
             v-for="item in bottomSheetTitles"
             :key="item.title"
             @click="add(item.value)">
-            <v-list-tile-title class="text-xs-right pr-2">{{ item.title }}</v-list-tile-title>
             <v-list-tile-avatar>
               <v-avatar size="32">
                 <v-icon color="blue">{{ item.icon }}</v-icon>
               </v-avatar>
             </v-list-tile-avatar>
+            <v-list-tile-title class="text-xs-left pr-2">{{ item.title }}</v-list-tile-title>
           </v-list-tile>
         </v-list>
       </v-bottom-sheet>
@@ -335,7 +335,7 @@ export default {
       bottomSheetTitles: [
         { icon: 'content_copy', title: 'New NRC', value: 'nrc' },
         { icon: 'add_shopping_cart', title: 'New Order', value: 'order' },
-        { icon: 'content_paste', title: 'Add Task', value: 'task' }
+        { icon: 'content_paste', title: 'Additional Task', value: 'task' }
       ],
       checkId: '',
       dialogAddNRC: false,
@@ -358,7 +358,7 @@ export default {
         zone: 'N/A',
         priority: '',
         content: '',
-        spares: '',
+        spareStatus: '',
         status: 'notYet'
       },
       defaultTask: {
@@ -482,7 +482,7 @@ export default {
       }
       if (this.checkId !== null && item === 'order') {
         this.newOrder.status = 'notYet'
-        this.newOrder.estDate = 'NIL'
+        this.newOrder.estDate = ''
         this.dialogOrder = true
       }
       if (this.checkId !== null && item === 'task') {
@@ -508,7 +508,9 @@ export default {
     },
     save(item) {
       if (item === 'nrc') {
-        firebase.database().ref('nrcs/' + this.checkId + '/' + this.nrcList.length).set(this.newNRC).then(
+        let newNRCKey = firebase.database().ref('nrcs/' + this.checkId).push().key
+        this.newNRC.id = newNRCKey
+        firebase.database().ref('nrcs/' + this.checkId + '/' + newNRCKey).update(this.newNRC).then(
           (data) => {
             // console.log(this.nrcList)
             this.openSnackbar('Success', 'success')
@@ -522,29 +524,24 @@ export default {
         )
       }
       if (item === 'order') {
-        let nrcIndex = this.nrcList.indexOf(this.orderNRC)
-        // console.log(nrcIndex)
-        if (nrcIndex > -1) {
-          let newSpareKey = firebase.database().ref('spares/' + this.checkId + '/' + nrcIndex).push().key
-          let updates = {}
-          if (this.orderNRC.spares === undefined || this.orderNRC.spares === '') {
-            this.orderNRC.spares = 'order'
-            updates['/nrcs/' + this.checkId + '/' + nrcIndex] = this.orderNRC
+        let updates = {}
+        let newSpareKey = firebase.database().ref('spares/' + this.checkId).push().key
+        this.newOrder.id = newSpareKey
+        this.newOrder.nrcId = this.orderNRC.id
+        updates['/nrcs/' + this.checkId + '/' + this.orderNRC.id + '/spareStatus'] = 'order'
+        updates['/spares/' + this.checkId + '/' + newSpareKey] = this.newOrder
+        firebase.database().ref().update(updates).then(
+          (data) => {
+            this.openSnackbar('Success', 'success')
+            this.newOrder = {}
+            this.newOrder.status = 'notYet'
+            this.newOrder.estDate = ''
+          },
+          (error) => {
+            // console.log(error)
+            this.openSnackbar(error, 'error')
           }
-          updates['/spares/' + this.checkId + '/' + nrcIndex + '/' + newSpareKey] = this.newOrder
-          firebase.database().ref().update(updates).then(
-            (data) => {
-              this.openSnackbar('Success', 'success')
-              this.newOrder = {}
-              this.newOrder.status = 'notYet'
-              this.newOrder.estDate = ''
-            },
-            (error) => {
-              // console.log(error)
-              this.openSnackbar(error, 'error')
-            }
-          )
-        }
+        )
       }
       if (item === 'task' && this.newTaskKey !== null) {
         let wpItem = this.newTask.wpItem.substring(0, 10) + '-' + this.newTask.wpItem.substring(10)
@@ -595,7 +592,7 @@ export default {
       // console.log(this.checkId)
       firebase.database().ref('nrcs/' + this.checkId).on('value',
         (data) => {
-          this.nrcList = data.val() || []
+          this.nrcList = Object.values(data.val()) || []
           this.defaultNRC.number = this.nrcList.length + 1
           // console.log(this.nrcList)
         },

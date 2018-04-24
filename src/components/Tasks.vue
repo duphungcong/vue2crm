@@ -53,13 +53,6 @@
             <td class="body-0" @click="props.expanded = !props.expanded">{{ props.item.wpItem }}</td>
             <td class="body-0" @click="props.expanded = !props.expanded">{{ props.item.taskType }}</td>
             <td class="body-0" @click="props.expanded = !props.expanded">{{ props.item.zoneDivision }}</td>
-            <!-- <td class="text-xs-center">
-              <v-btn icon class="mx-0" @click.native="selectShift(props.item)">
-                <v-tooltip bottom>
-                    <v-icon color="blue" slot="activator">sort</v-icon><span>shift</span>
-                </v-tooltip>
-              </v-btn>
-            </td> -->
           </template>
           <template slot="expand" slot-scope="props">
             <v-card flat color="blue lighten-5" class="elevation-0">
@@ -98,6 +91,11 @@
                 <p>Remarks: <strong>{{ props.item.remarks }}</strong></p>
               </v-card-text>
             </v-card>
+          </template>
+          <template slot="footer">
+            <td colspan="100%">
+              <strong>This is an extra footer</strong>
+            </td>
           </template>
         </v-data-table>
       </v-card>

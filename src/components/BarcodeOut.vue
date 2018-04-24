@@ -158,15 +158,15 @@ export default {
                   }
                   obj[key].status = 'out'
                   let log = {
+                    nrcId: obj[key].id,
                     status: 'out',
                     person: element.person,
                     time: element.time,
                     action: 'take out',
                     notes: element.notes
                   }
-                  firebase.database().ref('nrcs/' + this.checkId + '/' + key).update(obj[key]).then(
+                  firebase.database().ref('nrcs/' + this.checkId + '/' + obj[key].id).update(obj[key]).then(
                     (data) => {
-                      // console.log('update completed')
                       element.updateSuccess = true
                     },
                     (error) => {
@@ -174,10 +174,8 @@ export default {
                       element.updateFail = true
                     }
                   )
-                  firebase.database().ref('nrcLogs/' + this.checkId + '/' + key).push(log).then(
-                    (data) => {
-                      // console.log('log - take out')
-                    },
+                  firebase.database().ref('nrcLogs/' + this.checkId).push(log).then(
+                    (data) => {},
                     (error) => {
                       console.log(error)
                     }
