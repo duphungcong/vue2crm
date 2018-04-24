@@ -327,7 +327,6 @@ export default {
         { text: 'NOTES', left: true, value: 'notes' },
         { text: 'ACTIONS', sortable: false, value: '' }
       ],
-      itemIndex: -1,
       zoneSelection: this.constUtil.zoneSelection,
       prioritySelection: this.constUtil.prioritySelection,
       nrcStatusSelection: this.constUtil.nrcStatusSelection,
@@ -474,6 +473,7 @@ export default {
       let newSpareKey = firebase.database().ref('spares/' + this.checkId).push().key
       this.newOrder.id = newSpareKey
       this.newOrder.nrcId = this.editedNRC.id
+      this.newOrder.nrcNumber = this.editedNRC.number
       updates['/nrcs/' + this.checkId + '/' + this.editedNRC.id + '/spareStatus'] = 'order'
       updates['/spares/' + this.checkId + '/' + newSpareKey] = this.newOrder
       firebase.database().ref().update(updates).then(
@@ -528,7 +528,8 @@ export default {
       const iconByStatus = (status) => ({
         'avail': 'check_circle',
         'notYet': 'directions_bike',
-        'issued': 'build'
+        'issued': 'build',
+        'cancel': 'remove_circle_outline'
       })[status]
       return iconByStatus(itemStatus)
     },

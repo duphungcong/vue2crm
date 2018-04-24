@@ -528,6 +528,7 @@ export default {
         let newSpareKey = firebase.database().ref('spares/' + this.checkId).push().key
         this.newOrder.id = newSpareKey
         this.newOrder.nrcId = this.orderNRC.id
+        this.newOrder.nrcNumber = this.orderNRC.number
         updates['/nrcs/' + this.checkId + '/' + this.orderNRC.id + '/spareStatus'] = 'order'
         updates['/spares/' + this.checkId + '/' + newSpareKey] = this.newOrder
         firebase.database().ref().update(updates).then(
