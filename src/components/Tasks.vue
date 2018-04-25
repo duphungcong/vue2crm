@@ -92,11 +92,6 @@
               </v-card-text>
             </v-card>
           </template>
-          <template slot="footer">
-            <td colspan="100%">
-              <strong>This is an extra footer</strong>
-            </td>
-          </template>
         </v-data-table>
       </v-card>
     </v-flex>
