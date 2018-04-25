@@ -42,34 +42,34 @@
             <td class="body-0" @click="props.expanded = !props.expanded">{{ props.item.zone }}</td>
           </template>
           <template slot="expand" slot-scope="props">
-              <v-card flat color="blue lighten-5" class="elevation-0">
-                <v-card-actions>
-                  <v-btn icon class="mx-0" @click="editNRC(props.item)">
-                    <v-tooltip bottom>
-                      <v-icon color="blue" slot="activator">edit</v-icon><span>edit</span>
-                    </v-tooltip>
-                  </v-btn>
-                  <v-btn icon class="mx-0" @click.native="orderSpare(props.item)">
-                    <v-tooltip bottom>
-                      <v-icon color="blue" slot="activator">add_shopping_cart</v-icon><span>order</span>
-                    </v-tooltip>
-                  </v-btn>
-                  <v-btn icon class="mx-0" @click.native="makeTAR(props.item)">
-                    <v-tooltip bottom>
-                      <v-icon color="blue" slot="activator">help_outline</v-icon><span>tar</span>
-                    </v-tooltip>
-                  </v-btn>
-                  <v-btn icon class="mx-0" @click.native="showLog(props.item)">
-                    <v-tooltip bottom>
-                      <v-icon color="blue" slot="activator">assignment</v-icon><span>log</span>
-                    </v-tooltip>
-                  </v-btn>
-                </v-card-actions>
-                <v-card-text>
-                  <p>WO: <strong>{{ props.item.wo }}</strong></p>
-                </v-card-text>
-              </v-card>
-            </template>
+            <v-card flat color="blue lighten-5" class="elevation-0">
+              <v-card-actions>
+                <v-btn icon class="mx-0" @click="editNRC(props.item)">
+                  <v-tooltip bottom>
+                    <v-icon color="blue" slot="activator">edit</v-icon><span>edit</span>
+                  </v-tooltip>
+                </v-btn>
+                <v-btn icon class="mx-0" @click.native="orderSpare(props.item)">
+                  <v-tooltip bottom>
+                    <v-icon color="blue" slot="activator">add_shopping_cart</v-icon><span>order</span>
+                  </v-tooltip>
+                </v-btn>
+                <v-btn icon class="mx-0" @click.native="makeTAR(props.item)">
+                  <v-tooltip bottom>
+                    <v-icon color="blue" slot="activator">help_outline</v-icon><span>tar</span>
+                  </v-tooltip>
+                </v-btn>
+                <v-btn icon class="mx-0" @click.native="showLog(props.item)">
+                  <v-tooltip bottom>
+                    <v-icon color="blue" slot="activator">assignment</v-icon><span>log</span>
+                  </v-tooltip>
+                </v-btn>
+              </v-card-actions>
+              <v-card-text>
+                <p>WO: <strong>{{ props.item.wo }}</strong></p>
+              </v-card-text>
+            </v-card>
+          </template>
         </v-data-table>
       </v-card>
     </v-flex>

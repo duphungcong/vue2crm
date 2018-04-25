@@ -2,12 +2,25 @@
   <v-container fluid grid-list-sm>
     <v-flex sx12>
       <v-card>
+        <v-card-actions>
+          <v-layout row wrap px-2>
+            <v-flex xs12 sm3 md3>
+              <v-text-field append-icon="search" label="Search" single-line hide-details v-model="search"></v-text-field>
+            </v-flex>
+            <v-spacer></v-spacer>
+            <v-flex xs12 sm3 md3>
+              <v-btn @click.native="exportSparesList()" class="blue white--text">Export to Excel
+                <v-icon dark right>file_download</v-icon>
+              </v-btn>
+            </v-flex>
+          </v-layout>
+        </v-card-actions>
         <v-data-table
           :items="sparesList"
           item-key="pn"
           :headers="headerSpare"
           :pagination.sync="paginationSpare"
-          class="elevation-1">
+          :search="search">
           <template slot="items" slot-scope="props">
             <td class="boyd-0" @click="props.expanded = !props.expanded">{{ props.item.number }}</td>
             <td class="boyd-0" @click="props.expanded = !props.expanded">{{ props.item.nrcNumber }}</td>
@@ -26,14 +39,13 @@
                   </v-tooltip>
                 </v-btn>
                 <v-list>
-                  <v-list-tile v-for="status in spareStatusSelection" :key="status" @click="props.item.status = status">
+                  <v-list-tile v-for="status in spareStatusSelection" :key="status" @click="updateStatus(props.item, status)">
                     <v-list-tile-title v-text="status"></v-list-tile-title>
                   </v-list-tile>
                 </v-list>
               </v-menu>
               <v-menu
                 lazy
-                :close-on-content-click="true"
                 transition="scale-transition"
                 offset-y
                 :nudge-right="40"
@@ -43,7 +55,7 @@
                     <v-icon color="blue" slot="activator">today</v-icon><span>est date</span>
                   </v-tooltip>
                 </v-btn>
-                <v-date-picker v-model="props.item.estDate"></v-date-picker>
+                <v-date-picker v-model="props.item.estDate" @change="updateEstDate(props.item)"></v-date-picker>
               </v-menu>
             </td>
           </template>
@@ -214,10 +226,26 @@ export default {
         { text: 'ACTIONS', sortable: false, value: '' }
       ],
       editedSpare: {},
-      dialogEditSpare: false
+      dialogEditSpare: false,
+      search: ''
     }
   },
   methods: {
+    loadSpares() {
+      this.$store.dispatch('beginLoading')
+      firebase.database().ref('spares/' + this.checkId).on('value',
+      (data) => {
+        this.sparesList = Object.values(data.val()) || []
+        this.sparesList.sort((a, b) => {
+          return a.nrcNumber - b.nrcNumber || a.reqDate - b.reqDate
+        })
+        this.$store.dispatch('endLoading')
+      },
+      (error) => {
+        console.log(error)
+        this.$store.dispatch('endLoading')
+      })
+    },
     editSpare(item) {
       this.editedSpare = Object.assign({}, item)
       this.dialogEditSpare = true
@@ -241,20 +269,34 @@ export default {
       )
       this.closeEditSpare()
     },
-    loadSpares() {
-      this.$store.dispatch('beginLoading')
-      firebase.database().ref('spares/' + this.checkId).on('value',
-      (data) => {
-        this.sparesList = Object.values(data.val()) || []
-        this.sparesList.sort((a, b) => {
-          return a.nrcNumber - b.nrcNumber || a.reqDate - b.reqDate
-        })
-        this.$store.dispatch('endLoading')
-      },
-      (error) => {
-        console.log(error)
-        this.$store.dispatch('endLoading')
-      })
+    updateStatus(item, status) {
+      const rootComponent = this.appUtil.getRootComponent(this)
+      let updates = {}
+      updates['/spares/' + this.checkId + '/' + item.id + '/status'] = status
+      firebase.database().ref().update(updates).then(
+         (data) => {
+          item.status = status
+          rootComponent.openSnackbar('Success', 'success')
+        },
+        (error) => {
+          // console.log(error)
+          rootComponent.openSnackbar(error, 'error')
+        }
+      )
+    },
+    updateEstDate(item) {
+      const rootComponent = this.appUtil.getRootComponent(this)
+      let updates = {}
+      updates['/spares/' + this.checkId + '/' + item.id + '/estDate'] = item.estDate
+      firebase.database().ref().update(updates).then(
+         (data) => {
+          rootComponent.openSnackbar('Success', 'success')
+        },
+        (error) => {
+          // console.log(error)
+          rootComponent.openSnackbar(error, 'error')
+        }
+      )
     },
     priorityColor(priority) {
       if (priority === 'AOG') {
