@@ -21,17 +21,17 @@ export default {
     'normal'
   ],
   nrcStatusSelection: [
-    'notYet',
     'inProgress',
     'done',
-    'out',
     'ready',
+    'notYet',
+    'out',
     'cancel'
   ],
   spareStatusSelection: [
-    'notYet',
     'avail',
     'issued',
+    'notYet',
     'cancel'
   ]
 }

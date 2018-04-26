@@ -74,6 +74,7 @@
         </ul>
       </v-flex>
     </v-layout>
+    <loading-progress></loading-progress>
   </v-container>
 </template>
 
@@ -97,7 +98,7 @@ export default {
       // console.log(barcode)
       this.scannedAlert = false
       let scanItem = this.formatBarcode(this.barcode)
-      console.log(scanItem)
+      // console.log(scanItem)
       let found = this.scanList.find((item) => {
         return item.number === scanItem.number
       })
@@ -130,7 +131,7 @@ export default {
       let isNRC = barcode.substr(0, 3) === 'nrc'
       if (isNRC) {
         let nrcNumber = parseInt(barcode.substr(3, 7), 10)
-        console.log(nrcNumber)
+        // console.log(nrcNumber)
         return {
           number: nrcNumber,
           isNRC: isNRC
@@ -145,6 +146,7 @@ export default {
       }
     },
     update() {
+      this.$store.dispatch('beginLoading')
       this.scanList.forEach(element => {
         if (element.isNRC) {
           firebase.database().ref('nrcs/' + this.checkId).orderByChild('number').equalTo(element.number).limitToFirst(1).once('value').then(
@@ -236,13 +238,14 @@ export default {
             })
           }
         })
+        this.$store.dispatch('endLoading')
+      },
+      clear() {
+        this.scanList.forEach(element => {
+          element.updateSuccess = false
+          element.updateFail = false
+        })
       }
-    },
-    clear() {
-      this.scanList.forEach(element => {
-        element.updateSuccess = false
-        element.updateFail = false
-      })
     },
     created() {
       this.$barcodeScanner.init(this.onBarcodeScanned)

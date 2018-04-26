@@ -74,6 +74,7 @@
         </ul>
       </v-flex>
     </v-layout>
+    <loading-progress></loading-progress>
   </v-container>
 </template>
 
@@ -155,6 +156,7 @@ export default {
       }
     },
     update() {
+      this.$store.dispatch('beginLoading')
       this.scanList.forEach(element => {
         if (element.isNRC) {
           firebase.database().ref('nrcs/' + this.checkId).orderByChild('number').equalTo(element.number).limitToFirst(1).once('value').then(
@@ -215,7 +217,7 @@ export default {
                   obj[key].status = element.status
                   let log = {
                     status: element.status,
-                    person: element.person,
+                    person: 'ppc',
                     time: element.time,
                     action: 'received',
                     notes: element.notes
@@ -250,6 +252,7 @@ export default {
           )
         }
       })
+      this.$store.dispatch('endLoading')
     },
     clear() {
       this.scanList.forEach(element => {

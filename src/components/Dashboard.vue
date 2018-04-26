@@ -53,13 +53,7 @@ export default {
   data () {
     return {
       checkId: null,
-      taskData: {
-        total: '',
-        done: '',
-        inProgress: '',
-        notYet: '',
-        out: ''
-      },
+      taskData: {},
       nrcData: {
         total: '',
         done: '',
@@ -103,20 +97,35 @@ export default {
       firebase.database().ref('workpacks/' + this.checkId).on('value',
         (data) => {
           this.workpack = data.val()
-          this.taskData.total = this.workpack.length
-          this.taskData.done = this.workpack.filter(element => element.status === 'done').length
-          this.taskData.inProgress = this.workpack.filter(element => element.status === 'inProgress').length
-          this.taskData.notYet = this.workpack.filter(element => element.status === 'notYet').length
-          this.taskData.out = this.workpack.filter(element => element.status === 'out').length
-          let arr = [
-            this.taskData.done,
-            this.taskData.inProgress,
-            this.taskData.out,
-            this.taskData.notYet
-          ]
-          // console.log(arr)
-          this.taskDataChart.datasets[0].data = arr
+          let scanWorkpack = {
+            done: 0,
+            inProgress: 0,
+            out: 0,
+            notYet: 0
+          }
+          this.workpack.forEach(element => {
+            if (element.status === 'notYet') {
+              scanWorkpack.notYet++
+              return
+            }
+            if (element.status === 'inProgress') {
+              scanWorkpack.inProgress++
+              return
+            }
+            if (element.status === 'done') {
+              scanWorkpack.done++
+              return
+            }
+            if (element.status === 'out') {
+              scanWorkpack.out++
+              return
+            }
+          })
+          // console.log(scanWorkpack)
+          this.taskData = Object.assign({}, scanWorkpack)
+          this.taskDataChart.datasets[0].data = Object.values(this.taskData)
           this.$refs.taskChart.update()
+          this.taskData.total = this.workpack.length
           this.$store.dispatch('endLoading')
         },
         (error) => {
@@ -130,20 +139,35 @@ export default {
       firebase.database().ref('nrcs/' + this.checkId).on('value',
         (data) => {
           this.nrcList = Object.values(data.val()) || []
-          this.nrcData.total = this.nrcList.length
-          this.nrcData.done = this.nrcList.filter(element => element.status === 'done').length
-          this.nrcData.inProgress = this.nrcList.filter(element => element.status === 'inProgress').length
-          this.nrcData.notYet = this.nrcList.filter(element => element.status === 'notYet').length
-          this.nrcData.out = this.nrcList.filter(element => element.status === 'out').length
-          let arr = [
-            this.nrcData.done,
-            this.nrcData.inProgress,
-            this.nrcData.out,
-            this.nrcData.notYet
-          ]
-          // console.log(arr)
-          this.nrcDataChart.datasets[0].data = arr
+          let scanNRCList = {
+            done: 0,
+            inProgress: 0,
+            out: 0,
+            notYet: 0
+          }
+          this.nrcList.forEach(element => {
+            if (element.status === 'notYet') {
+              scanNRCList.notYet++
+              return
+            }
+            if (element.status === 'inProgress') {
+              scanNRCList.inProgress++
+              return
+            }
+            if (element.status === 'done') {
+              scanNRCList.done++
+              return
+            }
+            if (element.status === 'out') {
+              scanNRCList.out++
+              return
+            }
+          })
+          // console.log(scanNRCList)
+          this.nrcData = Object.assign({}, scanNRCList)
+          this.nrcDataChart.datasets[0].data = Object.values(this.nrcData)
           this.$refs.nrcChart.update()
+          this.nrcData.total = this.nrcList.length
           this.$store.dispatch('endLoading')
         },
         (error) => {
