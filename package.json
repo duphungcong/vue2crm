@@ -19,6 +19,8 @@
     "axios": "^0.16.2",
     "chart.js": "^2.7.2",
     "firebase": "^4.12.1",
+    "global": "^4.3.2",
+    "npm": "^6.0.0",
     "vue": "^2.5.15",
     "vue-barcode-scanner": "^0.6.0",
     "vue-chartjs": "^2.6.5",
