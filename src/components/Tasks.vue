@@ -230,7 +230,6 @@ export default {
         descending: true
       },
       search: '',
-      itemIndex: -1,
       editedItem: {},
       dialogDelete: false,
       dialogEdit: false,
@@ -275,130 +274,108 @@ export default {
   },
   methods: {
     deleteTask(item) {
-      this.itemIndex = this.workpack.indexOf(item)
-      // console.log(this.itemIndex)
       this.editedItem = Object.assign({}, item)
       this.dialogDelete = true
     },
     editTask(item) {
-      this.itemIndex = this.workpack.indexOf(item)
-      // console.log(this.itemIndex)
       this.editedItem = Object.assign({}, item)
       this.dialogEdit = true
     },
     moveTask(zone, item) {
-      this.itemIndex = this.workpack.indexOf(item)
-      // console.log(this.itemIndex)
       this.editedItem = Object.assign({}, item)
       this.editedItem.zoneDivision = zone + ' from ' + this.editedItem.zoneDivision
-      if (this.itemIndex > -1) {
-        const rootComponent = this.appUtil.getRootComponent(this)
-        firebase.database().ref('/workpacks/' + this.checkId + '/' + this.itemIndex).update(this.editedItem).then(
-          (data) => {
-            rootComponent.openSnackbar('Success', 'success')
-            this.editedItem = {}
-          },
-          (error) => {
-            // console.log(error)
-            rootComponent.openSnackbar(error, 'error')
-            this.editedItem = {}
-          }
-        )
-      }
+      const rootComponent = this.appUtil.getRootComponent(this)
+      firebase.database().ref('/workpacks/' + this.checkId + '/' + this.editedItem.id).update(this.editedItem).then(
+        (data) => {
+          rootComponent.openSnackbar('Success', 'success')
+          this.editedItem = {}
+        },
+        (error) => {
+          // console.log(error)
+          rootComponent.openSnackbar(error, 'error')
+          this.editedItem = {}
+        }
+      )
     },
     selectShift(item) {
-      this.itemIndex = this.workpack.indexOf(item)
-      // console.log(this.itemIndex)
       this.editedItem = Object.assign({}, item)
       this.dialogSelectShift = true
     },
     showLog(item) {
-      this.itemIndex = this.workpack.indexOf(item)
-      if (this.itemIndex > -1) {
-        this.logLoading = true
-        firebase.database().ref('taskLogs/' + this.checkId + '/' + this.itemIndex).once('value').then(
-          (data) => {
-            let obj = data.val()
-            // console.log(obj)
-            for (let key in obj) {
-              this.taskLogs.push(obj[key])
-            }
-            this.logLoading = false
-          },
-          (error) => {
-            console.log(error)
-            this.logLoading = false
+      this.logLoading = true
+      firebase.database().ref('taskLogs/' + this.checkId).orderByChild('taskId').equalTo(item.id).once('value').then(
+        (data) => {
+          let obj = data.val()
+          // console.log(obj)
+          for (let key in obj) {
+            this.taskLogs.push(obj[key])
           }
-        )
-      }
+          this.logLoading = false
+        },
+        (error) => {
+          console.log(error)
+          this.logLoading = false
+        }
+      )
       this.dialogLog = true
     },
     closeDeleteTask() {
       this.dialogDelete = false
       setTimeout(() => {
         this.editedItem = {}
-        this.itemIndex = -1
       }, 300)
     },
     closeEditTask() {
       this.dialogEdit = false
       setTimeout(() => {
         this.editedItem = {}
-        this.itemIndex = -1
       }, 300)
     },
     closeSelectShift() {
       this.dialogSelectShift = false
       setTimeout(() => {
         this.editedItem = {}
-        this.itemIndex = -1
       }, 300)
     },
     saveDeleteTask() {
       this.editedItem.zoneDivision = 'REMOVED ' + this.editedItem.zoneDivision
-      if (this.itemIndex > -1) {
-        const rootComponent = this.appUtil.getRootComponent(this)
-        firebase.database().ref('/workpacks/' + this.checkId + '/' + this.itemIndex).update(this.editedItem).then(
-          (data) => {
-            rootComponent.openSnackbar('Deleted', 'error')
-          },
-          (error) => {
-            // console.log(error)
-            rootComponent.openSnackbar(error, 'error')
-          }
-        )
-      }
+      const rootComponent = this.appUtil.getRootComponent(this)
+      firebase.database().ref('/workpacks/' + this.checkId + '/' + this.editedItem.id).update(this.editedItem).then(
+        (data) => {
+          rootComponent.openSnackbar('Deleted', 'error')
+        },
+        (error) => {
+          // console.log(error)
+          rootComponent.openSnackbar(error, 'error')
+        }
+      )
       this.closeDeleteTask()
     },
     saveEditTask() {
-      if (this.itemIndex > -1) {
-        const rootComponent = this.appUtil.getRootComponent(this)
-        firebase.database().ref('/workpacks/' + this.checkId + '/' + this.itemIndex).update(this.editedItem).then(
-          (data) => {
-            rootComponent.openSnackbar('Success', 'success')
-          },
-          (error) => {
-            // console.log(error)
-            rootComponent.openSnackbar(error, 'error')
-            this.closeEditTask()
-          }
-        )
-      }
+      const rootComponent = this.appUtil.getRootComponent(this)
+      firebase.database().ref('/workpacks/' + this.checkId + '/' + this.editedItem.id).update(this.editedItem).then(
+        (data) => {
+          rootComponent.openSnackbar('Success', 'success')
+        },
+        (error) => {
+          // console.log(error)
+          rootComponent.openSnackbar(error, 'error')
+          this.closeEditTask()
+        }
+      )
       this.closeEditTask()
     },
     saveSelectShift() {
       this.editedItem.shifts.sort((a, b) => {
         return a - b
       })
-      if (this.itemIndex > -1) {
-        firebase.database().ref('/workpacks/' + this.checkId + '/' + this.itemIndex).update(this.editedItem).then(
-          (data) => {},
-          (error) => {
-            console.log(error)
-          }
-        )
-        this.closeSelectShift()
-      }
+      firebase.database().ref('/workpacks/' + this.checkId + '/' + this.editedItem.id).update(this.editedItem).then(
+        (data) => {},
+        (error) => {
+          console.log(error)
+        }
+      )
+      this.closeSelectShift()
     },
     shiftColor(shifts, shiftNumber, taskStatus) {
       let lastShiftNumber = shifts[shifts.length - 1]
@@ -474,7 +451,7 @@ export default {
       }
     },
     loadCheck() {
-      firebase.database().ref('checks').child(this.checkId).once('value').then(
+      firebase.database().ref('checks').child(this.checkId).on('value',
         (data) => {
           this.check = data.val()
         },
@@ -487,7 +464,7 @@ export default {
       this.$store.dispatch('beginLoading')
       firebase.database().ref('workpacks/' + this.checkId).on('value',
         (data) => {
-          this.workpack = data.val()
+          this.workpack = Object.values(data.val()) || []
           this.showTab()
           // console.log(this.firstLoad)
           if (!this.firstLoad) {

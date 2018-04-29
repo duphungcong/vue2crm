@@ -207,6 +207,7 @@ export default {
                   }
                   obj[key].status = 'out'
                   let log = {
+                    taskId: obj[key].id,
                     status: 'out',
                     person: element.person,
                     time: element.time,

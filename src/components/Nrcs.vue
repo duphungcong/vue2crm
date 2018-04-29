@@ -19,7 +19,7 @@
             </v-flex>
           </v-layout>
         </v-card-actions>
-        <v-data-table :headers="headerNRC" :items="nrcList" :pagination.sync="paginationNRC" :search="search" item-key="number">
+        <v-data-table :headers="headerNRC" :items="nrcList" :pagination.sync="paginationNRC" :search="search" item-key="id">
           <template slot="items" slot-scope="props" class="body-0">
             <td class="body-0" @click="props.expanded = !props.expanded"><v-chip :class="statusColor(props.item.status)" label>{{ props.item.number }}</v-chip></td>
             <td class="body-0" @click="props.expanded = !props.expanded" :class="priorityColor(props.item.priority)">{{ props.item.priority }}</td>
@@ -134,7 +134,7 @@
           </v-layout>
           <v-layout row wrap align-baseline>
             <v-flex xs6>
-              <v-text-field label="RQF" mask="AA  ########" counter="12" v-model="newOrder.number"></v-text-field>
+              <v-text-field label="RQF (Ex: HM  01145678)" mask="AA  ########" counter="12" v-model="newOrder.number"></v-text-field>
             </v-flex>
             <v-flex xs1></v-flex>
             <v-flex xs5>
@@ -431,14 +431,6 @@ export default {
         } else {
           this.editedNRC.spareStatus = 'order'
         }
-
-        // let sparesListObj = this.sparesList.reduce((obj, item) => {
-        //   obj[item.id] = item
-        //   obj[item.id].id = null
-        //   return obj
-        // }, {})
-        // console.log(sparesListObj)
-
         let updates = {}
         updates['/nrcs/' + this.checkId + '/' + this.editedNRC.id + '/spareStatus'] = this.editedNRC.spareStatus
         this.sparesList.forEach(element => {

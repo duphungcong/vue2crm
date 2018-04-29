@@ -17,7 +17,7 @@
         </v-card-actions>
         <v-data-table
           :items="sparesList"
-          item-key="pn"
+          item-key="id"
           :headers="headerSpare"
           :pagination.sync="paginationSpare"
           :search="search">

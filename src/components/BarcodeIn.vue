@@ -176,7 +176,7 @@ export default {
                   let log = {
                     nrcId: obj[key].id,
                     status: element.status,
-                    person: 'ppc',
+                    person: 'PPC',
                     time: element.time,
                     action: 'received',
                     notes: element.notes
@@ -215,8 +215,9 @@ export default {
                   }
                   obj[key].status = element.status
                   let log = {
+                    taskId: obj[key].id,
                     status: element.status,
-                    person: 'ppc',
+                    person: 'PPC',
                     time: element.time,
                     action: 'received',
                     notes: element.notes

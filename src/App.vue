@@ -563,6 +563,7 @@ export default {
       }
       if (item === 'order') {
         this.save(item)
+        this.orderNRC = {}
         this.close('order')
       }
       if (item === 'task') {
