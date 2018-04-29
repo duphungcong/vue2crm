@@ -3,6 +3,7 @@
     <v-layout row wrap>
       <v-flex xs4 pl-2>
         <v-text-field
+          ref="scanBox"
           label="Scan Task"
           @change.native="onBarcodeScanned(barcode)"
           v-model="barcode"
@@ -13,7 +14,8 @@
           mask="####"
           clearable
           label="Type vaeco ID (4 digits) to active scan"
-          v-model="person"></v-text-field>
+          v-model="person"
+          @keyup.native.enter="focusToScan()"></v-text-field>
         <v-alert type="success" v-model="scannedAlert">
           This task is already scanned!
         </v-alert>
@@ -245,6 +247,9 @@ export default {
           element.updateSuccess = false
           element.updateFail = false
         })
+      },
+      focusToScan() {
+        this.$refs.scanBox.focus()
       }
     },
     created() {

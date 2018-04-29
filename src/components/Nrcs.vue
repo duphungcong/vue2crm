@@ -537,9 +537,9 @@ export default {
       let exportedNRCList = []
       this.nrcList.forEach((element) => {
         let item = {
-          nrc: element.number,
-          description: element.content,
-          reference: element.ref
+          NRC: element.number,
+          DESCRIPTION: element.content,
+          REF: element.ref
         }
         exportedNRCList.push(item)
       })

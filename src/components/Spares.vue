@@ -197,6 +197,7 @@
 <script>
 
 import firebase from 'firebase'
+import XLSX from 'xlsx'
 
 export default {
   name: 'Spares',
@@ -311,6 +312,29 @@ export default {
         'cancel': 'remove_circle_outline'
       })[status]
       return iconByStatus(itemStatus)
+    },
+    exportSparesList() {
+      let exportedSparesList = []
+      this.sparesList.forEach((element) => {
+        let item = {
+          RQF: element.number,
+          NRC: element.nrc,
+          DESCRIPTION: element.description,
+          PN: element.pn,
+          QTY: element.quantity,
+          PRI: element.priority,
+          STATUS: element.status,
+          EST_DATE: element.estDate
+        }
+        exportedSparesList.push(item)
+      })
+      // console.log(exportedWorkpack)
+      let worksheet = XLSX.utils.json_to_sheet(Object.assign([], exportedSparesList))
+      // console.log(worksheet)
+      let workbook = XLSX.utils.book_new()
+      XLSX.utils.book_append_sheet(workbook, worksheet, 'SPARES')
+      // // console.log(workbook)
+      XLSX.writeFile(workbook, 'SPARES.xlsx')
     }
   },
   mounted() {
