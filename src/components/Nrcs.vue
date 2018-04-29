@@ -358,7 +358,12 @@ export default {
       this.$store.dispatch('beginLoading')
       firebase.database().ref('nrcs/' + this.checkId).on('value',
         (data) => {
-          this.nrcList = Object.values(data.val()) || []
+          const obj = data.val()
+          if (obj !== null && obj !== undefined) {
+            this.nrcList = Object.values(data.val()) || []
+          } else {
+            this.nrcList = []
+          }
           this.nrcListBeforeFilter = this.nrcList
           this.$store.dispatch('endLoading')
         },

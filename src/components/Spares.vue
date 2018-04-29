@@ -236,7 +236,12 @@ export default {
       this.$store.dispatch('beginLoading')
       firebase.database().ref('spares/' + this.checkId).on('value',
       (data) => {
-        this.sparesList = Object.values(data.val()) || []
+        const obj = data.val()
+          if (obj !== null && obj !== undefined) {
+            this.sparesList = Object.values(data.val()) || []
+          } else {
+            this.sparesList = []
+          }
         this.sparesList.sort((a, b) => {
           return a.nrcNumber - b.nrcNumber || a.reqDate - b.reqDate
         })

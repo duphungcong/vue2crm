@@ -33,6 +33,7 @@
             <v-btn @click.native="dialogConfirmCancel = true">Cancel</v-btn>
             <v-btn color="primary" @click.native="e1 = 2" :disabled="!inputCheckInfoCompleted">Next</v-btn>
           </v-stepper-content>
+
           <v-stepper-content step="2">
             <v-card class="lighten-4 elevation-0">
               <v-card-title><h3>Import WP CONTROL</h3></v-card-title>
@@ -47,13 +48,15 @@
             <v-btn @click.native="e1 = 1">Back</v-btn>
             <v-btn color="primary" @click.native="scanZoneDivision()" :disabled="!readingIsCompleted">Next</v-btn>
           </v-stepper-content>
+
           <v-stepper-content step="3">
             <v-card class="lighten-4 elevation-0">
               <v-card-title><h3>Zone Division</h3></v-card-title>
-            </v-card>
-            <v-btn @click.native="e1 = 2">Back</v-btn>
-            <v-btn color="primary" @click.native="e1 = 4">Next</v-btn>
-            <v-card class="lighten-4 elevation-0">
+              <v-card-actions>
+                <v-btn @click.native="e1 = 2">Back</v-btn>
+                <v-btn color="primary" @click.native="e1 = 4">Next</v-btn>
+              </v-card-actions>
+            
               <v-data-table :headers="headers" :items="workpack">
                 <template slot="items" slot-scope="props" class="body-0">
                   <td class="body-0">{{ props.item.wpItem }}</td>
@@ -71,6 +74,7 @@
               </v-data-table>
             </v-card>
           </v-stepper-content>
+
           <v-stepper-content step="4">
             <v-card class="lighten-4 elevation-0">
               <v-card-title><h3>Review and submit</h3></v-card-title>
@@ -162,6 +166,7 @@ export default {
   },
   methods: {
     saveCheck() {
+      this.$store.dispatch('beginLoading')
       let start = new Date(this.check.startDate)
       let finish = new Date(this.check.finishDate)
       let diff = new Date(finish - start)
@@ -174,13 +179,18 @@ export default {
           hyd: true
         })
       }
-      let newCheckKey = firebase.database().ref().child('checks').push().key
       let updates = {}
+      let newCheckKey = firebase.database().ref().child('checks').push().key
       updates['/checks/' + newCheckKey] = this.check
-      updates['/workpacks/' + newCheckKey] = this.workpack
+      this.workpack.forEach(element => {
+        let newItemKey = firebase.database().ref('/workpacks/' + newCheckKey).push().key
+        element.id = newItemKey
+        updates['/workpacks/' + newCheckKey + '/' + newItemKey] = element
+      })
 
       firebase.database().ref().update(updates).then(
         (data) => {
+          this.$store.dispatch('endLoading')
           this.$router.push('/checks')
         },
         (error) => {
@@ -202,6 +212,7 @@ export default {
         },
         (error) => {
           console.log(error)
+          this.$store.dispatch('endLoading')
         }
       )
     },
@@ -241,7 +252,7 @@ export default {
             const obj = data.val()
             if (obj !== null && obj !== undefined) {
               for (let key2 in obj) {
-                this.workpack[key1].taskId = key2
+                this.workpack[key1].amsId = key2
                 this.workpack[key1].zoneDivision = obj[key2].zoneDivision || 'N/A'
                 this.workpack[key1].amsMH = obj[key2].amsMH || ''
                 this.workpack[key1].macMH = obj[key2].macMH || ''
