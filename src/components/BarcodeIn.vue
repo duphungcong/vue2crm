@@ -64,7 +64,11 @@
                   <v-text-field label="Remarks" v-model="item.notes"></v-text-field>
                 </v-flex>
                 <v-flex xs1 pl-3>
-                  <v-icon color="red">delete</v-icon>
+                  <v-btn icon @click.native="remove(item)">
+                    <v-tooltip bottom>
+                      <v-icon color="red" slot="activator">delete</v-icon><span>delete</span>
+                    </v-tooltip>
+                  </v-btn>
                   <v-icon color="green" v-if="item.updateSuccess">check</v-icon>
                   <v-icon color="red" v-if="item.updateFail">close</v-icon>
                 </v-flex>
@@ -253,6 +257,12 @@ export default {
         }
       })
       this.$store.dispatch('endLoading')
+    },
+    remove(item) {
+      let itemIndex = this.scanList.indexOf(item)
+      if (itemIndex > -1) {
+        this.scanList.splice(itemIndex, 1)
+      }
     },
     clear() {
       this.scanList.forEach(element => {
