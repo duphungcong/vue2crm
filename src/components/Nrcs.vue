@@ -278,6 +278,24 @@
         </v-data-table>
       </v-card>
     </v-dialog>
+    <v-dialog v-model="dialogLog" max-width="900">
+      <v-card class="elevation-0">
+        <v-data-table
+          :items="nrcLogs"
+          :headers="headerLog"
+          :pagination.sync="paginationLog"
+          :loading="logLoading"
+          class="elevation-1">
+          <template slot="items" slot-scope="props">
+            <td class="boyd-0">{{ props.item.person }}</td>
+            <td class="boyd-0">{{ props.item.action }}</td>
+            <td class="boyd-0">{{ props.item.status }}</td>
+            <td class="boyd-0">{{ props.item.time }}</td>
+            <td class="boyd-0">{{ props.item.notes || 'NIL'}}</td>
+          </template>
+        </v-data-table>
+      </v-card>
+    </v-dialog>
     <loading-progress></loading-progress>
   </v-container>
 </template>
@@ -294,6 +312,7 @@ export default {
       checkId: null,
       nrcList: [],
       nrcListBeforeFilter: [],
+      nrcLogs: [],
       paginationNRC: {
         page: 1,
         totalItems: 0,
@@ -306,6 +325,13 @@ export default {
         totalItems: 0,
         rowsPerPage: 10,
         sortBy: 'number',
+        descending: true
+      },
+      paginationLog: {
+        page: 1,
+        totalItems: 0,
+        rowsPerPage: 10,
+        sortBy: 'time',
         descending: true
       },
       headerNRC: [
@@ -327,6 +353,13 @@ export default {
         { text: 'NOTES', left: true, value: 'notes' },
         { text: 'ACTIONS', sortable: false, value: '' }
       ],
+      headerLog: [
+        { text: 'PERSON', left: true, value: 'person' },
+        { text: 'ACTION', left: true, value: 'action' },
+        { text: 'STATUS', left: true, value: 'status' },
+        { text: 'TIME', left: true, value: 'time' },
+        { text: 'NOTES', left: true, value: 'notes' }
+      ],
       zoneSelection: this.constUtil.zoneSelection,
       prioritySelection: this.constUtil.prioritySelection,
       nrcStatusSelection: this.constUtil.nrcStatusSelection,
@@ -338,6 +371,8 @@ export default {
       dialogEditNRC: false,
       dialogOrderSpare: false,
       dialogNRCSpares: false,
+      dialogLog: false,
+      logLoading: false,
       selectedZone: null,
       search: '',
       allSparesReady: false
@@ -448,7 +483,24 @@ export default {
       }
       this.closeNRCSpares()
     },
-    showLog(item) {},
+    showLog(item) {
+      this.logLoading = true
+      firebase.database().ref('nrcLogs/' + this.checkId).orderByChild('nrcId').equalTo(item.id).once('value').then(
+        (data) => {
+          let obj = data.val()
+          // console.log(obj)
+          for (let key in obj) {
+            this.nrcLogs.push(obj[key])
+          }
+          this.logLoading = false
+        },
+        (error) => {
+          console.log(error)
+          this.logLoading = false
+        }
+      )
+      this.dialogLog = true
+    },
     showTAR(item) {},
     orderSpare(item) {
       this.editedNRC = Object.assign({}, item)
