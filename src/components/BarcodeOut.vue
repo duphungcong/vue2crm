@@ -173,19 +173,17 @@ export default {
                     action: 'take out',
                     notes: element.notes
                   }
-                  firebase.database().ref('nrcs/' + this.checkId + '/' + obj[key].id).update(obj[key]).then(
+                  let updates = {}
+                  let newLogKey = firebase.database().ref('nrcLogs/' + this.checkId).push().key
+                  updates['nrcs/' + this.checkId + '/' + obj[key].id] = obj[key]
+                  updates['nrcLogs/' + this.checkId + '/' + newLogKey] = log
+                  firebase.database().ref().update(updates).then(
                     (data) => {
                       element.updateSuccess = true
                     },
                     (error) => {
                       console.log(error)
                       element.updateFail = true
-                    }
-                  )
-                  firebase.database().ref('nrcLogs/' + this.checkId).push(log).then(
-                    (data) => {},
-                    (error) => {
-                      console.log(error)
                     }
                   )
                 }
@@ -215,22 +213,17 @@ export default {
                     action: 'take out',
                     notes: element.notes
                   }
-                  firebase.database().ref('workpacks/' + this.checkId + '/' + key).update(obj[key]).then(
+                  let updates = {}
+                  let newLogKey = firebase.database().ref('taskLogs/' + this.checkId).push().key
+                  updates['workpacks/' + this.checkId + '/' + key] = obj[key]
+                  updates['taskLogs/' + this.checkId + '/' + newLogKey] = log
+                  firebase.database().ref().update(updates).then(
                     (data) => {
-                      // console.log('update completed')
                       element.updateSuccess = true
                     },
                     (error) => {
                       console.log(error)
                       element.updateFail = true
-                    }
-                  )
-                  firebase.database().ref('taskLogs/' + this.checkId + '/' + key).push(log).then(
-                    (data) => {
-                      // console.log('log - take out')
-                    },
-                    (error) => {
-                      console.log(error)
                     }
                   )
                 }
