@@ -24,9 +24,9 @@
             <td class="body-0" @click="props.expanded = !props.expanded"><v-chip :class="statusColor(props.item.status)" label>{{ props.item.number }}</v-chip></td>
             <td class="body-0" @click="props.expanded = !props.expanded" :class="priorityColor(props.item.priority)">{{ props.item.priority }}</td>
             <td class="body-0">
-              <v-btn v-if="props.item.spares !== undefined && props.item.spares !== ''" icon class="mx-0" @click.native="showNRCSpares(props.item)">
+              <v-btn v-if="props.item.spareStatus !== undefined && props.item.spareStatus !== ''" icon class="mx-0" @click.native="showNRCSpares(props.item)">
                 <v-tooltip bottom>
-                  <v-icon color="blue" slot="activator" v-if="props.item.spares === 'ready'">local_grocery_store</v-icon>
+                  <v-icon color="blue" slot="activator" v-if="props.item.spareStatus === 'ready'">local_grocery_store</v-icon>
                   <v-icon color="grey darken-2" slot="activator" v-else>local_grocery_store</v-icon><span>spares</span>
                 </v-tooltip>
               </v-btn>
@@ -42,34 +42,34 @@
             <td class="body-0" @click="props.expanded = !props.expanded">{{ props.item.zone }}</td>
           </template>
           <template slot="expand" slot-scope="props">
-              <v-card flat color="blue lighten-5" class="elevation-0">
-                <v-card-actions>
-                  <v-btn icon class="mx-0" @click="editNRC(props.item)">
-                    <v-tooltip bottom>
-                      <v-icon color="blue" slot="activator">edit</v-icon><span>edit</span>
-                    </v-tooltip>
-                  </v-btn>
-                  <v-btn icon class="mx-0" @click.native="orderSpare(props.item)">
-                    <v-tooltip bottom>
-                      <v-icon color="blue" slot="activator">add_shopping_cart</v-icon><span>order</span>
-                    </v-tooltip>
-                  </v-btn>
-                  <v-btn icon class="mx-0" @click.native="makeTAR(props.item)">
-                    <v-tooltip bottom>
-                      <v-icon color="blue" slot="activator">help_outline</v-icon><span>tar</span>
-                    </v-tooltip>
-                  </v-btn>
-                  <v-btn icon class="mx-0" @click.native="showLog(props.item)">
-                    <v-tooltip bottom>
-                      <v-icon color="blue" slot="activator">assignment</v-icon><span>log</span>
-                    </v-tooltip>
-                  </v-btn>
-                </v-card-actions>
-                <v-card-text>
-                  <p>WO: <strong>{{ props.item.wo }}</strong></p>
-                </v-card-text>
-              </v-card>
-            </template>
+            <v-card flat color="blue lighten-5" class="elevation-0">
+              <v-card-actions>
+                <v-btn icon class="mx-0" @click="editNRC(props.item)">
+                  <v-tooltip bottom>
+                    <v-icon color="blue" slot="activator">edit</v-icon><span>edit</span>
+                  </v-tooltip>
+                </v-btn>
+                <v-btn icon class="mx-0" @click.native="orderSpare(props.item)">
+                  <v-tooltip bottom>
+                    <v-icon color="blue" slot="activator">add_shopping_cart</v-icon><span>order</span>
+                  </v-tooltip>
+                </v-btn>
+                <v-btn icon class="mx-0" @click.native="makeTAR(props.item)">
+                  <v-tooltip bottom>
+                    <v-icon color="blue" slot="activator">help_outline</v-icon><span>tar</span>
+                  </v-tooltip>
+                </v-btn>
+                <v-btn icon class="mx-0" @click.native="showLog(props.item)">
+                  <v-tooltip bottom>
+                    <v-icon color="blue" slot="activator">assignment</v-icon><span>log</span>
+                  </v-tooltip>
+                </v-btn>
+              </v-card-actions>
+              <v-card-text>
+                <p>WO: <strong>{{ props.item.wo }}</strong></p>
+              </v-card-text>
+            </v-card>
+          </template>
         </v-data-table>
       </v-card>
     </v-flex>
@@ -240,7 +240,7 @@
             <td class="boyd-0" @click="props.expanded = !props.expanded">{{ props.item.notes || 'NIL'}}</td>
             <td class="body-0">
               <v-menu bottom right>
-                <v-btn icon class="mx-0" @click.native="selectStatus(props.item)" slot="activator">
+                <v-btn icon class="mx-0" slot="activator">
                   <v-tooltip bottom>
                     <v-icon color="blue" slot="activator">edit</v-icon><span>status</span>
                   </v-tooltip>
@@ -327,7 +327,6 @@ export default {
         { text: 'NOTES', left: true, value: 'notes' },
         { text: 'ACTIONS', sortable: false, value: '' }
       ],
-      itemIndex: -1,
       zoneSelection: this.constUtil.zoneSelection,
       prioritySelection: this.constUtil.prioritySelection,
       nrcStatusSelection: this.constUtil.nrcStatusSelection,
@@ -359,7 +358,7 @@ export default {
       this.$store.dispatch('beginLoading')
       firebase.database().ref('nrcs/' + this.checkId).on('value',
         (data) => {
-          this.nrcList = data.val() || []
+          this.nrcList = Object.values(data.val()) || []
           this.nrcListBeforeFilter = this.nrcList
           this.$store.dispatch('endLoading')
         },
@@ -370,8 +369,6 @@ export default {
       )
     },
     editNRC(item) {
-      this.itemIndex = this.nrcList.indexOf(item)
-      console.log(this.itemIndex)
       this.editedNRC = Object.assign({}, item)
       this.dialogEditNRC = true
     },
@@ -379,50 +376,39 @@ export default {
       this.dialogEditNRC = false
       setTimeout(() => {
         this.editedNRC = {}
-        this.itemIndex = -1
       }, 300)
     },
     saveEditedNRC() {
-      if (this.itemIndex > -1) {
-        const rootComponent = this.appUtil.getRootComponent(this)
-        firebase.database().ref('nrcs/' + this.checkId + '/' + this.itemIndex).update(this.editedNRC).then(
-          (data) => {
-            rootComponent.openSnackbar('Success', 'success')
-          },
-          (error) => {
-            // console.log(error)
-            rootComponent.openSnackbar(error, 'error')
-          }
-        )
-      }
+      const rootComponent = this.appUtil.getRootComponent(this)
+      firebase.database().ref('nrcs/' + this.checkId + '/' + this.editedNRC.id).update(this.editedNRC).then(
+        (data) => {
+          rootComponent.openSnackbar('Success', 'success')
+        },
+        (error) => {
+          // console.log(error)
+          rootComponent.openSnackbar(error, 'error')
+        }
+      )
       this.closeEditNRC()
     },
     showNRCSpares(item) {
-      this.itemIndex = this.nrcList.indexOf(item)
       this.editedNRC = Object.assign({}, item)
-      if (this.editedNRC.spares === 'ready') {
+      if (this.editedNRC.spareStatus === 'ready') {
         this.allSparesReady = true
       } else {
         this.allSparesReady = false
       }
-      if (this.itemIndex > -1) {
-        this.spareLoading = true
-        firebase.database().ref('spares/' + this.checkId + '/' + this.itemIndex).once('value').then(
-          (data) => {
-            let obj = data.val()
-            if (obj !== null && obj !== undefined) {
-              for (let key in obj) {
-                this.sparesList.push(Object.assign({}, obj[key], { id: key }))
-              }
-            }
-            this.spareLoading = false
-          },
-          (error) => {
-            console.log(error)
-            this.spareLoading = false
-          }
-        )
-      }
+      this.spareLoading = true
+      firebase.database().ref('spares/' + this.checkId).orderByChild('nrcId').equalTo(this.editedNRC.id).once('value').then(
+        (data) => {
+          this.sparesList = Object.values(data.val()) || []
+          this.spareLoading = false
+        },
+        (error) => {
+          console.log(error)
+          this.spareLoading = false
+        }
+      )
       this.dialogNRCSpares = true
     },
     closeNRCSpares() {
@@ -430,28 +416,29 @@ export default {
       this.sparesList = []
       setTimeout(() => {
         this.editedNRC = {}
-        this.itemIndex = -1
       }, 300)
     },
     saveNRCSpares() {
-      if (this.itemIndex > -1 && this.sparesList.length > 0) {
+      if (this.sparesList.length > 0) {
         const rootComponent = this.appUtil.getRootComponent(this)
         if (this.allSparesReady) {
-          this.editedNRC.spares = 'ready'
+          this.editedNRC.spareStatus = 'ready'
         } else {
-          this.editedNRC.spares = 'order'
+          this.editedNRC.spareStatus = 'order'
         }
 
-        let sparesListObj = this.sparesList.reduce((obj, item) => {
-          obj[item.id] = item
-          obj[item.id].id = null
-          return obj
-        }, {})
+        // let sparesListObj = this.sparesList.reduce((obj, item) => {
+        //   obj[item.id] = item
+        //   obj[item.id].id = null
+        //   return obj
+        // }, {})
         // console.log(sparesListObj)
 
         let updates = {}
-        updates['/nrcs/' + this.checkId + '/' + this.itemIndex] = this.editedNRC
-        updates['/spares/' + this.checkId + '/' + this.itemIndex] = sparesListObj
+        updates['/nrcs/' + this.checkId + '/' + this.editedNRC.id + '/spareStatus'] = this.editedNRC.spareStatus
+        this.sparesList.forEach(element => {
+          updates['/spares/' + this.checkId + '/' + element.id] = element
+        })
         firebase.database().ref().update(updates).then(
           (data) => {
             rootComponent.openSnackbar('Success', 'success')
@@ -467,8 +454,6 @@ export default {
     showLog(item) {},
     showTAR(item) {},
     orderSpare(item) {
-      this.itemIndex = this.nrcList.indexOf(item)
-      console.log(this.itemIndex)
       this.editedNRC = Object.assign({}, item)
       this.newOrder.priority = this.editedNRC.priority
       this.newOrder.status = 'notYet'
@@ -480,28 +465,26 @@ export default {
       setTimeout(() => {
         this.newOrder = {}
         this.editedNRC = {}
-        this.itemIndex = -1
       }, 300)
     },
     saveOrderSpare() {
-      if (this.itemIndex > -1) {
-        const rootComponent = this.appUtil.getRootComponent(this)
-        console.log(this.itemIndex)
-        this.editedNRC.spares = 'order'
-        let newSpareKey = firebase.database().ref('spares/' + this.checkId + '/' + this.itemIndex).push().key
-        let updates = {}
-        updates['/nrcs/' + this.checkId + '/' + this.itemIndex] = this.editedNRC
-        updates['/spares/' + this.checkId + '/' + this.itemIndex + '/' + newSpareKey] = this.newOrder
-        firebase.database().ref().update(updates).then(
-          (data) => {
-            rootComponent.openSnackbar('Success', 'success')
-          },
-          (error) => {
-            // console.log(error)
-            rootComponent.openSnackbar(error, 'error')
-          }
-        )
-      }
+      const rootComponent = this.appUtil.getRootComponent(this)
+      let updates = {}
+      let newSpareKey = firebase.database().ref('spares/' + this.checkId).push().key
+      this.newOrder.id = newSpareKey
+      this.newOrder.nrcId = this.editedNRC.id
+      this.newOrder.nrcNumber = this.editedNRC.number
+      updates['/nrcs/' + this.checkId + '/' + this.editedNRC.id + '/spareStatus'] = 'order'
+      updates['/spares/' + this.checkId + '/' + newSpareKey] = this.newOrder
+      firebase.database().ref().update(updates).then(
+        (data) => {
+          rootComponent.openSnackbar('Success', 'success')
+        },
+        (error) => {
+          // console.log(error)
+          rootComponent.openSnackbar(error, 'error')
+        }
+      )
       this.closeOrderSpare()
     },
     makeTAR(item) {},
@@ -545,7 +528,8 @@ export default {
       const iconByStatus = (status) => ({
         'avail': 'check_circle',
         'notYet': 'directions_bike',
-        'issued': 'build'
+        'issued': 'build',
+        'cancel': 'remove_circle_outline'
       })[status]
       return iconByStatus(itemStatus)
     },

@@ -8,5 +8,11 @@ export default {
         return this.getRootComponent(vueComponent.$parent)
       } else { return root }
     } else { return root }
+  },
+  getNumberOfShifts(check) {
+    let start = new Date(check.startDate)
+    let finish = new Date(check.finishDate)
+    let diff = new Date(finish - start)
+    return diff.getUTCDate()
   }
 }
