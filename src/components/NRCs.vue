@@ -384,6 +384,11 @@ export default {
         this.closeNRCSpares()
       }
     },
+    dialogLog (newValue, oldValue) {
+      if (newValue === false) {
+        this.nrcLogs = []
+      }
+    },
     selectedZone (newValue, oldValue) {
       this.filterNRC(newValue)
     }

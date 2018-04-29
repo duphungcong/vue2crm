@@ -91,6 +91,7 @@ export default {
   data () {
     return {
       checkId: '',
+      person: '',
       barcode: '',
       scan: [],
       scanList: [],
@@ -176,7 +177,7 @@ export default {
                   let log = {
                     nrcId: obj[key].id,
                     status: element.status,
-                    person: 'PPC',
+                    person: this.person,
                     time: element.time,
                     action: 'received',
                     notes: element.notes
@@ -217,7 +218,7 @@ export default {
                   let log = {
                     taskId: obj[key].id,
                     status: element.status,
-                    person: 'PPC',
+                    person: this.person,
                     time: element.time,
                     action: 'received',
                     notes: element.notes
@@ -267,6 +268,7 @@ export default {
   },
   mounted() {
     this.checkId = this.$store.getters.following
+    this.person = this.$store.getters.user.displayName || this.$store.getters.user.email
   },
   destroyed() {
     this.$barcodeScanner.destroy()
