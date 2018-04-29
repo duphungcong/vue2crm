@@ -39,11 +39,7 @@ const actions = {
     firebase.auth().signInWithEmailAndPassword(payload.email, payload.password).then(
       (user) => {
         commit('setLoading', false)
-        const newUser = {
-          id: user.uid,
-          email: user.email
-        }
-        commit('setUser', newUser)
+        commit('setUser', user)
       },
       (error) => {
         commit('setLoading', false)
@@ -57,11 +53,7 @@ const actions = {
     firebase.auth().createUserWithEmailAndPassword(payload.email, payload.password).then(
       (user) => {
         commit('setLoading', false)
-        const newUser = {
-          id: user.uid,
-          email: user.email
-        }
-        commit('setUser', newUser)
+        commit('setUser', user)
       },
       (error) => {
         commit('setLoading', false)
@@ -70,7 +62,7 @@ const actions = {
     )
   },
   autoSignIn ({commit}, payload) {
-    commit('setUser', {id: payload.uid, email: payload.email})
+    commit('setUser', payload)
   },
   logOut ({commit}) {
     firebase.auth().signOut()

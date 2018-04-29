@@ -17,6 +17,7 @@ import Spares from '@/components/Spares'
 
 import Login from '@/components/Login'
 import SignUp from '@/components/SignUp'
+import User from '@/components/User'
 
 import store from '@/store'
 
@@ -93,6 +94,12 @@ let router = new Router({
       path: '/barcodeout', component: BarcodeOut, name: 'BarcodeOut', meta: {
         requireAuth: true,
         requireFollowing: true
+      }
+    },
+    {
+      path: '/user', component: User, name: 'User', meta: {
+        requireAuth: true,
+        requireFollowing: false
       }
     },
     { path: '/login', component: Login, name: 'Login' },

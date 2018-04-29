@@ -40,6 +40,7 @@
               </v-btn>
               <v-list>
                 <v-list-tile v-if="userIsFollowingCheck"  @click="onStopFollowing">Stop following check</v-list-tile>
+                <v-list-tile @click="editUser">Settings</v-list-tile>
                 <v-list-tile @click="onLogOut">Logout</v-list-tile>
               </v-list>
             </v-menu>
@@ -463,6 +464,9 @@ export default {
     },
     onLogOut () {
       this.$store.dispatch('logOut')
+    },
+    editUser() {
+      this.$router.push('/user')
     },
     onStopFollowing () {
       this.$store.dispatch('stopFollowing')
