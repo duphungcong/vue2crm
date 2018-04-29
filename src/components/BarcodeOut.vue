@@ -3,6 +3,7 @@
     <v-layout row wrap>
       <v-flex xs4 pl-2>
         <v-text-field
+          ref="scanBox"
           label="Scan Task"
           @change.native="onBarcodeScanned(barcode)"
           v-model="barcode"
@@ -13,7 +14,8 @@
           mask="####"
           clearable
           label="Type vaeco ID (4 digits) to active scan"
-          v-model="person"></v-text-field>
+          v-model="person"
+          @keyup.native.enter="focusToScan()"></v-text-field>
         <v-alert type="success" v-model="scannedAlert">
           This task is already scanned!
         </v-alert>
@@ -64,7 +66,11 @@
                   <v-text-field label="Remarks" v-model="item.notes"></v-text-field>
                 </v-flex>
                 <v-flex xs1 pl-3>
-                  <v-icon color="red">delete</v-icon>
+                  <v-btn icon @click.native="remove(item)">
+                    <v-tooltip bottom>
+                      <v-icon color="red" slot="activator">delete</v-icon><span>delete</span>
+                    </v-tooltip>
+                  </v-btn>
                   <v-icon color="green" v-if="item.updateSuccess">check</v-icon>
                   <v-icon color="red" v-if="item.updateFail">close</v-icon>
                 </v-flex>
@@ -167,19 +173,17 @@ export default {
                     action: 'take out',
                     notes: element.notes
                   }
-                  firebase.database().ref('nrcs/' + this.checkId + '/' + obj[key].id).update(obj[key]).then(
+                  let updates = {}
+                  let newLogKey = firebase.database().ref('nrcLogs/' + this.checkId).push().key
+                  updates['nrcs/' + this.checkId + '/' + obj[key].id] = obj[key]
+                  updates['nrcLogs/' + this.checkId + '/' + newLogKey] = log
+                  firebase.database().ref().update(updates).then(
                     (data) => {
                       element.updateSuccess = true
                     },
                     (error) => {
                       console.log(error)
                       element.updateFail = true
-                    }
-                  )
-                  firebase.database().ref('nrcLogs/' + this.checkId).push(log).then(
-                    (data) => {},
-                    (error) => {
-                      console.log(error)
                     }
                   )
                 }
@@ -203,28 +207,24 @@ export default {
                   }
                   obj[key].status = 'out'
                   let log = {
+                    taskId: obj[key].id,
                     status: 'out',
                     person: element.person,
                     time: element.time,
                     action: 'take out',
                     notes: element.notes
                   }
-                  firebase.database().ref('workpacks/' + this.checkId + '/' + key).update(obj[key]).then(
+                  let updates = {}
+                  let newLogKey = firebase.database().ref('taskLogs/' + this.checkId).push().key
+                  updates['workpacks/' + this.checkId + '/' + key] = obj[key]
+                  updates['taskLogs/' + this.checkId + '/' + newLogKey] = log
+                  firebase.database().ref().update(updates).then(
                     (data) => {
-                      // console.log('update completed')
                       element.updateSuccess = true
                     },
                     (error) => {
                       console.log(error)
                       element.updateFail = true
-                    }
-                  )
-                  firebase.database().ref('taskLogs/' + this.checkId + '/' + key).push(log).then(
-                    (data) => {
-                      // console.log('log - take out')
-                    },
-                    (error) => {
-                      console.log(error)
                     }
                   )
                 }
@@ -235,28 +235,38 @@ export default {
             (error) => {
               element.updateFail = true
               console.log(error)
-            })
-          }
-        })
-        this.$store.dispatch('endLoading')
-      },
-      clear() {
-        this.scanList.forEach(element => {
-          element.updateSuccess = false
-          element.updateFail = false
-        })
+            }
+          )
+        }
+      })
+      this.$store.dispatch('endLoading')
+    },
+    clear() {
+      this.scanList.forEach(element => {
+        element.updateSuccess = false
+        element.updateFail = false
+      })
+    },
+    remove(item) {
+      let itemIndex = this.scanList.indexOf(item)
+      if (itemIndex > -1) {
+        this.scanList.splice(itemIndex, 1)
       }
     },
-    created() {
-      this.$barcodeScanner.init(this.onBarcodeScanned)
-    },
-    mounted() {
-      this.checkId = this.$store.getters.following
-    },
-    destroyed() {
-      this.$barcodeScanner.destroy()
+    focusToScan() {
+      this.$refs.scanBox.focus()
     }
+  },
+  created() {
+    this.$barcodeScanner.init(this.onBarcodeScanned)
+  },
+  mounted() {
+    this.checkId = this.$store.getters.following
+  },
+  destroyed() {
+    this.$barcodeScanner.destroy()
   }
+}
 </script>
 
 <style scoped>

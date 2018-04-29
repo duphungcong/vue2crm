@@ -17,7 +17,7 @@
         </v-card-actions>
         <v-data-table
           :items="sparesList"
-          item-key="pn"
+          item-key="id"
           :headers="headerSpare"
           :pagination.sync="paginationSpare"
           :search="search">
@@ -197,6 +197,7 @@
 <script>
 
 import firebase from 'firebase'
+import XLSX from 'xlsx'
 
 export default {
   name: 'Spares',
@@ -235,7 +236,12 @@ export default {
       this.$store.dispatch('beginLoading')
       firebase.database().ref('spares/' + this.checkId).on('value',
       (data) => {
-        this.sparesList = Object.values(data.val()) || []
+        const obj = data.val()
+          if (obj !== null && obj !== undefined) {
+            this.sparesList = Object.values(data.val()) || []
+          } else {
+            this.sparesList = []
+          }
         this.sparesList.sort((a, b) => {
           return a.nrcNumber - b.nrcNumber || a.reqDate - b.reqDate
         })
@@ -311,6 +317,29 @@ export default {
         'cancel': 'remove_circle_outline'
       })[status]
       return iconByStatus(itemStatus)
+    },
+    exportSparesList() {
+      let exportedSparesList = []
+      this.sparesList.forEach((element) => {
+        let item = {
+          RQF: element.number,
+          NRC: element.nrc,
+          DESCRIPTION: element.description,
+          PN: element.pn,
+          QTY: element.quantity,
+          PRI: element.priority,
+          STATUS: element.status,
+          EST_DATE: element.estDate
+        }
+        exportedSparesList.push(item)
+      })
+      // console.log(exportedWorkpack)
+      let worksheet = XLSX.utils.json_to_sheet(Object.assign([], exportedSparesList))
+      // console.log(worksheet)
+      let workbook = XLSX.utils.book_new()
+      XLSX.utils.book_append_sheet(workbook, worksheet, 'SPARES')
+      // // console.log(workbook)
+      XLSX.writeFile(workbook, 'SPARES.xlsx')
     }
   },
   mounted() {

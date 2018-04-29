@@ -19,7 +19,7 @@
             </v-flex>
           </v-layout>
         </v-card-actions>
-        <v-data-table :headers="headerNRC" :items="nrcList" :pagination.sync="paginationNRC" :search="search" item-key="number">
+        <v-data-table :headers="headerNRC" :items="nrcList" :pagination.sync="paginationNRC" :search="search" item-key="id">
           <template slot="items" slot-scope="props" class="body-0">
             <td class="body-0" @click="props.expanded = !props.expanded"><v-chip :class="statusColor(props.item.status)" label>{{ props.item.number }}</v-chip></td>
             <td class="body-0" @click="props.expanded = !props.expanded" :class="priorityColor(props.item.priority)">{{ props.item.priority }}</td>
@@ -134,7 +134,7 @@
           </v-layout>
           <v-layout row wrap align-baseline>
             <v-flex xs6>
-              <v-text-field label="RQF" mask="AA  ########" counter="12" v-model="newOrder.number"></v-text-field>
+              <v-text-field label="RQF (Ex: HM  01145678)" mask="AA  ########" counter="12" v-model="newOrder.number"></v-text-field>
             </v-flex>
             <v-flex xs1></v-flex>
             <v-flex xs5>
@@ -278,6 +278,24 @@
         </v-data-table>
       </v-card>
     </v-dialog>
+    <v-dialog v-model="dialogLog" max-width="900">
+      <v-card class="elevation-0">
+        <v-data-table
+          :items="nrcLogs"
+          :headers="headerLog"
+          :pagination.sync="paginationLog"
+          :loading="logLoading"
+          class="elevation-1">
+          <template slot="items" slot-scope="props">
+            <td class="boyd-0">{{ props.item.person }}</td>
+            <td class="boyd-0">{{ props.item.action }}</td>
+            <td class="boyd-0">{{ props.item.status }}</td>
+            <td class="boyd-0">{{ props.item.time }}</td>
+            <td class="boyd-0">{{ props.item.notes || 'NIL'}}</td>
+          </template>
+        </v-data-table>
+      </v-card>
+    </v-dialog>
     <loading-progress></loading-progress>
   </v-container>
 </template>
@@ -294,6 +312,7 @@ export default {
       checkId: null,
       nrcList: [],
       nrcListBeforeFilter: [],
+      nrcLogs: [],
       paginationNRC: {
         page: 1,
         totalItems: 0,
@@ -306,6 +325,13 @@ export default {
         totalItems: 0,
         rowsPerPage: 10,
         sortBy: 'number',
+        descending: true
+      },
+      paginationLog: {
+        page: 1,
+        totalItems: 0,
+        rowsPerPage: 10,
+        sortBy: 'time',
         descending: true
       },
       headerNRC: [
@@ -327,6 +353,13 @@ export default {
         { text: 'NOTES', left: true, value: 'notes' },
         { text: 'ACTIONS', sortable: false, value: '' }
       ],
+      headerLog: [
+        { text: 'PERSON', left: true, value: 'person' },
+        { text: 'ACTION', left: true, value: 'action' },
+        { text: 'STATUS', left: true, value: 'status' },
+        { text: 'TIME', left: true, value: 'time' },
+        { text: 'NOTES', left: true, value: 'notes' }
+      ],
       zoneSelection: this.constUtil.zoneSelection,
       prioritySelection: this.constUtil.prioritySelection,
       nrcStatusSelection: this.constUtil.nrcStatusSelection,
@@ -338,6 +371,8 @@ export default {
       dialogEditNRC: false,
       dialogOrderSpare: false,
       dialogNRCSpares: false,
+      dialogLog: false,
+      logLoading: false,
       selectedZone: null,
       search: '',
       allSparesReady: false
@@ -358,7 +393,12 @@ export default {
       this.$store.dispatch('beginLoading')
       firebase.database().ref('nrcs/' + this.checkId).on('value',
         (data) => {
-          this.nrcList = Object.values(data.val()) || []
+          const obj = data.val()
+          if (obj !== null && obj !== undefined) {
+            this.nrcList = Object.values(data.val()) || []
+          } else {
+            this.nrcList = []
+          }
           this.nrcListBeforeFilter = this.nrcList
           this.$store.dispatch('endLoading')
         },
@@ -426,14 +466,6 @@ export default {
         } else {
           this.editedNRC.spareStatus = 'order'
         }
-
-        // let sparesListObj = this.sparesList.reduce((obj, item) => {
-        //   obj[item.id] = item
-        //   obj[item.id].id = null
-        //   return obj
-        // }, {})
-        // console.log(sparesListObj)
-
         let updates = {}
         updates['/nrcs/' + this.checkId + '/' + this.editedNRC.id + '/spareStatus'] = this.editedNRC.spareStatus
         this.sparesList.forEach(element => {
@@ -451,7 +483,24 @@ export default {
       }
       this.closeNRCSpares()
     },
-    showLog(item) {},
+    showLog(item) {
+      this.logLoading = true
+      firebase.database().ref('nrcLogs/' + this.checkId).orderByChild('nrcId').equalTo(item.id).once('value').then(
+        (data) => {
+          let obj = data.val()
+          // console.log(obj)
+          for (let key in obj) {
+            this.nrcLogs.push(obj[key])
+          }
+          this.logLoading = false
+        },
+        (error) => {
+          console.log(error)
+          this.logLoading = false
+        }
+      )
+      this.dialogLog = true
+    },
     showTAR(item) {},
     orderSpare(item) {
       this.editedNRC = Object.assign({}, item)
@@ -537,9 +586,9 @@ export default {
       let exportedNRCList = []
       this.nrcList.forEach((element) => {
         let item = {
-          nrc: element.number,
-          description: element.content,
-          reference: element.ref
+          NRC: element.number,
+          DESCRIPTION: element.content,
+          REF: element.ref
         }
         exportedNRCList.push(item)
       })

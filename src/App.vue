@@ -252,11 +252,6 @@
           <v-card-text>
             <v-layout row wrap align-baseline>
               <v-flex xs12>
-                Task Number: {{ newTaskKey }}
-              </v-flex>
-            </v-layout>
-            <v-layout row wrap align-baseline>
-              <v-flex xs12>
                 <v-text-field label="WP Item (Ex: VN 00273556-12)" mask="VN ########-###" v-model="newTask.wpItem" @change="validateExist(newTask.wpItem)"></v-text-field>
               </v-flex>
               <v-flex xs12>
@@ -345,7 +340,6 @@ export default {
       newNRC: {},
       newOrder: {},
       newTask: {},
-      newTaskKey: null,
       orderNRC: {},
       zoneSelection: this.constUtil.zoneSelection,
       prioritySelection: this.constUtil.prioritySelection,
@@ -544,11 +538,13 @@ export default {
           }
         )
       }
-      if (item === 'task' && this.newTaskKey !== null) {
+      if (item === 'task') {
         let wpItem = this.newTask.wpItem.substring(0, 10) + '-' + this.newTask.wpItem.substring(10)
         let saveTask = Object.assign({}, this.newTask, { wpItem: wpItem })
+        let newTaskKey = firebase.database().ref('workpacks/' + this.checkId).push().key
+        saveTask.id = newTaskKey
         // console.log(saveTask)
-        firebase.database().ref('workpacks/' + this.checkId + '/' + this.newTaskKey).set(saveTask).then(
+        firebase.database().ref('workpacks/' + this.checkId + '/' + newTaskKey).update(saveTask).then(
           (data) => {
             this.openSnackbar('Success', 'success')
             this.newTask = Object.assign({}, this.defaultTask)
@@ -567,6 +563,7 @@ export default {
       }
       if (item === 'order') {
         this.save(item)
+        this.orderNRC = {}
         this.close('order')
       }
       if (item === 'task') {
@@ -593,7 +590,12 @@ export default {
       // console.log(this.checkId)
       firebase.database().ref('nrcs/' + this.checkId).on('value',
         (data) => {
-          this.nrcList = Object.values(data.val()) || []
+          const obj = data.val()
+          if (obj !== null && obj !== undefined) {
+            this.nrcList = Object.values(data.val()) || []
+          } else {
+            this.nrcList = []
+          }
           this.defaultNRC.number = this.nrcList.length + 1
           // console.log(this.nrcList)
         },
@@ -604,17 +606,6 @@ export default {
     },
     loadInitData() {
       this.loadNRC()
-
-      firebase.database().ref('workpacks/' + this.checkId).orderByKey().limitToLast(1).on('child_added',
-          (data) => {
-            this.newTaskKey = Number.parseInt(data.key) + 1
-            // console.log(this.newTaskKey)
-          },
-          (error) => {
-            console.log(error)
-            this.newTaskKey = null
-          }
-        )
 
       firebase.database().ref('checks/' + this.checkId + '/startDate').on('value',
         (data) => {

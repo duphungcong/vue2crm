@@ -167,7 +167,6 @@ export default {
         // { text: 'REMARK', left: true, value: 'remarks' },
         { text: '', sortable: false, value: '' }
       ],
-      itemIndex: -1,
       defaultItem: {
         amsMH: 0,
         macMH: 0,
@@ -197,8 +196,6 @@ export default {
   },
   methods: {
     editItem(item) {
-      this.itemIndex = this.workpackBeforeFilter.indexOf(item)
-      // console.log(this.itemIndex)
       this.editedItem = Object.assign({}, item)
       this.dialogEditItem = true
     },
@@ -206,29 +203,43 @@ export default {
       this.dialogEditItem = false
       setTimeout(() => {
         this.editedItem = Object.assign({}, this.defaultItem)
-        this.itemIndex = -1
       }, 300)
     },
     saveEditItem() {
-      if (this.itemIndex > -1) {
-        const rootComponent = this.appUtil.getRootComponent(this)
-        let editedProps = {
-          amsMH: this.editedItem.amsMH,
-          macMH: this.editedItem.macMH,
-          men: this.editedItem.men,
-          hour: this.editedItem.hour,
-          zoneDivision: this.editedItem.zoneDivision,
-          remarks: this.editedItem.remarks,
-          taskName: this.editedItem.taskName,
-          taskTitle: this.editedItem.taskTitle,
-          taskType: this.editedItem.taskType,
-          zone: this.editedItem.zone
-        }
-        if (this.editedItem.taskId !== null && this.editedItem.taskId !== undefined) {
-          // console.log('edit')
+      const rootComponent = this.appUtil.getRootComponent(this)
+      let editedProps = {
+        amsMH: this.editedItem.amsMH,
+        macMH: this.editedItem.macMH,
+        men: this.editedItem.men,
+        hour: this.editedItem.hour,
+        zoneDivision: this.editedItem.zoneDivision,
+        remarks: this.editedItem.remarks,
+        taskName: this.editedItem.taskName,
+        taskTitle: this.editedItem.taskTitle,
+        taskType: this.editedItem.taskType,
+        zone: this.editedItem.zone
+      }
+      if (this.editedItem.amsId !== null && this.editedItem.amsId !== undefined) {
+        // console.log('edit')
+        let updates = {}
+        updates['/ams' + this.check.aircraft.type + '/' + this.editedItem.amsId] = editedProps
+        updates['/workpacks/' + this.checkId + '/' + this.editedItem.id] = this.editedItem
+        firebase.database().ref().update(updates).then(
+          (data) => {
+            rootComponent.openSnackbar('Success', 'success')
+          },
+          (error) => {
+            // console.log(error)
+            rootComponent.openSnackbar(error, 'error')
+        })
+      } else {
+        // console.log('new')
+        if (!this.editedItem.taskName.includes('VN ')) {
+          let newAmsTaskKey = firebase.database().ref('ams' + this.check.aircraft.type).push().key
+          this.editedItem.amsId = newAmsTaskKey
           let updates = {}
-          updates['/ams' + this.check.aircraft.type + '/' + this.editedItem.taskId] = editedProps
-          updates['/workpacks/' + this.checkId + '/' + this.itemIndex] = this.editedItem
+          updates['/ams' + this.check.aircraft.type + '/' + newAmsTaskKey] = editedProps
+          updates['/workpacks/' + this.checkId + '/' + this.editedItem.id] = this.editedItem
           firebase.database().ref().update(updates).then(
             (data) => {
               rootComponent.openSnackbar('Success', 'success')
@@ -236,42 +247,23 @@ export default {
             (error) => {
               // console.log(error)
               rootComponent.openSnackbar(error, 'error')
-          })
+            }
+          )
         } else {
-          // console.log('new')
-          if (!this.editedItem.taskName.includes('VN ')) {
-            let newAmsTaskKey = firebase.database().ref('ams' + this.check.aircraft.type).push().key
-            this.editedItem.taskId = newAmsTaskKey
-            let updates = {}
-            updates['/ams' + this.check.aircraft.type + '/' + newAmsTaskKey] = editedProps
-            updates['/workpacks/' + this.checkId + '/' + this.itemIndex] = this.editedItem
-            firebase.database().ref().update(updates).then(
-              (data) => {
-                rootComponent.openSnackbar('Success', 'success')
-              },
-              (error) => {
-                // console.log(error)
-                rootComponent.openSnackbar(error, 'error')
-              }
-            )
-          } else {
-            // console.log('edit wo. no link')
-            firebase.database().ref('/workpacks/' + this.checkId + '/' + this.itemIndex).update(this.editedItem).then(
-              (data) => {
-                rootComponent.openSnackbar('Success', 'success')
-              },
-              (error) => {
-                rootComponent.openSnackbar(error, 'error')
-              }
-            )
-          }
+          // console.log('edit wo. no link')
+          firebase.database().ref('/workpacks/' + this.checkId + '/' + this.editedItem.id).update(this.editedItem).then(
+            (data) => {
+              rootComponent.openSnackbar('Success', 'success')
+            },
+            (error) => {
+              rootComponent.openSnackbar(error, 'error')
+            }
+          )
         }
       }
       this.closeEditItem()
     },
     linkItem(item) {
-      this.itemIndex = this.workpackBeforeFilter.indexOf(item)
-      console.log(this.itemIndex)
       this.editedItem = Object.assign({}, item)
       this.linkedItem = Object.assign({}, item)
       this.dialogLinkItem = true
@@ -281,11 +273,10 @@ export default {
       setTimeout(() => {
         this.editedItem = Object.assign({}, this.defaultItem)
         this.linkedItem = this.editedItem
-        this.itemIndex = -1
       }, 300)
     },
     saveLinkItem() {
-      if (this.itemIndex > -1 && this.linkedItem.name !== undefined) {
+      if (this.linkedItem.name !== undefined) {
         const rootComponent = this.appUtil.getRootComponent(this)
         let editedProps = {
           amsMH: this.linkedItem.amsMH,
@@ -296,8 +287,8 @@ export default {
           remarks: this.linkedItem.remarks
         }
         let updates = {}
-        updates['/eo/' + this.linkedItem.id] = Object.assign({}, editedProps, { name: this.linkedItem.name })
-        updates['/workpacks/' + this.checkId + '/' + this.itemIndex] = Object.assign({}, this.editedItem, editedProps, { taskId: this.linkedItem.id })
+        updates['/eo/' + this.linkedItem.id] = this.linkedItem
+        updates['/workpacks/' + this.checkId + '/' + this.editedItem.id] = Object.assign({}, this.editedItem, editedProps, { amsId: this.linkedItem.id })
         firebase.database().ref().update(updates).then(
           (data) => {
             rootComponent.openSnackbar('Success', 'success')
@@ -346,7 +337,7 @@ export default {
       this.$store.dispatch('beginLoading')
       firebase.database().ref('workpacks/' + this.checkId).on('value',
         (data) => {
-          this.workpackBeforeFilter = data.val()
+          this.workpackBeforeFilter = Object.values(data.val()) || []
           this.workpack = this.workpackBeforeFilter
           this.filterTask(this.selectedZone)
           this.$store.dispatch('endLoading')
@@ -360,12 +351,7 @@ export default {
     loadEO() {
       firebase.database().ref('eo').on('value',
         (data) => {
-          this.eoList = []
-          const obj = data.val()
-          for (let key in obj) {
-            obj[key].id = key
-            this.eoList.push(obj[key])
-          }
+          this.eoList = Object.values(data.val()) || []
         },
         (error) => {
           console.log(error)
@@ -377,7 +363,9 @@ export default {
         return item['name'] === e.target.value
       })
       if (found === undefined) {
+        let newEOKey = firebase.database().ref('eo').push().key
         let newEO = {
+          id: newEOKey,
           name: e.target.value,
           amsMH: 0,
           macMH: 0,
@@ -386,7 +374,7 @@ export default {
           zoneDivision: 'N/A',
           remarks: 'NIL'
         }
-        firebase.database().ref('eo').push(newEO).then(
+        firebase.database().ref('/eo/' + newEOKey).update(newEO).then(
           (data) => {},
           (error) => {
             console.log(error)

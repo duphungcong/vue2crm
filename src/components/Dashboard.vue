@@ -96,7 +96,7 @@ export default {
       this.$store.dispatch('beginLoading')
       firebase.database().ref('workpacks/' + this.checkId).on('value',
         (data) => {
-          this.workpack = data.val()
+          this.workpack = Object.values(data.val()) || []
           let scanWorkpack = {
             done: 0,
             inProgress: 0,
@@ -138,7 +138,12 @@ export default {
       this.$store.dispatch('beginLoading')
       firebase.database().ref('nrcs/' + this.checkId).on('value',
         (data) => {
-          this.nrcList = Object.values(data.val()) || []
+          const obj = data.val()
+          if (obj !== null && obj !== undefined) {
+            this.nrcList = Object.values(data.val()) || []
+          } else {
+            this.nrcList = []
+          }
           let scanNRCList = {
             done: 0,
             inProgress: 0,

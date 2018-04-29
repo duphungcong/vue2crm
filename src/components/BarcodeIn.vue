@@ -64,7 +64,11 @@
                   <v-text-field label="Remarks" v-model="item.notes"></v-text-field>
                 </v-flex>
                 <v-flex xs1 pl-3>
-                  <v-icon color="red">delete</v-icon>
+                  <v-btn icon @click.native="remove(item)">
+                    <v-tooltip bottom>
+                      <v-icon color="red" slot="activator">delete</v-icon><span>delete</span>
+                    </v-tooltip>
+                  </v-btn>
                   <v-icon color="green" v-if="item.updateSuccess">check</v-icon>
                   <v-icon color="red" v-if="item.updateFail">close</v-icon>
                 </v-flex>
@@ -172,27 +176,22 @@ export default {
                   let log = {
                     nrcId: obj[key].id,
                     status: element.status,
-                    person: 'ppc',
+                    person: 'PPC',
                     time: element.time,
                     action: 'received',
                     notes: element.notes
                   }
-                  firebase.database().ref('nrcs/' + this.checkId + '/' + obj[key].id).update(obj[key]).then(
+                  let updates = {}
+                  let newLogKey = firebase.database().ref('nrcLogs/' + this.checkId).push().key
+                  updates['nrcs/' + this.checkId + '/' + obj[key].id] = obj[key]
+                  updates['nrcLogs/' + this.checkId + '/' + newLogKey] = log
+                  firebase.database().ref().update(updates).then(
                     (data) => {
-                      // console.log('update completed')
                       element.updateSuccess = true
                     },
                     (error) => {
                       console.log(error)
                       element.updateFail = true
-                    }
-                  )
-                  firebase.database().ref('nrcLogs/' + this.checkId).push(log).then(
-                    (data) => {
-                      // console.log('log - take out')
-                    },
-                    (error) => {
-                      console.log(error)
                     }
                   )
                 }
@@ -216,28 +215,24 @@ export default {
                   }
                   obj[key].status = element.status
                   let log = {
+                    taskId: obj[key].id,
                     status: element.status,
-                    person: 'ppc',
+                    person: 'PPC',
                     time: element.time,
                     action: 'received',
                     notes: element.notes
                   }
-                  firebase.database().ref('workpacks/' + this.checkId + '/' + key).update(obj[key]).then(
+                  let updates = {}
+                  let newLogKey = firebase.database().ref('taskLogs/' + this.checkId).push().key
+                  updates['workpacks/' + this.checkId + '/' + key] = obj[key]
+                  updates['taskLogs/' + this.checkId + '/' + newLogKey] = log
+                  firebase.database().ref().update(updates).then(
                     (data) => {
-                      // console.log('update completed')
                       element.updateSuccess = true
                     },
                     (error) => {
                       console.log(error)
                       element.updateFail = true
-                    }
-                  )
-                  firebase.database().ref('taskLogs/' + this.checkId + '/' + key).push(log).then(
-                    (data) => {
-                      // console.log('log - take out')
-                    },
-                    (error) => {
-                      console.log(error)
                     }
                   )
                 }
@@ -253,6 +248,12 @@ export default {
         }
       })
       this.$store.dispatch('endLoading')
+    },
+    remove(item) {
+      let itemIndex = this.scanList.indexOf(item)
+      if (itemIndex > -1) {
+        this.scanList.splice(itemIndex, 1)
+      }
     },
     clear() {
       this.scanList.forEach(element => {
