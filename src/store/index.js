@@ -39,7 +39,15 @@ const actions = {
     firebase.auth().signInWithEmailAndPassword(payload.email, payload.password).then(
       (user) => {
         commit('setLoading', false)
-        commit('setUser', user)
+        firebase.database().ref('users/' + user.uid).on('value',
+          (data) => {
+            let newUser = data.val()
+            commit('setUser', newUser)
+          },
+          (error) => {
+            console.log(error)
+          }
+        )
       },
       (error) => {
         commit('setLoading', false)
@@ -53,7 +61,20 @@ const actions = {
     firebase.auth().createUserWithEmailAndPassword(payload.email, payload.password).then(
       (user) => {
         commit('setLoading', false)
-        commit('setUser', user)
+        const newUser = {
+          id: user.uid,
+          email: user.email,
+          displayName: '',
+          photoUrl: '/assets/img/avatar0.png'
+        }
+        firebase.database().ref('users/' + user.uid).set(newUser).then(
+          (data) => {
+            commit('setUser', newUser)
+          },
+          (error) => {
+            console.log(error)
+          }
+        )
       },
       (error) => {
         commit('setLoading', false)
@@ -62,7 +83,15 @@ const actions = {
     )
   },
   autoSignIn ({commit}, payload) {
-    commit('setUser', payload)
+    firebase.database().ref('users/' + payload.uid).on('value',
+      (data) => {
+        let newUser = data.val()
+        commit('setUser', newUser)
+      },
+      (error) => {
+        console.log(error)
+      }
+    )
   },
   logOut ({commit}) {
     firebase.auth().signOut()

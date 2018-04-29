@@ -29,10 +29,11 @@
         <v-list>
           <v-list-tile avatar tag="div">
             <v-list-tile-avatar>
-              <img src="/assets/img/avatar0.png">
+              <img :src="user.photoUrl">
             </v-list-tile-avatar>
             <v-list-tile-content>
-              <v-list-tile-title>{{ user.email }}</v-list-tile-title>
+              <v-list-tile-title v-if="user.displayName !== ''" >{{ user.displayName }}</v-list-tile-title>
+              <v-list-tile-title v-else>{{ user.email }}</v-list-tile-title>
             </v-list-tile-content>
             <v-menu bottom left offset-y origin="bottom right" transition="v-slide-y-transition">
               <v-btn icon light slot="activator">
