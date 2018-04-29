@@ -41,7 +41,7 @@
               </v-btn>
               <v-list>
                 <v-list-tile v-if="userIsFollowingCheck"  @click="onStopFollowing">Stop following check</v-list-tile>
-                <v-list-tile @click="editUser">Settings</v-list-tile>
+                <v-list-tile @click="editUser">Account</v-list-tile>
                 <v-list-tile @click="onLogOut">Logout</v-list-tile>
               </v-list>
             </v-menu>
@@ -507,9 +507,23 @@ export default {
     },
     save(item) {
       if (item === 'nrc') {
+        let now = Date.now(7)
+        let time = new Date(now)
         let newNRCKey = firebase.database().ref('nrcs/' + this.checkId).push().key
+        let newLogKey = firebase.database().ref('nrcLogs/' + this.checkId).push().key
         this.newNRC.id = newNRCKey
-        firebase.database().ref('nrcs/' + this.checkId + '/' + newNRCKey).update(this.newNRC).then(
+        let log = {
+          nrcId: newNRCKey,
+          status: this.newNRC.status,
+          person: this.user.displayName || this.user.email,
+          time: time.toLocaleString(),
+          action: 'created',
+          notes: ''
+        }
+        let updates = {}
+        updates['nrcs/' + this.checkId + '/' + newNRCKey] = this.newNRC
+        updates['nrcLogs/' + this.checkId + '/' + newLogKey] = log
+        firebase.database().ref().update(updates).then(
           (data) => {
             // console.log(this.nrcList)
             this.openSnackbar('Success', 'success')

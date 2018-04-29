@@ -324,7 +324,7 @@ export default {
         page: 1,
         totalItems: 0,
         rowsPerPage: 10,
-        sortBy: 'number',
+        sortBy: 'reqDate',
         descending: true
       },
       paginationLog: {
