@@ -584,5 +584,3 @@ export default {
     ) !important;
   }
 </style>
-
-
