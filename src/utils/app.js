@@ -14,5 +14,19 @@ export default {
     let finish = new Date(check.finishDate)
     let diff = new Date(finish - start)
     return diff.getUTCDate()
+  },
+  getZoneByTab(selectedTab) {
+    const zoneByTab = (tab) => ({
+      'tab-1': '100-200-800',
+      'tab-2': '300-400',
+      'tab-3': '500-600-700',
+      'tab-4': 'AVI',
+      'tab-5': 'STRUCTURE',
+      'tab-6': 'CABIN',
+      'tab-7': 'CLEANING',
+      'tab-8': 'N/A',
+      'tab-9': 'REMOVED'
+    })[tab]
+    return zoneByTab(selectedTab)
   }
 }

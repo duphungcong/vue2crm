@@ -149,8 +149,8 @@
         <v-card-text>
           <v-layout row wrap>
             <v-flex lg1 md1 sm1 xs1 v-for="shift in check.shifts" :key="shift.number">
-            <v-checkbox :label="shift.number.toString()" v-model="editedItem.shifts" :value="shift.number"></v-checkbox>
-          </v-flex>
+              <v-checkbox :label="shift.number.toString()" v-model="editedItem.shifts" :value="shift.number"></v-checkbox>
+            </v-flex>
           </v-layout>
         </v-card-text>
         <v-card-actions>
@@ -480,18 +480,7 @@ export default {
       )
     },
     showTab() {
-      const zoneByTab = (tab) => ({
-        'tab-1': '100-200-800',
-        'tab-2': '300-400',
-        'tab-3': '500-600-700',
-        'tab-4': 'AVI',
-        'tab-5': 'STRUCTURE',
-        'tab-6': 'CABIN',
-        'tab-7': 'CLEANING',
-        'tab-8': 'N/A',
-        'tab-9': 'REMOVED'
-      })[tab]
-      if (zoneByTab(this.tabs) === 'N/A') {
+      if (this.appUtil.getZoneByTab(this.tabs) === 'N/A') {
         this.workpackByTab = this.workpack.filter(element =>
           element.zoneDivision.indexOf('100-200-800') === -1 &&
           element.zoneDivision.indexOf('300-400') === -1 &&
@@ -504,24 +493,12 @@ export default {
         this.workpackByTabBeforeFilter = this.workpackByTab
         return
       } else {
-        this.workpackByTab = this.workpack.filter(task => task.zoneDivision.indexOf(zoneByTab(this.tabs)) === 0)
+        this.workpackByTab = this.workpack.filter(task => task.zoneDivision.indexOf(this.appUtil.getZoneByTab(this.tabs)) === 0)
         this.workpackByTabBeforeFilter = this.workpackByTab
         this.$store.dispatch('endLoading')
       }
     },
     exportTask() {
-      const zoneByTab = (tab) => ({
-        'tab-1': '100-200-800',
-        'tab-2': '300-400',
-        'tab-3': '500-600-700',
-        'tab-4': 'AVI',
-        'tab-5': 'STRUCTURE',
-        'tab-6': 'CABIN',
-        'tab-7': 'CLEANING',
-        'tab-8': 'N/A',
-        'tab-9': 'REMOVED'
-      })[tab]
-
       let exportedWorkpack = []
       this.workpackByTab.forEach((element) => {
         let item = {
@@ -540,7 +517,7 @@ export default {
       let workbook = XLSX.utils.book_new()
       XLSX.utils.book_append_sheet(workbook, worksheet, 'ZD')
       // // console.log(workbook)
-      XLSX.writeFile(workbook, 'BSF40 - ' + zoneByTab(this.tabs) + '.xlsx')
+      XLSX.writeFile(workbook, 'BSF40 - ' + this.appUtil.getZoneByTab(this.tabs) + '.xlsx')
     }
   },
   mounted() {

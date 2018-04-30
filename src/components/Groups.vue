@@ -23,10 +23,10 @@
           <v-card-actions>
             <v-layout row>
               <v-flex xs3>
-                <v-select label="Select group" :items="groups" item-text="name"></v-select>
+                <v-select label="Select group" :items="groupListByTab" item-text="name" v-model="selectedGroup"></v-select>
               </v-flex>
               <v-flex xs3 pl-2 pt-3>
-                <v-btn icon class="mx-0" @click.native="editGroup()">
+                <v-btn icon class="mx-0" @click.native="editGroup(selectedGroup)">
                   <v-tooltip bottom>
                       <v-icon color="blue" slot="activator">edit</v-icon><span>edit</span>
                   </v-tooltip>
@@ -191,6 +191,40 @@
         </v-card>
       </v-flex>
     </v-layout>
+    <v-dialog v-model="dialogGroup" max-width="800">
+      <v-card>
+        <v-card-title class="blue darken-1">
+          <h4 class="white--text"><span v-if="editedGroup.id === ''" >New Group</span><span v-else>Edit Group</span></h4>
+        </v-card-title>
+        <v-card-text>
+          <v-layout row wrap align-baseline>
+            <v-flex xs12>
+              <v-select disabled label="Zone" :items="zoneSelection" v-model="editedGroup.zone"></v-select>
+            </v-flex>
+          </v-layout>
+          <v-layout row wrap align-baseline>
+            <v-flex xs12>
+              <v-text-field label="Name" counter="20" v-model="editedGroup.name"></v-text-field>
+            </v-flex>
+            <v-flex xs12>
+              <v-text-field label="Description" v-model="editedGroup.description"></v-text-field>
+            </v-flex>
+          </v-layout>
+          <v-layout row wrap align-baseline>
+            <v-flex xs12>Select shifts</v-flex>
+            <v-flex lg1 md1 sm2 xs6 v-for="shift in check.shifts" :key="shift.number">
+              <v-checkbox :label="shift.number.toString()" v-model="editedGroup.shifts" :value="shift.number"></v-checkbox>
+            </v-flex>
+          </v-layout>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="blue" flat @click.native="closeGroup()">Cancel</v-btn>
+          <v-btn color="blue" flat @click.native="saveGroup()">Save</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <loading-progress></loading-progress>
   </v-container>
 </template>
 
@@ -214,6 +248,9 @@ export default {
       search: '',
       selected: [],
       unSelected: [],
+      zoneSelection: this.constUtil.zoneSelection,
+      dialogGroup: false,
+      selectedGroup: null,
       headers: [
         {
           text: 'Dessert (100g serving)',
@@ -242,28 +279,16 @@ export default {
         rowsPerPage: 10,
         sortBy: 'zoneDivision'
       },
-      groups: [
-        { name: 'Dool 1L' },
-        { name: 'Dool 2L' },
-        { name: 'Dool 3L' },
-        { name: 'Dool 4L' },
-        { name: 'Aft cargo' },
-        { name: 'Dool 1R' },
-        { name: 'Dool 2R' },
-        { name: 'Dool 3R' },
-        { name: 'Dool 4R' },
-        { name: 'Fwd cargo' },
-        { name: 'Dool 1L' },
-        { name: 'Dool 2L' },
-        { name: 'Dool 3L' },
-        { name: 'Dool 4L' },
-        { name: 'Aft cargo' },
-        { name: 'Dool 1R' },
-        { name: 'Dool 2R' },
-        { name: 'Dool 3R' },
-        { name: 'Dool 4R' },
-        { name: 'Fwd cargo' }
-      ]
+      editedGroup: {},
+      defaultGroup: {
+        id: '',
+        name: '',
+        description: '',
+        zone: 'N/A',
+        shifts: []
+      },
+      groupList: [],
+      groupListByTab: []
     }
   },
   watch: {
@@ -273,19 +298,37 @@ export default {
     }
   },
   methods: {
+    addGroup() {
+      this.editedGroup = Object.assign({}, this.defaultGroup)
+      this.dialogGroup = true
+    },
+    editGroup(item) {
+      if (item !== null && item !== undefined) {
+        this.editedGroup = Object.assign({}, item)
+        this.dialogGroup = true
+      }
+    },
+    closeGroup() {
+      this.editedGroup = Object.assign({}, this.defaultGroup)
+      this.dialogGroup = false
+    },
+    saveGroup() {
+      const rootComponent = this.appUtil.getRootComponent(this)
+      if (this.editedGroup.id === '') {
+        this.editedGroup.id = firebase.database().ref('groups/' + this.checkId).push().key
+      }
+      firebase.database().ref('groups/' + this.checkId + '/' + this.editedGroup.id).update(this.editedGroup).then(
+        (data) => {
+          rootComponent.openSnackbar('Success', 'success')
+        },
+        (error) => {
+          rootComponent.openSnackbar(error, 'error')
+        }
+      )
+      this.closeGroup()
+    },
     showTab() {
-      const zoneByTab = (tab) => ({
-        'tab-1': '100-200-800',
-        'tab-2': '300-400',
-        'tab-3': '500-600-700',
-        'tab-4': 'AVI',
-        'tab-5': 'STRUCTURE',
-        'tab-6': 'CABIN',
-        'tab-7': 'CLEANING',
-        'tab-8': 'N/A',
-        'tab-9': 'REMOVED'
-      })[tab]
-      if (zoneByTab(this.tabs) === 'N/A') {
+      if (this.appUtil.getZoneByTab(this.tabs) === 'N/A') {
         this.workpackByTab = this.workpack.filter(element =>
           element.zoneDivision.indexOf('100-200-800') === -1 &&
           element.zoneDivision.indexOf('300-400') === -1 &&
@@ -298,8 +341,11 @@ export default {
         this.workpackByTabBeforeFilter = this.workpackByTab
         return
       } else {
-        this.workpackByTab = this.workpack.filter(task => task.zoneDivision.indexOf(zoneByTab(this.tabs)) === 0)
+        this.workpackByTab = this.workpack.filter(task => task.zoneDivision.indexOf(this.appUtil.getZoneByTab(this.tabs)) === 0)
         this.workpackByTabBeforeFilter = this.workpackByTab
+        this.defaultGroup.zone = this.appUtil.getZoneByTab(this.tabs)
+        this.selectedGroup = null
+        this.groupListByTab = this.groupList.filter(element => element.zone.indexOf(this.appUtil.getZoneByTab(this.tabs)) === 0)
         this.$store.dispatch('endLoading')
       }
     },
@@ -321,7 +367,7 @@ export default {
           this.showTab()
           // console.log(this.firstLoad)
           if (!this.firstLoad) {
-            this.filterTask(this.selectedShift, this.selectedStatus, true)
+            // this.filterTask(this.selectedShift, this.selectedStatus, true)
           }
           this.firstLoad = false
           this.$store.dispatch('endLoading')
@@ -331,11 +377,28 @@ export default {
           this.$store.dispatch('endLoading')
         }
       )
+    },
+    loadGroups() {
+      firebase.database().ref('groups/' + this.checkId).on('value',
+        (data) => {
+          const obj = data.val()
+          if (obj !== null && obj !== undefined) {
+            this.groupList = Object.values(data.val()) || []
+            this.groupListByTab = this.groupList.filter(element => element.zone.indexOf(this.appUtil.getZoneByTab(this.tabs)) === 0)
+          } else {
+            this.groupList = []
+          }
+        },
+        (error) => {
+          console.log(error)
+        }
+      )
     }
   },
   mounted() {
     this.checkId = this.$store.getters.following
     this.loadCheck()
+    this.loadGroups()
     this.loadWorkpack()
   }
 }
