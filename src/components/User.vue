@@ -45,6 +45,42 @@
               <v-btn color="blue" flat @click.native="save()">Save</v-btn>
             </v-card-actions>
         </v-card>
+        <br>
+        <v-card>
+          <v-card-title>
+              <h4>Change Password</h4>
+            </v-card-title>
+            <v-card-text>
+              <v-layout row align-baseline>
+                <v-flex xs2>
+                  Current Password
+                </v-flex>
+                <v-flex xs10>
+                  <v-text-field></v-text-field>
+                </v-flex>
+              </v-layout>
+               <v-layout row align-baseline>
+                <v-flex xs2>
+                  New Password
+                </v-flex>
+                <v-flex xs10>
+                  <v-text-field></v-text-field>
+                </v-flex>
+              </v-layout>
+               <v-layout row align-baseline>
+                <v-flex xs2>
+                  Confirm Password
+                </v-flex>
+                <v-flex xs10>
+                  <v-text-field></v-text-field>
+                </v-flex>
+              </v-layout>
+            </v-card-text>
+            <v-card-actions>
+              <v-spacer></v-spacer>
+              <v-btn color="blue" flat>Change</v-btn>
+            </v-card-actions>
+        </v-card>
       </v-flex>
     </v-layout>
   </v-container>

@@ -499,7 +499,8 @@ export default {
           element.zoneDivision.indexOf('AVI') === -1 &&
           element.zoneDivision.indexOf('STRUCTURE') === -1 &&
           element.zoneDivision.indexOf('CAB') === -1 &&
-          element.zoneDivision.indexOf('CLEANING') === -1)
+          element.zoneDivision.indexOf('CLEANING') === -1 &&
+          element.zoneDivision.indexOf('REMOVED') === -1)
         this.workpackByTabBeforeFilter = this.workpackByTab
         return
       } else {

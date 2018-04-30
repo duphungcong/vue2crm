@@ -14,6 +14,7 @@ import BarcodeIn from '@/components/BarcodeIn'
 import BarcodeOut from '@/components/BarcodeOut'
 import NRCs from '@/components/NRCs'
 import Spares from '@/components/Spares'
+import Groups from '@/components/Groups'
 
 import Login from '@/components/Login'
 import SignUp from '@/components/SignUp'
@@ -92,6 +93,12 @@ let router = new Router({
     },
     {
       path: '/barcodeout', component: BarcodeOut, name: 'BarcodeOut', meta: {
+        requireAuth: true,
+        requireFollowing: true
+      }
+    },
+    {
+      path: '/groups', component: Groups, name: 'Groups', meta: {
         requireAuth: true,
         requireFollowing: true
       }
