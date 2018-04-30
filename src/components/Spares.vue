@@ -170,7 +170,7 @@
               >
                 <v-text-field
                   slot="activator"
-                  label="Req date"
+                  label="Est date"
                   v-model="editedSpare.estDate"
                   prepend-icon="event"
                   readonly

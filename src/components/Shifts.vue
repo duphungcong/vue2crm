@@ -13,17 +13,12 @@
         <v-card>
           <v-card-actions>
             <v-layout row wrap align-baseline>
-              <!-- <v-flex xs4>
-                <v-select :items="check.shifts" label="Select shift" item-text="number" item-value="number" v-model="selectedShiftNumber"></v-select>
-              </v-flex>
-              <v-flex xs1></v-flex> -->
               <v-flex xs2>
-                <v-text-field :rules="[rules.moreThan]" label="Number of shifts" type="number" v-model="numberOfShifts"></v-text-field>
+                <v-text-field :rules="[rules.min]" label="Number of shifts" type="number" v-model="numberOfShifts"></v-text-field>
               </v-flex>
-              <!-- <v-btn :disabled="hasError" @click.native="updateShiftNumber" class="blue white--text">Update</v-btn> -->
               <v-flex xs12>
                 <v-layout row wrap>
-                  <v-flex xs1 v-for="shift in check.shifts" :key="shift.number">
+                  <v-flex xs6 sm4 md2 lg2 xl1 v-for="shift in check.shifts" :key="shift.number">
                     <shift
                       :date="dateOfShift(shift.number)"
                       :current="isCurrentShift(shift.number)"
@@ -55,11 +50,9 @@ export default {
       },
       minShift: 0,
       numberOfShifts: null,
-      // selectedShift: {},
-      // selectedShiftNumber: null
       hasError: false,
       rules: {
-        moreThan: (value) => {
+        min: (value) => {
           if (value >= this.minShift) {
             this.hasError = false
             return true
