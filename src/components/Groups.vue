@@ -280,7 +280,8 @@ export default {
         shifts: []
       },
       groupList: [],
-      groupListByTab: []
+      groupListByTab: [],
+      moveTaskMode: true
     }
   },
   watch: {
@@ -329,8 +330,12 @@ export default {
         let updates = {}
         this.selectedTasks.forEach((element) => {
           element.groupId = this.selectedGroup.id
-          let duplicateShifts = element.shifts.concat(this.selectedGroup.shifts)
-          element.shifts = [...(new Set(duplicateShifts))]
+          // Merge group shifts with task shifts
+          // let duplicateShifts = element.shifts.concat(this.selectedGroup.shifts)
+          // element.shifts = [...(new Set(duplicateShifts))]
+
+          // Apply group shifts to task shifts
+          element.shifts = Object.assign([], this.editedGroup.shifts)
           updates['workpacks/' + this.checkId + '/' + element.id] = element
         })
         // console.log(this.selectedTasks)
@@ -368,9 +373,11 @@ export default {
       if (this.editedGroup.id === '') {
         this.editedGroup.id = firebase.database().ref('groups/' + this.checkId).push().key
       }
+      this.selectedGroup = this.editedGroup
       updates['groups/' + this.checkId + '/' + this.editedGroup.id] = this.editedGroup
-      if (this.oldShifts !== this.editedGroup.shifts) {
+      if (!this.appUtil.compareNumericArray(this.oldShifts, this.editedGroup.shifts)) {
         this.workpackByGroup.forEach(element => {
+          // console.log('change shifts')
           element.shifts = Object.assign([], this.editedGroup.shifts)
           updates['workpacks/' + this.checkId + '/' + element.id] = element
         })
@@ -404,7 +411,7 @@ export default {
         this.workpackByTab = this.workpackByTabBeforeFilter.filter(element => element.groupId === null || element.groupId === undefined)
       }
       this.defaultGroup.zoneDivision = this.appUtil.getZoneByTab(this.tabs)
-        this.groupListByTab = this.groupList.filter(element => element.zoneDivision.indexOf(this.appUtil.getZoneByTab(this.tabs)) === 0)
+      this.groupListByTab = this.groupList.filter(element => element.zoneDivision.indexOf(this.appUtil.getZoneByTab(this.tabs)) === 0)
       if (this.selectedGroup !== null && this.groupListByTab.indexOf(this.selectedGroup) === -1) {
         this.selectedGroup = null
       }
@@ -450,6 +457,9 @@ export default {
           if (obj !== null && obj !== undefined) {
             this.groupList = Object.values(data.val()) || []
             this.groupListByTab = this.groupList.filter(element => element.zoneDivision.indexOf(this.appUtil.getZoneByTab(this.tabs)) === 0)
+            if (this.selectedGroup !== null && this.selectedGroup !== undefined) {
+              this.selectedGroup = this.groupListByTab.filter(element => element.id === this.selectedGroup.id).pop()
+            }
           } else {
             this.groupList = []
           }
