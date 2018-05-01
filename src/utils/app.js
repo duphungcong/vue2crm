@@ -28,5 +28,15 @@ export default {
       'tab-9': 'REMOVED'
     })[tab]
     return zoneByTab(selectedTab)
+  },
+  compareNumericArray(arr1, arr2) {
+    let duplicateArr = arr1.concat(arr2)
+    let uniqueArr = [...(new Set(duplicateArr))]
+    if (uniqueArr.length !== arr1.length) { // arr1 = [1,2,3], arr2 = [2,4] => false
+      return false
+    } else if (arr1.length > arr2.length) { // arr1 = [1,2,3], arr2 = [2,3] => false
+      return false
+    }
+    return true // arr1 = [1,2,3], arr2 = [2,3,1] => true
   }
 }

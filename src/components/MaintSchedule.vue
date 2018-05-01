@@ -30,6 +30,13 @@
             <v-btn class="primary" @click.native="save()" :disabled="!readingIsCompleted || aircraftType == null">Save</v-btn>
           </v-card-actions>
         </v-card>
+        <br>
+        <v-card>
+          <v-card-title><h3>Delete AMS</h3></v-card-title>
+          <v-layout row justify-center>
+            <v-btn class="error" @click.native="remove()" :disabled="aircraftType == null">Delete</v-btn>
+          </v-layout>
+        </v-card>
       </v-flex>
       <loading-progress></loading-progress>
     </v-layout>
@@ -64,7 +71,9 @@ export default {
       this.count = 0
       this.$store.dispatch('beginLoading')
       for (let key in maintSchedule) {
-        firebase.database().ref(this.aircraftType).push(maintSchedule[key]).then(
+        let newAMSKey = firebase.database().ref(this.aircraftType).push().key
+        maintSchedule[key].id = newAMSKey
+        firebase.database().ref(this.aircraftType + '/' + newAMSKey).update(maintSchedule[key]).then(
           (data) => {
             this.count++
             if (this.count === this.numberTaskCard) {
@@ -90,6 +99,16 @@ export default {
       if (files && files[0]) {
         this.readFile(files[0])
       }
+    },
+    remove() {
+      let removes = {}
+      removes[this.aircraftType] = null
+      firebase.database().ref().update(removes).then(
+        (data) => {},
+        (error) => {
+          console.log(error)
+        }
+      )
     },
     readFile(file) {
       const reader = new FileReader()
