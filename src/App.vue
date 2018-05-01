@@ -318,7 +318,7 @@ export default {
       followingItems: [
         { icon: 'contacts', text: 'Dashboard', link: 'Dashboard', vertical: 'Dashboard' },
         { icon: 'assignment', text: 'Shifts', link: 'Shifts', vertical: 'Shifts' },
-        // { icon: 'assignment', text: 'Group Tasks', link: 'Groups', vertical: 'Groups' },
+        { icon: 'assignment', text: 'Group Tasks', link: 'Groups', vertical: 'Groups' },
         { icon: 'assignment', text: 'Tasks', link: 'Tasks', vertical: 'Tasks' },
         { icon: 'assignment', text: 'NRCs', link: 'NRCs', vertical: 'NRCs' },
         { icon: 'assignment', text: 'Spares', link: 'Spares', vertical: 'Spares' },
