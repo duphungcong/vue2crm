@@ -122,6 +122,9 @@
                   <v-icon dark>arrow_forward</v-icon>
                 </v-btn>
               </v-layout>
+              <v-layout justify-center>
+                <v-btn class="blue white--text" @click.native="deSelect()">RESET SELECT</v-btn>
+              </v-layout>
             </v-flex>
 
             <v-flex xs6 class="border-workpack">
@@ -252,19 +255,6 @@ export default {
       zoneSelection: this.constUtil.zoneSelection,
       dialogGroup: false,
       selectedGroup: null,
-      headers: [
-        {
-          text: 'Dessert (100g serving)',
-          align: 'left',
-          sortable: false,
-          value: 'name'
-        },
-        { text: 'Calories', value: 'calories' },
-        { text: 'Fat (g)', value: 'fat' },
-        { text: 'Carbs (g)', value: 'carbs' },
-        { text: 'Protein (g)', value: 'protein' },
-        { text: 'Iron (%)', value: 'iron' }
-      ],
       headerTask: [
         { text: 'TITLE', left: true, value: 'taskTitle' },
         // { text: 'STATUS', left: true, value: 'status' },
@@ -281,6 +271,7 @@ export default {
         sortBy: 'zoneDivision'
       },
       editedGroup: {},
+      oldShifts: [],
       defaultGroup: {
         id: '',
         name: '',
@@ -303,45 +294,57 @@ export default {
       } else {
         this.workpackByGroup = []
       }
-      this.unSelectedTasks = []
+      this.deSelect()
     }
   },
   methods: {
+    deSelect() {
+      this.selectedTasks = []
+      this.unSelectedTasks = []
+    },
     moveToWorkpack() {
       const rootComponent = this.appUtil.getRootComponent(this)
-      let updates = {}
-      this.unSelectedTasks.forEach((element) => {
-        element.groupId = null
-        updates['workpacks/' + this.checkId + '/' + element.id] = element
-      })
-      // console.log(this.selectedTasks)
-      firebase.database().ref().update(updates).then(
-        (data) => {
-          rootComponent.openSnackbar('Success', 'success')
-        },
-        (error) => {
-          rootComponent.openSnackbar(error, 'error')
-        }
-      )
+      if (this.unSelectedTasks.length > 0) {
+        let updates = {}
+        this.unSelectedTasks.forEach((element) => {
+          element.groupId = null
+          updates['workpacks/' + this.checkId + '/' + element.id] = element
+        })
+        // console.log(this.selectedTasks)
+        firebase.database().ref().update(updates).then(
+          (data) => {
+            rootComponent.openSnackbar('Success', 'success')
+          },
+          (error) => {
+            rootComponent.openSnackbar(error, 'error')
+          }
+        )
+      } else {
+        rootComponent.openSnackbar('No task to move', 'error')
+      }
     },
     moveToGroup() {
       const rootComponent = this.appUtil.getRootComponent(this)
-      let updates = {}
-      this.selectedTasks.forEach((element) => {
-        element.groupId = this.selectedGroup.id
-        let duplicateShifts = element.shifts.concat(this.selectedGroup.shifts)
-        element.shifts = [...(new Set(duplicateShifts))]
-        updates['workpacks/' + this.checkId + '/' + element.id] = element
-      })
-      // console.log(this.selectedTasks)
-      firebase.database().ref().update(updates).then(
-        (data) => {
-          rootComponent.openSnackbar('Success', 'success')
-        },
-        (error) => {
-          rootComponent.openSnackbar(error, 'error')
-        }
-      )
+      if (this.selectedTasks.length > 0) {
+        let updates = {}
+        this.selectedTasks.forEach((element) => {
+          element.groupId = this.selectedGroup.id
+          let duplicateShifts = element.shifts.concat(this.selectedGroup.shifts)
+          element.shifts = [...(new Set(duplicateShifts))]
+          updates['workpacks/' + this.checkId + '/' + element.id] = element
+        })
+        // console.log(this.selectedTasks)
+        firebase.database().ref().update(updates).then(
+          (data) => {
+            rootComponent.openSnackbar('Success', 'success')
+          },
+          (error) => {
+            rootComponent.openSnackbar(error, 'error')
+          }
+        )
+      } else {
+        rootComponent.openSnackbar('No task to move', 'error')
+      }
     },
     addGroup() {
       this.editedGroup = Object.assign({}, this.defaultGroup)
@@ -350,19 +353,29 @@ export default {
     editGroup(item) {
       if (item !== null && item !== undefined) {
         this.editedGroup = Object.assign({}, item)
+        this.oldShifts = Object.assign([], this.editedGroup.shifts)
         this.dialogGroup = true
       }
     },
     closeGroup() {
       this.editedGroup = Object.assign({}, this.defaultGroup)
       this.dialogGroup = false
+      this.oldShifts = []
     },
     saveGroup() {
       const rootComponent = this.appUtil.getRootComponent(this)
+      let updates = {}
       if (this.editedGroup.id === '') {
         this.editedGroup.id = firebase.database().ref('groups/' + this.checkId).push().key
       }
-      firebase.database().ref('groups/' + this.checkId + '/' + this.editedGroup.id).update(this.editedGroup).then(
+      updates['groups/' + this.checkId + '/' + this.editedGroup.id] = this.editedGroup
+      if (this.oldShifts !== this.editedGroup.shifts) {
+        this.workpackByGroup.forEach(element => {
+          element.shifts = Object.assign([], this.editedGroup.shifts)
+          updates['workpacks/' + this.checkId + '/' + element.id] = element
+        })
+      }
+      firebase.database().ref().update(updates).then(
         (data) => {
           rootComponent.openSnackbar('Success', 'success')
         },
@@ -384,23 +397,22 @@ export default {
           element.zoneDivision.indexOf('CLEANING') === -1 &&
           element.zoneDivision.indexOf('REMOVED') === -1)
         this.workpackByTab = this.workpackByTabBeforeFilter
-        return
       } else {
         // this.workpackByTab = this.workpack.filter(task => task.zoneDivision.indexOf(this.appUtil.getZoneByTab(this.tabs)) === 0)
         // this.workpackByTabBeforeFilter = this.workpackByTab
         this.workpackByTabBeforeFilter = this.workpack.filter(element => element.zoneDivision.indexOf(this.appUtil.getZoneByTab(this.tabs)) === 0)
         this.workpackByTab = this.workpackByTabBeforeFilter.filter(element => element.groupId === null || element.groupId === undefined)
-        this.defaultGroup.zoneDivision = this.appUtil.getZoneByTab(this.tabs)
-        this.groupListByTab = this.groupList.filter(element => element.zoneDivision.indexOf(this.appUtil.getZoneByTab(this.tabs)) === 0)
-        if (this.selectedGroup !== null && this.groupListByTab.indexOf(this.selectedGroup) === -1) {
-          this.selectedGroup = null
-        }
-        if (this.selectedGroup !== null && this.selectedGroup !== undefined) {
-          this.workpackByGroup = this.workpackByTabBeforeFilter.filter(element => element.groupId === this.selectedGroup.id)
-        }
-        this.unSelectedTasks = []
-        this.$store.dispatch('endLoading')
       }
+      this.defaultGroup.zoneDivision = this.appUtil.getZoneByTab(this.tabs)
+        this.groupListByTab = this.groupList.filter(element => element.zoneDivision.indexOf(this.appUtil.getZoneByTab(this.tabs)) === 0)
+      if (this.selectedGroup !== null && this.groupListByTab.indexOf(this.selectedGroup) === -1) {
+        this.selectedGroup = null
+      }
+      if (this.selectedGroup !== null && this.selectedGroup !== undefined) {
+        this.workpackByGroup = this.workpackByTabBeforeFilter.filter(element => element.groupId === this.selectedGroup.id)
+      }
+      this.deSelect()
+      this.$store.dispatch('endLoading')
     },
     loadCheck() {
       firebase.database().ref('checks').child(this.checkId).on('value',
