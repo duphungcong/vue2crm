@@ -199,7 +199,7 @@
         <v-card-text>
           <v-layout row wrap align-baseline>
             <v-flex xs12>
-              <v-select disabled label="Zone" :items="zoneSelection" v-model="editedGroup.zone"></v-select>
+              <v-select disabled label="Zone" :items="zoneSelection" v-model="editedGroup.zoneDivision"></v-select>
             </v-flex>
           </v-layout>
           <v-layout row wrap align-baseline>
@@ -374,7 +374,7 @@ export default {
     },
     showTab() {
       if (this.appUtil.getZoneByTab(this.tabs) === 'N/A') {
-        this.workpackByTab = this.workpack.filter(element =>
+        this.workpackByTabBeforeFilter = this.workpack.filter(element =>
           element.zoneDivision.indexOf('100-200-800') === -1 &&
           element.zoneDivision.indexOf('300-400') === -1 &&
           element.zoneDivision.indexOf('500-600-700') === -1 &&
@@ -383,16 +383,16 @@ export default {
           element.zoneDivision.indexOf('CAB') === -1 &&
           element.zoneDivision.indexOf('CLEANING') === -1 &&
           element.zoneDivision.indexOf('REMOVED') === -1)
-        this.workpackByTabBeforeFilter = this.workpackByTab
+        this.workpackByTab = this.workpackByTabBeforeFilter
         return
       } else {
         // this.workpackByTab = this.workpack.filter(task => task.zoneDivision.indexOf(this.appUtil.getZoneByTab(this.tabs)) === 0)
         // this.workpackByTabBeforeFilter = this.workpackByTab
         this.workpackByTabBeforeFilter = this.workpack.filter(element => element.zoneDivision.indexOf(this.appUtil.getZoneByTab(this.tabs)) === 0)
         this.workpackByTab = this.workpackByTabBeforeFilter.filter(element => element.groupId === null || element.groupId === undefined)
-        this.defaultGroup.zone = this.appUtil.getZoneByTab(this.tabs)
-        this.groupListByTab = this.groupList.filter(element => element.zone.indexOf(this.appUtil.getZoneByTab(this.tabs)) === 0)
-        if (this.groupListByTab.indexOf(this.selectedGroup) === -1) {
+        this.defaultGroup.zoneDivision = this.appUtil.getZoneByTab(this.tabs)
+        this.groupListByTab = this.groupList.filter(element => element.zoneDivision.indexOf(this.appUtil.getZoneByTab(this.tabs)) === 0)
+        if (this.selectedGroup !== null && this.groupListByTab.indexOf(this.selectedGroup) === -1) {
           this.selectedGroup = null
         }
         if (this.selectedGroup !== null && this.selectedGroup !== undefined) {
@@ -437,7 +437,7 @@ export default {
           const obj = data.val()
           if (obj !== null && obj !== undefined) {
             this.groupList = Object.values(data.val()) || []
-            this.groupListByTab = this.groupList.filter(element => element.zone.indexOf(this.appUtil.getZoneByTab(this.tabs)) === 0)
+            this.groupListByTab = this.groupList.filter(element => element.zoneDivision.indexOf(this.appUtil.getZoneByTab(this.tabs)) === 0)
           } else {
             this.groupList = []
           }
