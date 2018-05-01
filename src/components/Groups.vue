@@ -50,12 +50,12 @@
               <v-data-table
               light
                 :headers="headerTask"
-                :items="selected"
+                :items="workpackByGroup"
                 :pagination.sync="paginationTask"
                 :search="search"
                 item-key="wpItem"
                 select-all
-                v-model="unSelected">
+                v-model="unSelectedTasks">
                 <template slot="items" slot-scope="props">
                   <td>
                     <v-checkbox
@@ -113,12 +113,12 @@
 
             <v-flex xs1>
               <v-layout justify-center>
-                <v-btn class="blue white--text">
+                <v-btn :disabled="selectedGroup === null" class="blue white--text" @click.native="moveToGroup()">
                   <v-icon dark>arrow_back</v-icon>
                 </v-btn>
               </v-layout>
               <v-layout justify-center>
-                <v-btn class="blue white--text">
+                <v-btn :disabled="selectedGroup === null" class="blue white--text" @click.native="moveToWorkpack()">
                   <v-icon dark>arrow_forward</v-icon>
                 </v-btn>
               </v-layout>
@@ -132,7 +132,7 @@
                 :search="search"
                 item-key="wpItem"
                 select-all
-                v-model="selected">
+                v-model="selectedTasks">
                 <template slot="items" slot-scope="props">
                   <td>
                     <v-checkbox
@@ -244,10 +244,11 @@ export default {
       workpack: [],
       workpackByTab: [],
       workpackByTabBeforeFilter: [],
+      workpackByGroup: [],
       tabs: 'tab-1',
       search: '',
-      selected: [],
-      unSelected: [],
+      selectedTasks: [],
+      unSelectedTasks: [],
       zoneSelection: this.constUtil.zoneSelection,
       dialogGroup: false,
       selectedGroup: null,
@@ -295,9 +296,53 @@ export default {
     tabs (newValue, oldValue) {
       this.showTab()
       this.search = ''
+    },
+    selectedGroup(newValue, oldValue) {
+      if (newValue !== null && newValue !== undefined) {
+        this.workpackByGroup = this.workpackByTabBeforeFilter.filter(element => element.groupId === newValue.id)
+      } else {
+        this.workpackByGroup = []
+      }
+      this.unSelectedTasks = []
     }
   },
   methods: {
+    moveToWorkpack() {
+      const rootComponent = this.appUtil.getRootComponent(this)
+      let updates = {}
+      this.unSelectedTasks.forEach((element) => {
+        element.groupId = null
+        updates['workpacks/' + this.checkId + '/' + element.id] = element
+      })
+      // console.log(this.selectedTasks)
+      firebase.database().ref().update(updates).then(
+        (data) => {
+          rootComponent.openSnackbar('Success', 'success')
+        },
+        (error) => {
+          rootComponent.openSnackbar(error, 'error')
+        }
+      )
+    },
+    moveToGroup() {
+      const rootComponent = this.appUtil.getRootComponent(this)
+      let updates = {}
+      this.selectedTasks.forEach((element) => {
+        element.groupId = this.selectedGroup.id
+        let duplicateShifts = element.shifts.concat(this.selectedGroup.shifts)
+        element.shifts = [...(new Set(duplicateShifts))]
+        updates['workpacks/' + this.checkId + '/' + element.id] = element
+      })
+      // console.log(this.selectedTasks)
+      firebase.database().ref().update(updates).then(
+        (data) => {
+          rootComponent.openSnackbar('Success', 'success')
+        },
+        (error) => {
+          rootComponent.openSnackbar(error, 'error')
+        }
+      )
+    },
     addGroup() {
       this.editedGroup = Object.assign({}, this.defaultGroup)
       this.dialogGroup = true
@@ -341,11 +386,19 @@ export default {
         this.workpackByTabBeforeFilter = this.workpackByTab
         return
       } else {
-        this.workpackByTab = this.workpack.filter(task => task.zoneDivision.indexOf(this.appUtil.getZoneByTab(this.tabs)) === 0)
-        this.workpackByTabBeforeFilter = this.workpackByTab
+        // this.workpackByTab = this.workpack.filter(task => task.zoneDivision.indexOf(this.appUtil.getZoneByTab(this.tabs)) === 0)
+        // this.workpackByTabBeforeFilter = this.workpackByTab
+        this.workpackByTabBeforeFilter = this.workpack.filter(element => element.zoneDivision.indexOf(this.appUtil.getZoneByTab(this.tabs)) === 0)
+        this.workpackByTab = this.workpackByTabBeforeFilter.filter(element => element.groupId === null || element.groupId === undefined)
         this.defaultGroup.zone = this.appUtil.getZoneByTab(this.tabs)
-        this.selectedGroup = null
         this.groupListByTab = this.groupList.filter(element => element.zone.indexOf(this.appUtil.getZoneByTab(this.tabs)) === 0)
+        if (this.groupListByTab.indexOf(this.selectedGroup) === -1) {
+          this.selectedGroup = null
+        }
+        if (this.selectedGroup !== null && this.selectedGroup !== undefined) {
+          this.workpackByGroup = this.workpackByTabBeforeFilter.filter(element => element.groupId === this.selectedGroup.id)
+        }
+        this.unSelectedTasks = []
         this.$store.dispatch('endLoading')
       }
     },
