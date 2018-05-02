@@ -247,6 +247,9 @@ export default {
     currentShift () {
       let today = Date.now(7)
       let start = new Date(this.check.startDate)
+      if (today < start) {
+        return 0
+      }
       let diff = new Date(today - start)
       return diff.getUTCDate()
     }
@@ -378,6 +381,9 @@ export default {
       this.closeSelectShift()
     },
     shiftColor(shifts, shiftNumber, taskStatus) {
+      if (this.currentShift === 0) {
+        return 'grey lighten-2'
+      }
       let lastShiftNumber = shifts[shifts.length - 1]
       if (taskStatus === 'done') {
         return 'green'

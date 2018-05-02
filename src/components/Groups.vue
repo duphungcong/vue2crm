@@ -46,7 +46,7 @@
           </v-card-actions>
 
           <v-layout row>
-            <v-flex xs6 class="border-group">
+            <v-flex xs5 class="border-group">
               <v-data-table
               light
                 :headers="headerTask"
@@ -123,7 +123,9 @@
                 </v-btn>
               </v-layout>
               <v-layout justify-center>
-                <v-btn class="blue white--text" @click.native="deSelect()">RESET SELECT</v-btn>
+                <v-btn class="blue white--text" @click.native="deSelect()">
+                  <v-icon dark>loop</v-icon>
+                </v-btn>
               </v-layout>
             </v-flex>
 
@@ -335,7 +337,7 @@ export default {
           // element.shifts = [...(new Set(duplicateShifts))]
 
           // Apply group shifts to task shifts
-          element.shifts = Object.assign([], this.editedGroup.shifts)
+          element.shifts = Object.assign([], this.selectedGroup.shifts)
           updates['workpacks/' + this.checkId + '/' + element.id] = element
         })
         // console.log(this.selectedTasks)
@@ -373,6 +375,9 @@ export default {
       if (this.editedGroup.id === '') {
         this.editedGroup.id = firebase.database().ref('groups/' + this.checkId).push().key
       }
+      this.editedGroup.shifts.sort((a, b) => {
+        return a - b
+      })
       this.selectedGroup = this.editedGroup
       updates['groups/' + this.checkId + '/' + this.editedGroup.id] = this.editedGroup
       if (!this.appUtil.compareNumericArray(this.oldShifts, this.editedGroup.shifts)) {

@@ -18,7 +18,7 @@
               </v-flex>
               <v-flex xs12>
                 <v-layout row wrap>
-                  <v-flex xs6 sm4 md2 lg2 xl1 v-for="shift in check.shifts" :key="shift.number">
+                  <v-flex xs6 sm3 md3 lg2 xl1 v-for="shift in check.shifts" :key="shift.number">
                     <shift
                       :date="dateOfShift(shift.number)"
                       :current="isCurrentShift(shift.number)"
