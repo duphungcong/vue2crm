@@ -114,17 +114,23 @@
             <v-flex xs1>
               <v-layout justify-center>
                 <v-btn :disabled="selectedGroup === null" class="blue white--text" @click.native="moveToGroup()">
-                  <v-icon dark>arrow_back</v-icon>
+                  <v-tooltip bottom>
+                    <v-icon dark slot="activator">arrow_back</v-icon><span>Move to group</span>
+                  </v-tooltip>
                 </v-btn>
               </v-layout>
               <v-layout justify-center>
                 <v-btn :disabled="selectedGroup === null" class="blue white--text" @click.native="moveToWorkpack()">
-                  <v-icon dark>arrow_forward</v-icon>
+                  <v-tooltip bottom>
+                    <v-icon dark slot="activator">arrow_forward</v-icon><span>Back to zone</span>
+                  </v-tooltip>
                 </v-btn>
               </v-layout>
               <v-layout justify-center>
                 <v-btn class="blue white--text" @click.native="deSelect()">
-                  <v-icon dark>loop</v-icon>
+                  <v-tooltip bottom>
+                    <v-icon dark slot="activator">loop</v-icon><span>De-select</span>
+                  </v-tooltip>
                 </v-btn>
               </v-layout>
             </v-flex>
