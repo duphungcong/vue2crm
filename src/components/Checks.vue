@@ -67,10 +67,12 @@ export default {
       pagination: {
         page: 1,
         totalItems: 0,
-        rowsPerPage: 10
+        rowsPerPage: 10,
+        sortBy: 'startDate',
+        descending: true
       },
       headers: [
-        { text: 'Aircraft', left: true, value: 'aircraft' },
+        { text: 'Aircraft', left: true, value: 'aircraft.name' },
         { text: 'Name', left: true, value: 'name' },
         { text: 'From', left: true, value: 'startDate' },
         { text: 'To', left: true, value: 'finishDate' },

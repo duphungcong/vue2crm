@@ -286,6 +286,7 @@ export default {
     },
     moveTask(zone, item) {
       this.editedItem = Object.assign({}, item)
+      this.editedItem.groupId = null
       this.editedItem.zoneDivision = zone + ' from ' + this.editedItem.zoneDivision
       const rootComponent = this.appUtil.getRootComponent(this)
       firebase.database().ref('/workpacks/' + this.checkId + '/' + this.editedItem.id).update(this.editedItem).then(

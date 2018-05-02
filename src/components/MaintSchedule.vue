@@ -34,12 +34,22 @@
         <v-card>
           <v-card-title><h3>Delete AMS</h3></v-card-title>
           <v-layout row justify-center>
-            <v-btn class="error" @click.native="remove()" :disabled="aircraftType == null">Delete</v-btn>
+            <v-btn class="error" @click.native="dialogDelete = true" :disabled="aircraftType == null">Delete</v-btn>
           </v-layout>
         </v-card>
       </v-flex>
-      <loading-progress></loading-progress>
     </v-layout>
+    <v-dialog v-model="dialogDelete" max-width="290">
+      <v-card>
+        <v-card-title>Do you want to delete the {{ aircraftType }}?</v-card-title>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="blue" flat @click.native="dialogDelete = false">No</v-btn>
+          <v-btn color="red" flat @click.native="dialogDelete =  false, remove()">Delete</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <loading-progress></loading-progress>
   </v-container>
 </template>
 
@@ -57,7 +67,8 @@ export default {
       aircraftType: null,
       maintSchedule: [],
       readingIsCompleted: false,
-      count: null
+      count: null,
+      dialogDelete: false
     }
   },
   computed: {
@@ -101,12 +112,16 @@ export default {
       }
     },
     remove() {
+      this.$store.dispatch('beginLoading')
       let removes = {}
       removes[this.aircraftType] = null
       firebase.database().ref().update(removes).then(
-        (data) => {},
+        (data) => {
+          this.$store.dispatch('endLoading')
+        },
         (error) => {
           console.log(error)
+          this.$store.dispatch('endLoading')
         }
       )
     },
