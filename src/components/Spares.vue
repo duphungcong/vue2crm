@@ -323,13 +323,14 @@ export default {
       this.sparesList.forEach((element) => {
         let item = {
           RQF: element.number,
-          NRC: element.nrc,
+          NRC: element.nrcNumber,
           DESCRIPTION: element.description,
           PN: element.pn,
           QTY: element.quantity,
           PRI: element.priority,
           STATUS: element.status,
-          EST_DATE: element.estDate
+          EST_DATE: element.estDate,
+          NOTES: element.notes
         }
         exportedSparesList.push(item)
       })

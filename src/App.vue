@@ -128,7 +128,7 @@
             </v-layout>
             <v-layout row wrap align-baseline>
               <v-flex xs6>
-                <v-select label="Zone" :items="zoneSelection" v-model="newNRC.zone"></v-select>
+                <v-select label="Zone" :items="zoneSelection" v-model="newNRC.zoneDivision"></v-select>
               </v-flex>
               <v-flex xs1></v-flex>
               <v-flex xs5>

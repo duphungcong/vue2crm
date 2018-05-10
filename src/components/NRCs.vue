@@ -39,7 +39,7 @@
             <td class="body-0" @click="props.expanded = !props.expanded">{{ props.item.notes }}</td>
             <td class="body-0" @click="props.expanded = !props.expanded">{{ props.item.content }}</td>
             <td class="body-0" @click="props.expanded = !props.expanded">{{ props.item.ref }}</td>
-            <td class="body-0" @click="props.expanded = !props.expanded">{{ props.item.zone }}</td>
+            <td class="body-0" @click="props.expanded = !props.expanded">{{ props.item.zoneDivision }}</td>
           </template>
           <template slot="expand" slot-scope="props">
             <v-card flat color="blue lighten-5" class="elevation-0">
@@ -95,7 +95,7 @@
           </v-layout>
           <v-layout row wrap align-baseline>
             <v-flex xs6>
-              <v-select label="Zone" :items="zoneSelection" v-model="editedNRC.zone"></v-select>
+              <v-select label="Zone" :items="zoneSelection" v-model="editedNRC.zoneDivision"></v-select>
             </v-flex>
             <v-flex xs1></v-flex>
             <v-flex xs5>
@@ -593,7 +593,12 @@ export default {
         let item = {
           NRC: element.number,
           DESCRIPTION: element.content,
-          REF: element.ref
+          REF: element.ref,
+          PRIORITY: element.priority,
+          ZONE: element.zoneDivisison,
+          STATUS: element.status,
+          SPARES: element.spareStatus,
+          NOTES: element.notes
         }
         exportedNRCList.push(item)
       })
