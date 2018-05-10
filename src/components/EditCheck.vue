@@ -115,10 +115,10 @@
                 <v-text-field type="number" label="HOUR" v-model="linkedItem.hour"></v-text-field>
               </v-flex>
               <v-flex xs12 sm12 md12>
-                <v-text-field label="ZONE DIVISION" v-model="linkedItem.zoneDivision"></v-text-field>
+                <v-text-field multi-line rows="2" label="ZONE DIVISION" v-model="linkedItem.zoneDivision"></v-text-field>
               </v-flex>
               <v-flex xs12 sm12 md12>
-                <v-text-field label="REMARKS" v-model="linkedItem.remarks"></v-text-field>
+                <v-text-field multi-line rows="2" label="REMARKS" v-model="linkedItem.remarks"></v-text-field>
               </v-flex>
             </v-layout>
           </v-container>
@@ -222,7 +222,9 @@ export default {
       if (this.editedItem.amsId !== null && this.editedItem.amsId !== undefined) {
         // console.log('edit')
         let updates = {}
-        updates['/ams' + this.check.aircraft.type + '/' + this.editedItem.amsId] = editedProps
+        if (!this.editedItem.taskName.includes('VN ')) {
+           updates['/ams' + this.check.aircraft.type + '/' + this.editedItem.amsId] = editedProps
+        }
         updates['/workpacks/' + this.checkId + '/' + this.editedItem.id] = this.editedItem
         firebase.database().ref().update(updates).then(
           (data) => {
