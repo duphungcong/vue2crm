@@ -129,7 +129,7 @@
                 <v-text-field multi-line rows="2" label="ZONE DIVISION" v-model="editedItem.zoneDivision"></v-text-field>
               </v-flex>
               <v-flex xs12 sm12 md12>
-                <v-text-field multi-line rows="2" no-resize label="REMARKS" v-model="editedItem.remarks"></v-text-field>
+                <v-text-field multi-line rows="2" no-resize label="NOTES" v-model="editedItem.notes"></v-text-field>
               </v-flex>
             </v-layout>
           </v-container>

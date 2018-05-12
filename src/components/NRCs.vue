@@ -595,7 +595,7 @@ export default {
           DESCRIPTION: element.content,
           REF: element.ref,
           PRIORITY: element.priority,
-          ZONE: element.zoneDivisison,
+          ZONE: element.zoneDivision,
           STATUS: element.status,
           SPARES: element.spareStatus,
           NOTES: element.notes
