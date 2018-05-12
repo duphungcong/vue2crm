@@ -337,7 +337,7 @@ export default {
       headerNRC: [
         { text: 'NRC', left: true, value: 'number' },
         { text: 'PRI', left: true, value: 'priority' },
-        { text: 'INFO', left: true, value: '' },
+        { text: 'SPARE-TAR', left: true, value: '' },
         { text: 'NOTES', left: true, value: 'notes' },
         { text: 'CONTENT', left: true, value: 'content' },
         { text: 'REF', left: true, value: 'ref' },
@@ -549,7 +549,7 @@ export default {
     },
     filterNRC(byZone) {
       function filterByZone(element) {
-        return element.zone.indexOf(byZone) === 0
+        return element.zoneDivision.indexOf(byZone) === 0
       }
 
       if (byZone === null) {

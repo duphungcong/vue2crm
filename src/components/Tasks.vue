@@ -113,6 +113,9 @@
         <v-card-text>
           <v-container grid-list-sm>
             <v-layout wrap>
+              <v-flex xs12 sm12 md12>
+                <v-text-field multi-line rows="3" label="TITLE" v-model="editedItem.taskTitle"></v-text-field>
+              </v-flex>
               <v-flex xs12 sm3 md3>
                 <v-text-field type="number" label="AMS MH" v-model="editedItem.amsMH"></v-text-field>
               </v-flex>

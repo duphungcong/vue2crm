@@ -35,7 +35,7 @@
               <v-menu bottom right>
                 <v-btn icon class="mx-0" slot="activator">
                   <v-tooltip bottom>
-                    <v-icon color="blue" slot="activator">edit</v-icon><span>quick edit</span>
+                    <v-icon color="blue" slot="activator">edit</v-icon><span>status</span>
                   </v-tooltip>
                 </v-btn>
                 <v-list>
@@ -224,7 +224,7 @@ export default {
         { text: 'STATUS', left: true, value: 'status' },
         { text: 'EST DATE', left: true, value: 'estDate' },
         { text: 'NOTES', left: true, value: 'notes' },
-        { text: 'ACTIONS', sortable: false, value: '' }
+        { text: 'QUICK UPDATE', sortable: false, value: '' }
       ],
       editedSpare: {},
       dialogEditSpare: false,
